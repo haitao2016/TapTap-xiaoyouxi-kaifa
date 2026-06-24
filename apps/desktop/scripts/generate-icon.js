@@ -9,59 +9,83 @@ if (!existsSync(assetsDir)) {
 }
 
 if (!existsSync(iconPath)) {
-  const pngHeader = Buffer.from([
-    0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A
-  ]);
-  const icoHeader = Buffer.alloc(22);
-  icoHeader.writeUInt16LE(0, 0);
-  icoHeader.writeUInt16LE(1, 2);
-  icoHeader.writeUInt16LE(1, 4);
-  icoHeader.writeUInt8(32, 6);
-  icoHeader.writeUInt8(32, 7);
-  icoHeader.writeUInt8(0, 8);
-  icoHeader.writeUInt8(0, 9);
-  icoHeader.writeUInt16LE(1, 10);
-  icoHeader.writeUInt16LE(32, 12);
-  icoHeader.writeUInt32LE(0, 14);
-  icoHeader.writeUInt32LE(22, 18);
+  const sizes = [16, 24, 32, 48, 64, 128, 256];
+  const images = [];
 
-  const pixelDataSize = 32 * 32 * 4 + 40;
-  const pixelData = Buffer.alloc(pixelDataSize, 0);
-  pixelData.writeUInt32LE(40, 0);
-  pixelData.writeInt32LE(32, 4);
-  pixelData.writeInt32LE(64, 8);
-  pixelData.writeUInt16LE(1, 12);
-  pixelData.writeUInt16LE(32, 14);
-  pixelData.writeUInt32LE(0, 16);
-  pixelData.writeUInt32LE(32 * 32 * 4, 20);
-  pixelData.writeInt32LE(2835, 24);
-  pixelData.writeInt32LE(2835, 28);
-  pixelData.writeUInt32LE(0, 32);
-  pixelData.writeUInt32LE(0, 36);
+  for (const size of sizes) {
+    const bpp = 32;
+    const rowSize = Math.ceil((size * bpp / 8) / 4) * 4;
+    const pixelDataSize = rowSize * size;
+    const andMaskRowSize = Math.ceil(size / 8 / 4) * 4;
+    const andMaskSize = andMaskRowSize * size;
+    const dibSize = 40 + pixelDataSize + andMaskSize;
 
-  let offset = 40;
-  for (let y = 31; y >= 0; y--) {
-    for (let x = 0; x < 32; x++) {
-      const centerX = 16, centerY = 16, radius = 14;
-      const dist = Math.sqrt((x - centerX) ** 2 + (y - centerY) ** 2);
-      if (dist <= radius) {
-        pixelData[offset++] = 255;
-        pixelData[offset++] = 140;
-        pixelData[offset++] = 0;
-        pixelData[offset++] = 255;
-      } else {
-        pixelData[offset++] = 0;
-        pixelData[offset++] = 0;
-        pixelData[offset++] = 0;
-        pixelData[offset++] = 0;
+    const dib = Buffer.alloc(dibSize, 0);
+    dib.writeUInt32LE(40, 0);
+    dib.writeInt32LE(size, 4);
+    dib.writeInt32LE(size * 2, 8);
+    dib.writeUInt16LE(1, 12);
+    dib.writeUInt16LE(bpp, 14);
+    dib.writeUInt32LE(0, 16);
+    dib.writeUInt32LE(pixelDataSize, 20);
+    dib.writeInt32LE(2835, 24);
+    dib.writeInt32LE(2835, 28);
+    dib.writeUInt32LE(0, 32);
+    dib.writeUInt32LE(0, 36);
+
+    let offset = 40;
+    const center = size / 2;
+    const radius = size * 0.45;
+    for (let y = size - 1; y >= 0; y--) {
+      for (let x = 0; x < size; x++) {
+        const dist = Math.sqrt((x - center + 0.5) ** 2 + (y - center + 0.5) ** 2);
+        if (dist <= radius) {
+          dib[offset++] = 255;
+          dib[offset++] = 140;
+          dib[offset++] = 0;
+          dib[offset++] = 255;
+        } else {
+          dib[offset++] = 0;
+          dib[offset++] = 0;
+          dib[offset++] = 0;
+          dib[offset++] = 0;
+        }
       }
+      offset += rowSize - size * 4;
     }
+
+    images.push({ size, dib, dibSize });
   }
 
-  const andMaskSize = Math.ceil(32 / 32) * 4 * 32;
-  const andMask = Buffer.alloc(andMaskSize, 0);
+  let totalSize = 6 + 16 * images.length;
+  for (const img of images) {
+    totalSize += img.dibSize;
+  }
 
-  const fullIco = Buffer.concat([icoHeader, pixelData, andMask]);
-  writeFileSync(iconPath, fullIco);
-  console.log('Generated placeholder icon: assets/icon.ico');
+  const iconBuffer = Buffer.alloc(totalSize);
+  iconBuffer.writeUInt16LE(0, 0);
+  iconBuffer.writeUInt16LE(1, 2);
+  iconBuffer.writeUInt16LE(images.length, 4);
+
+  let offset = 6;
+  let dataOffset = 6 + 16 * images.length;
+
+  for (const img of images) {
+    const w = img.size >= 256 ? 0 : img.size;
+    const h = img.size >= 256 ? 0 : img.size;
+    iconBuffer.writeUInt8(w, offset);
+    iconBuffer.writeUInt8(h, offset + 1);
+    iconBuffer.writeUInt8(0, offset + 2);
+    iconBuffer.writeUInt8(0, offset + 3);
+    iconBuffer.writeUInt16LE(1, offset + 4);
+    iconBuffer.writeUInt16LE(32, offset + 6);
+    iconBuffer.writeUInt32LE(img.dibSize, offset + 8);
+    iconBuffer.writeUInt32LE(dataOffset, offset + 12);
+    offset += 16;
+    img.dib.copy(iconBuffer, dataOffset);
+    dataOffset += img.dibSize;
+  }
+
+  writeFileSync(iconPath, iconBuffer);
+  console.log('Generated icon with sizes:', sizes.join(', '));
 }
