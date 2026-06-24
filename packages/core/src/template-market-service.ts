@@ -23,7 +23,7 @@ export class TemplateMarketService {
     category?: string;
     framework?: string;
     language?: string;
-    sortBy?: 'downloads' | 'rating' | 'updated';
+    sortBy?: 'downloads' | 'stars' | 'updated';
   }): Promise<ProjectTemplate[]> {
     const templates = templateService.getTemplates({ query, ...filters });
     return templates.map(template => ({

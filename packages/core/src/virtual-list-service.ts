@@ -27,8 +27,8 @@ export class VirtualListService {
   private visibleEndIndex = 0;
   private items = new Map<number, VirtualListItem>();
   
-  private scrollContainer: HTMLElement;
-  private contentElement: HTMLElement;
+  private scrollContainer!: HTMLElement;
+  private contentElement!: HTMLElement;
   
   private rafId?: number;
 

@@ -129,7 +129,7 @@ export class ProjectManager {
     engine?: EngineType;
     description?: string;
     unityVersion?: string;
-  }): FlatProject {
+  }): ProjectMeta {
     const now = new Date().toISOString();
     const tplMeta = DEFAULT_TEMPLATES.find((t) => t.id === options.template);
     const engine: EngineType =
@@ -145,17 +145,13 @@ export class ProjectManager {
       targetPlatform: ['webgl', 'mobile-web', 'pc-web'],
       createdAt: now,
       updatedAt: now,
-      // 引擎与 Unity 版本通过注释形式挂到 description 元数据不污染 FlatProject
       ...(options.unityVersion ? { template: `${options.template ?? 'default'}#${options.unityVersion}` } : {}),
     };
 
-    // 这里通过强制类型让 projects Map 同时承担 FlatProject 存储。
-    // 由于 Map 的 value 类型是结构性的，旧 API 路径会调用 toMeta() 转换。
     this.projects.set(project.id, project);
     this.addRecentProject(project);
-    // 保留 engine 以供 toMeta 使用
     (project as FlatProject & { __engine?: EngineType }).__engine = engine;
-    return project;
+    return this.toMeta(project);
   }
 
   /** 异步打开已有项目 */
@@ -275,7 +271,7 @@ export class ProjectManager {
   }
 
   /** 导入项目（测试期望方法） */
-  async importProject(data: { name: string; path: string }): Promise<FlatProject | null> {
+  async importProject(data: { name: string; path: string }): Promise<ProjectMeta | null> {
     if (!data.name || !data.path) return null;
     return this.createProject({
       name: data.name,

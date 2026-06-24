@@ -101,7 +101,7 @@ export function MonitorPage() {
         />
         <MetricCard
           label="GPU内存"
-          value={metrics ? `${(metrics.gpuMemory / 1024 / 1024).toFixed(0)} MB` : '--'}
+          value={metrics?.gpuMemory ? `${(metrics.gpuMemory / 1024 / 1024).toFixed(0)} MB` : '--'}
           sub="显存使用"
         />
         <MetricCard

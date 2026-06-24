@@ -50,13 +50,13 @@ export class CommandPaletteService {
   }
 
   getCategories(): string[] {
-    const categories = new Set(this.commands.values().map(c => c.category));
+    const categories = new Set(Array.from(this.commands.values()).map((c: Command) => c.category));
     return Array.from(categories).sort();
   }
 
   searchCommands(query: string): CommandMatch[] {
     if (!query.trim()) {
-      return this.commands.values().map(cmd => ({
+      return Array.from(this.commands.values()).map((cmd: Command) => ({
         command: cmd,
         score: 0,
         matches: [],

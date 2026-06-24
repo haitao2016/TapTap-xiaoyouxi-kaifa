@@ -1,5 +1,5 @@
 /** 平台类型 */
-export type Platform = 'pc' | 'mobile' | 'tablet';
+export type Platform = 'pc' | 'mobile' | 'tablet' | 'webgl' | 'android' | 'ios' | 'web';
 
 /** 项目引擎类型 */
 export type EngineType = 'unity' | 'cocos' | 'laya' | 'native-js' | 'custom';

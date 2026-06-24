@@ -44,7 +44,7 @@ interface AppState {
 
   setActiveView: (view: string) => void;
   toggleSidebar: () => void;
-  openProject: (path: string) => void;
+  openProject: (path: string) => Promise<void>;
   createProject: (name: string, path: string, engine: ProjectMeta['config']['engine']) => void;
   closeProject: () => void;
 
@@ -56,7 +56,14 @@ interface AppState {
   stopMonitor: () => void;
   resolveAlert: (id: string) => void;
 
-  startBuild: () => Promise<void>;
+  startBuild: (options?: {
+    platforms?: string[];
+    version?: string;
+    compress?: boolean;
+    wasmSplit?: boolean;
+    optimizeAssets?: boolean;
+    stripDebug?: boolean;
+  }) => Promise<void>;
   cancelBuild: (taskId: string) => void;
 
   openFile: (path: string, content?: string) => void;
@@ -89,8 +96,8 @@ export const useAppStore = create<AppState>((set, get) => ({
   setActiveView: (view) => set({ activeView: view }),
   toggleSidebar: () => set((s) => ({ sidebarOpen: !s.sidebarOpen })),
 
-  openProject: (path) => {
-    const project = projectManager.openProject(path);
+  openProject: async (path) => {
+    const project = await projectManager.openProject(path);
     set({ currentProject: project, activeView: 'editor' });
   },
 
@@ -174,20 +181,29 @@ export const useAppStore = create<AppState>((set, get) => ({
     set({ monitorAlerts: monitorService.getAlerts() });
   },
 
-  startBuild: async () => {
+  startBuild: async (options?: {
+    platforms?: string[];
+    version?: string;
+    compress?: boolean;
+    wasmSplit?: boolean;
+    optimizeAssets?: boolean;
+    stripDebug?: boolean;
+  }) => {
     const project = get().currentProject;
     if (!project) return;
     const task = await buildService.startBuild({
       projectId: project.config.id,
       projectPath: project.path,
       outputPath: project.config.buildPath,
-      compress: true,
-      wasmSplit: true,
+      compress: options?.compress ?? true,
+      wasmSplit: options?.wasmSplit ?? true,
       development: false,
-      targetPlatform: ['pc', 'mobile', 'tablet'],
-      version: '1.0.0',
+      targetPlatform: (options?.platforms?.map((p) => p as any) ?? ['pc', 'mobile', 'tablet']),
+      version: options?.version ?? '1.0.0',
       cdnUrl: project.config.cdnUrl,
       appId: project.config.appId,
+      optimizeAssets: options?.optimizeAssets,
+      stripDebugInfo: options?.stripDebug,
     });
     set({ activeBuildTask: task, buildTasks: buildService.getAllTasks(), activeView: 'build' });
 
