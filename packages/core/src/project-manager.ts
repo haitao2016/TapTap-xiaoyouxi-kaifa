@@ -129,7 +129,7 @@ export class ProjectManager {
     engine?: EngineType;
     description?: string;
     unityVersion?: string;
-  }): ProjectMeta {
+  }): FlatProject {
     const now = new Date().toISOString();
     const tplMeta = DEFAULT_TEMPLATES.find((t) => t.id === options.template);
     const engine: EngineType =
@@ -151,7 +151,7 @@ export class ProjectManager {
     this.projects.set(project.id, project);
     this.addRecentProject(project);
     (project as FlatProject & { __engine?: EngineType }).__engine = engine;
-    return this.toMeta(project);
+    return project;
   }
 
   /** 异步打开已有项目 */

@@ -152,8 +152,7 @@ export class BuildService {
       const history: BuildResult[] = [];
       const dirs = fs.readdirSync(this.historyDir, { withFileTypes: true })
         .filter(d => d.isDirectory())
-        .map(d => d.name)
-        .sort((a, b) => Number(b) - Number(a));
+        .map(d => d.name);
 
       for (const dir of dirs) {
         const filePath = path.join(this.historyDir, dir, 'result.json');
@@ -164,14 +163,12 @@ export class BuildService {
           if (!projectId || result.projectId === projectId) {
             history.push(result);
           }
-          
-          if (history.length >= this.maxHistoryItems) {
-            break;
-          }
         }
       }
       
-      return history;
+      history.sort((a, b) => b.timestamp - a.timestamp);
+      
+      return history.slice(0, this.maxHistoryItems);
     } catch {
       return [];
     }
@@ -668,13 +665,30 @@ export class BuildService {
     try {
       const dirs = fs.readdirSync(this.historyDir, { withFileTypes: true })
         .filter(d => d.isDirectory())
-        .map(d => ({ name: d.name, path: path.join(this.historyDir, d.name) }))
-        .sort((a, b) => Number(b.name) - Number(a.name));
+        .map(d => ({ name: d.name, path: path.join(this.historyDir, d.name) }));
 
-      if (dirs.length > this.maxHistoryItems) {
-        const toDelete = dirs.slice(this.maxHistoryItems);
-        toDelete.forEach(dir => {
-          this.rmdirSync(dir.path);
+      const results: Array<{ dir: string; timestamp: number }> = [];
+      for (const dir of dirs) {
+        const resultPath = path.join(dir.path, 'result.json');
+        if (fs.existsSync(resultPath)) {
+          try {
+            const content = fs.readFileSync(resultPath, 'utf-8');
+            const result = JSON.parse(content) as BuildResult;
+            results.push({ dir: dir.path, timestamp: result.timestamp });
+          } catch {
+            results.push({ dir: dir.path, timestamp: 0 });
+          }
+        } else {
+          results.push({ dir: dir.path, timestamp: 0 });
+        }
+      }
+
+      results.sort((a, b) => b.timestamp - a.timestamp);
+
+      if (results.length > this.maxHistoryItems) {
+        const toDelete = results.slice(this.maxHistoryItems);
+        toDelete.forEach(item => {
+          this.rmdirSync(item.dir);
         });
       }
     } catch {
