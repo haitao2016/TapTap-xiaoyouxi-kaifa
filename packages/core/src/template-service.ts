@@ -63,11 +63,11 @@ export class TemplateService {
     }
 
     if (options?.framework) {
-      result = result.filter(t => t.framework.toLowerCase() === options.framework.toLowerCase());
+      result = result.filter(t => t.framework.toLowerCase() === options.framework!.toLowerCase());
     }
 
     if (options?.language) {
-      result = result.filter(t => t.languages.some(l => l.toLowerCase() === options.language.toLowerCase()));
+      result = result.filter(t => t.languages.some(l => l.toLowerCase() === options.language!.toLowerCase()));
     }
 
     switch (options?.sortBy) {

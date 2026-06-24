@@ -13,6 +13,7 @@ export type DebugClientEvents = {
   onGameConnected: () => void;
   onGameDisconnected: () => void;
   onBreakpointsSync: (breakpoints: Breakpoint[]) => void;
+  onBreakpointHit: (breakpointId: string, vars?: Record<string, unknown>) => void;
   onConnect: () => void;
   onDisconnect: () => void;
   onError: (error: string) => void;
@@ -56,6 +57,10 @@ export class DebugWebSocketClient {
 
   removeBreakpoint(id: string): void {
     this.send({ type: 'breakpoint-remove', payload: { id } });
+  }
+
+  updateBreakpoint(id: string, updates: Partial<Breakpoint>): void {
+    this.send({ type: 'breakpoint-update', payload: { id, updates } });
   }
 
   isConnected(): boolean {
@@ -139,15 +144,19 @@ export class DebugWebSocketClient {
       case 'breakpoint-sync':
         this.events.onBreakpointsSync?.((msg.payload as BreakpointSyncPayload).breakpoints);
         break;
-      case 'breakpoint-hit':
+      case 'breakpoint-hit': {
+        const payload = msg.payload as { breakpointId?: string; vars?: Record<string, unknown> };
+        const breakpointId = payload.breakpointId ?? '';
+        this.events.onBreakpointHit?.(breakpointId, payload.vars);
         this.events.onLog?.({
           id: randomUUID(),
           level: 'warn',
-          message: `断点命中: ${JSON.stringify(msg.payload)}`,
+          message: `断点命中: ${breakpointId}`,
           timestamp: Date.now(),
           source: 'game',
         });
         break;
+      }
     }
   }
 

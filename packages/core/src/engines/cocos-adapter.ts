@@ -126,14 +126,13 @@ export class CocosAdapter {
 
       const result: BuildResult = {
         id: taskId,
+        projectId: config.projectId,
         success: true,
         duration: Date.now() - startTime,
-        outputPath,
         outputFiles,
         errors: [],
         warnings: [],
-        cacheHit: false,
-        timestamp: new Date().toISOString(),
+        timestamp: Date.now(),
       };
       globalEventBus.emit({ type: 'build:complete', payload: result });
       return result;
@@ -142,14 +141,13 @@ export class CocosAdapter {
       emit({ name: '构建失败', status: 'failed', error: message });
       return {
         id: taskId,
+        projectId: config.projectId,
         success: false,
         duration: Date.now() - startTime,
-        outputPath,
         outputFiles: [],
         errors: [message],
         warnings: [],
-        cacheHit: false,
-        timestamp: new Date().toISOString(),
+        timestamp: Date.now(),
       };
     }
   }

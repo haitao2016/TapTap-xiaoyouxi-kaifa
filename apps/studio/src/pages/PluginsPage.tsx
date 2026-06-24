@@ -98,8 +98,8 @@ export function PluginsPage() {
                     </span>
                   ))}
                 </div>
-                {plugin.author && (
-                  <p className="mt-2 text-xs text-text-muted">作者: {plugin.author}</p>
+                {plugin.meta.author && (
+                  <p className="mt-2 text-xs text-text-muted">作者: {plugin.meta.author}</p>
                 )}
               </CardContent>
             </Card>
@@ -308,7 +308,7 @@ export function deactivate() {
                     {pluginDetails.commands.map((cmd) => (
                       <li key={cmd.id} className="flex items-center justify-between rounded bg-surface-2 px-3 py-2 text-sm">
                         <span>{cmd.title}</span>
-                        {cmd.shortcut && <Badge variant="default" size="sm">{cmd.shortcut}</Badge>}
+                        {cmd.shortcut && <Badge variant="default">{cmd.shortcut}</Badge>}
                       </li>
                     ))}
                   </ul>

@@ -7,6 +7,7 @@ export type WSMessageType =
   | 'log'
   | 'breakpoint-add'
   | 'breakpoint-remove'
+  | 'breakpoint-update'
   | 'breakpoint-hit'
   | 'breakpoint-sync'
   | 'command'
@@ -53,6 +54,7 @@ export interface UnityInstallation {
   version: string;
   path: string;
   isHub: boolean;
+  isDefault?: boolean;
 }
 
 /** TapTap SDK 检测结果 */
@@ -60,6 +62,7 @@ export interface TapTapSDKInfo {
   installed: boolean;
   packagePath?: string;
   packageVersion?: string;
+  version?: string;
   hasBuildScript: boolean;
 }
 

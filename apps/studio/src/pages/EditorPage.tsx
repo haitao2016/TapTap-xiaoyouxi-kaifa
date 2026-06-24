@@ -2,9 +2,9 @@ import { useAppStore } from '../store/app-store';
 import { projectManager, snippetService } from '@tapdev/core';
 import { Icon } from '@tapdev/ui';
 import Editor, { useMonaco } from '@monaco-editor/react';
+import * as monaco from 'monaco-editor';
 import type { FileNode, Snippet } from '@tapdev/types';
 import { useState, useEffect, useCallback } from 'react';
-import * as monaco from 'monaco-editor';
 
 export function EditorPage() {
   const {
@@ -24,11 +24,11 @@ export function EditorPage() {
   const [snippetQuery, setSnippetQuery] = useState('');
   const [snippets, setSnippets] = useState<Snippet[]>([]);
 
-  const monaco = useMonaco();
+  const monacoInstance = useMonaco();
 
   useEffect(() => {
-    if (monaco) {
-      monaco.editor.defineTheme('tapdev-dark', {
+    if (monacoInstance) {
+      monacoInstance.editor.defineTheme('tapdev-dark', {
         base: 'vs-dark',
         inherit: true,
         rules: [],
@@ -47,10 +47,10 @@ export function EditorPage() {
         },
       });
     }
-  }, [monaco]);
+  }, [monacoInstance]);
 
   const handleEditorMount = useCallback((editor: monaco.editor.IStandaloneCodeEditor) => {
-    editor.onDidChangeCursorSelection((event) => {
+    editor.onDidChangeCursorSelection((event: monaco.editor.ICursorSelectionChangedEvent) => {
       const selections = editor.getSelections();
       setCursorCount(selections?.length || 1);
     });
@@ -61,22 +61,23 @@ export function EditorPage() {
       if (model && selection) {
         const word = model.getWordAtPosition(selection.getStartPosition());
         if (word) {
-          const range = new monaco.Range(
-            word.position.lineNumber,
-            word.position.column,
-            word.position.lineNumber,
-            word.position.column + word.word.length
+          const selections = editor.getSelections() || [];
+          const newSelection = new monaco.Selection(
+            selection.startLineNumber,
+            word.startColumn,
+            selection.startLineNumber,
+            word.endColumn
           );
-          editor.addSelection(range);
+          editor.setSelections([...selections, newSelection]);
         }
       }
     });
 
     editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyL, () => {
-      editor.getSelections()?.forEach((sel) => {
-        editor.removeSelection(sel);
-      });
-      editor.setSelection(editor.getSelection()!);
+      const selections = editor.getSelections();
+      if (selections && selections.length > 1) {
+        editor.setSelections([selections[0]]);
+      }
     });
   }, []);
 
@@ -93,8 +94,8 @@ export function EditorPage() {
 
   const handleSnippetSelect = useCallback((snippet: Snippet) => {
     const activeTab = editorTabs.find((t) => t.id === activeTabId);
-    if (activeTab && monaco) {
-      const editor = monaco.editor.getEditors()[0];
+    if (activeTab && monacoInstance) {
+      const editor = monacoInstance.editor.getEditors()[0];
       if (editor) {
         const body = snippet.body.join('\n');
         const insertText = body.replace(/\${(\d+):([^}]*)}/g, (_, num, defaultValue) => defaultValue);
@@ -114,12 +115,12 @@ export function EditorPage() {
             }]);
           }
         }
+        updateTabContent(activeTab.id, (editor.getModel()?.getValue() || ''));
       }
-      updateTabContent(activeTab.id, (editor.getModel()?.getValue() || ''));
     }
     setShowSnippets(false);
     setSnippetQuery('');
-  }, [activeTabId, editorTabs, updateTabContent, monaco]);
+  }, [activeTabId, editorTabs, updateTabContent, monacoInstance]);
 
   useEffect(() => {
     const filtered = snippetService.searchSnippets(snippetQuery);
@@ -225,7 +226,7 @@ export function EditorPage() {
                 cursorSmoothCaretAnimation: 'on',
                 cursorWidth: 2,
                 selectionHighlight: true,
-                occurrencesHighlight: true,
+                occurrencesHighlight: 'singleFile',
                 renderLineHighlight: 'line',
                 folding: true,
                 foldingHighlight: true,

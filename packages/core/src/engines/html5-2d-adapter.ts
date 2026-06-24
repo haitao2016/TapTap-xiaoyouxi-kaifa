@@ -92,14 +92,13 @@ export class Html5Adapter2D {
 
       const result: BuildResult = {
         id: taskId,
+        projectId: config.projectId,
         success: true,
         duration: Date.now() - startTime,
-        outputPath,
         outputFiles,
         errors: [],
         warnings: [],
-        cacheHit: false,
-        timestamp: new Date().toISOString(),
+        timestamp: Date.now(),
       };
       globalEventBus.emit({ type: 'build:complete', payload: result });
       return result;
@@ -108,14 +107,13 @@ export class Html5Adapter2D {
       emit({ name: '构建失败', status: 'failed', error: message });
       const result: BuildResult = {
         id: taskId,
+        projectId: config.projectId,
         success: false,
         duration: Date.now() - startTime,
-        outputPath,
         outputFiles: [],
         errors: [message],
         warnings: [],
-        cacheHit: false,
-        timestamp: new Date().toISOString(),
+        timestamp: Date.now(),
       };
       globalEventBus.emit({ type: 'build:failed', payload: result });
       return result;

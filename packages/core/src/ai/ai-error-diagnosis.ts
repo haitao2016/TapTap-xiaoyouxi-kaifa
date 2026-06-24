@@ -25,6 +25,8 @@ export interface ErrorContext {
   userAction?: string;
   /** 项目 SDK 类型 */
   projectTypes?: string[];
+  /** 错误分类 */
+  category?: DiagnosisSuggestion['category'];
 }
 
 export interface DiagnosisSuggestion {
@@ -52,6 +54,8 @@ export interface FixStep {
     searchText: string;
     replaceText: string;
   };
+  /** 相关文档链接 */
+  references?: string[];
 }
 
 export class AIErrorDiagnosis {

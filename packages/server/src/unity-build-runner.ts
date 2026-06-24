@@ -161,13 +161,16 @@ export class UnityBuildRunner {
   cancel(): void {
     this.cancelled = true;
     if (this.activeProcess && !this.activeProcess.killed) {
-      if (process.platform === 'win32') {
-        // Windows: 使用 taskkill 强制终止进程树
-        spawn('taskkill', ['/F', '/T', '/PID', this.activeProcess.pid.toString()]);
-      } else {
-        // Unix: 先尝试 SIGTERM，5秒后强制 SIGKILL
-        this.activeProcess.kill('SIGTERM');
-        setTimeout(() => this.activeProcess?.kill('SIGKILL'), 5000);
+      const pid = this.activeProcess.pid;
+      if (pid !== undefined) {
+        if (process.platform === 'win32') {
+          // Windows: 使用 taskkill 强制终止进程树
+          spawn('taskkill', ['/F', '/T', '/PID', pid.toString()]);
+        } else {
+          // Unix: 先尝试 SIGTERM，5秒后强制 SIGKILL
+          this.activeProcess.kill('SIGTERM');
+          setTimeout(() => this.activeProcess?.kill('SIGKILL'), 5000);
+        }
       }
     }
   }

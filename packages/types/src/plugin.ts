@@ -49,6 +49,7 @@ export interface PluginAction {
   id: string;
   type: 'command' | 'menu' | 'button';
   label: string;
+  description?: string;
   icon?: string;
   shortcut?: string;
   handler: () => void | Promise<void>;

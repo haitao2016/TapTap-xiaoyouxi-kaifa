@@ -13,8 +13,8 @@ export function DashboardPage() {
     navigate('/editor');
   };
 
-  const handleOpenDemo = () => {
-    openProject('./projects/demo-game');
+  const handleOpenDemo = async () => {
+    await openProject('./projects/demo-game');
     navigate('/editor');
   };
 
@@ -98,17 +98,17 @@ export function DashboardPage() {
           </CardHeader>
           <CardContent>
             <ul className="space-y-2">
-              {recentProjects.map((path) => (
-                <li key={path}>
+              {recentProjects.map((project) => (
+                <li key={project.id}>
                   <button
-                    onClick={() => {
-                      openProject(path);
+                    onClick={async () => {
+                      await openProject(project.path);
                       navigate('/editor');
                     }}
                     className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm hover:bg-surface-2"
                   >
                     <Icon name="folder" size={16} className="text-text-muted" />
-                    <span className="truncate">{path}</span>
+                    <span className="truncate">{project.path}</span>
                   </button>
                 </li>
               ))}

@@ -189,7 +189,7 @@ export function BuildPage() {
                         {u.version} — {u.path}
                       </div>
                       {u.isDefault && (
-                        <Badge variant="success" size="sm">默认</Badge>
+                        <Badge variant="success">默认</Badge>
                       )}
                     </li>
                   ))}

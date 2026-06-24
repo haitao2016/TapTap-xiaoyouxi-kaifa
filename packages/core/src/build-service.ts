@@ -602,7 +602,7 @@ export class BuildService {
       
       task.progressMessage = step.name;
       await this.delay(400 + Math.random() * 600);
-      progress += step.weight;
+      progress += step.weight ?? 0;
       task.progress = Math.min(progress, 100);
       globalEventBus.emit({ 
         type: 'build:progress', 
@@ -688,6 +688,8 @@ export class BuildService {
       fs.mkdirSync(cachePath, { recursive: true });
       
       const cacheInfo: BuildCacheInfo = {
+        enabled: true,
+        hit: false,
         hash,
         lastModified: Date.now(),
         valid: true,

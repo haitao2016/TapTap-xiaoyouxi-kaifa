@@ -1,4 +1,26 @@
-import type { FormatterConfig, FormatResult } from '@tapdev/types';
+import type { EngineType } from '@tapdev/types';
+
+export interface FormatterConfig {
+  tabSize?: number;
+  tabWidth?: number;
+  useTabs?: boolean;
+  lineWidth?: number;
+  printWidth?: number;
+  semi?: boolean;
+  singleQuote?: boolean;
+  trailingComma?: 'none' | 'es5' | 'all';
+  arrowParens?: 'always' | 'avoid';
+  bracketSpacing?: boolean;
+  bracketSameLine?: boolean;
+  endOfLine?: 'lf' | 'crlf' | 'cr';
+}
+
+export interface FormatResult {
+  success: boolean;
+  code: string;
+  error?: string;
+  diff?: string;
+}
 
 export class FormatService {
   private formatters: Map<string, Formatter> = new Map();
@@ -115,7 +137,7 @@ class JavaScriptFormatter implements Formatter {
       return {
         success: true,
         code: formatted,
-        error: null,
+        error: undefined,
       };
     } catch (error) {
       return {
@@ -264,7 +286,7 @@ class JsonFormatter implements Formatter {
       return {
         success: true,
         code: JSON.stringify(parsed, null, indent),
-        error: null,
+        error: undefined,
       };
     } catch (error) {
       return {
@@ -311,7 +333,7 @@ class MarkdownFormatter implements Formatter {
       return {
         success: true,
         code: formatted,
-        error: null,
+        error: undefined,
       };
     } catch (error) {
       return {
@@ -353,7 +375,7 @@ class HtmlFormatter implements Formatter {
       return {
         success: true,
         code: formatted,
-        error: null,
+        error: undefined,
       };
     } catch (error) {
       return {
@@ -449,7 +471,7 @@ class CssFormatter implements Formatter {
       return {
         success: true,
         code: formatted,
-        error: null,
+        error: undefined,
       };
     } catch (error) {
       return {
@@ -476,25 +498,6 @@ class CssFormatter implements Formatter {
     const indent = ' '.repeat(tabWidth);
     return code.replace(/([a-z-]+)\s*:\s*/gi, `${indent}$1: `);
   }
-}
-
-export interface FormatterConfig {
-  tabWidth?: number;
-  useTabs?: boolean;
-  printWidth?: number;
-  semi?: boolean;
-  singleQuote?: boolean;
-  trailingComma?: 'none' | 'es5' | 'all';
-  arrowParens?: 'always' | 'avoid';
-  bracketSpacing?: boolean;
-  bracketSameLine?: boolean;
-  endOfLine?: 'lf' | 'crlf' | 'cr';
-}
-
-export interface FormatResult {
-  success: boolean;
-  code: string;
-  error: string | null;
 }
 
 export interface LintIssue {

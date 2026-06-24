@@ -101,6 +101,10 @@ export class PluginManager {
     globalEventBus.emit({ type: 'plugin:deactivated', payload: plugin.meta });
   }
 
+  async loadPlugin(pluginId: string): Promise<void> {
+    await this.activatePlugin(pluginId);
+  }
+
   getPlugins(): PluginMeta[] {
     return [...this.plugins.values()].map((p) => p.meta);
   }
