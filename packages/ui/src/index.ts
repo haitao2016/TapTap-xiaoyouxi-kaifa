@@ -4,6 +4,7 @@ export function cn(...inputs: ClassValue[]): string {
   return clsx(inputs);
 }
 
+export { Checkbox } from './checkbox';
 export { Button } from './button';
 export { Card, CardHeader, CardTitle, CardContent } from './card';
 export { Badge } from './badge';
