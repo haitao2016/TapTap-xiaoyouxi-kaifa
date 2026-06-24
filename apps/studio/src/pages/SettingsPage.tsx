@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Input, Button } from '@tapdev/ui';
 import { useAppStore } from '../store/app-store';
 import { projectManager } from '@tapdev/core';
+import { UpdateChecker } from '../components/UpdateChecker';
 
 export function SettingsPage() {
   const { settings } = useAppStore();
@@ -81,6 +82,8 @@ export function SettingsPage() {
           ))}
         </div>
       </section>
+
+      <UpdateChecker />
 
       <Button onClick={handleSave}>保存设置</Button>
     </div>

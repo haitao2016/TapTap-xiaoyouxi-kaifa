@@ -22,7 +22,8 @@
   },
   "dependencies": {
     "@tapdev/server": "workspace:*",
-    "@tapdev/types": "workspace:*"
+    "@tapdev/types": "workspace:*",
+    "electron-updater": "^6.8.9"
   },
   "devDependencies": {
     "@tapdev/studio": "workspace:*",
@@ -50,16 +51,41 @@
       {
         "from": "../../templates/unity",
         "to": "templates/unity",
-        "filter": ["**/*"]
+        "filter": [
+          "**/*"
+        ]
       }
     ],
     "asar": false,
-    "electronLanguages": ["zh-CN", "en-US"],
+    "electronLanguages": [
+      "zh-CN",
+      "en-US"
+    ],
+    "publish": {
+      "provider": "generic",
+      "url": "https://example.com/updates/",
+      "channel": "latest"
+    },
     "win": {
       "target": [
-        { "target": "nsis", "arch": ["x64"] },
-        { "target": "portable", "arch": ["x64"] },
-        { "target": "zip", "arch": ["x64"] }
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        },
+        {
+          "target": "zip",
+          "arch": [
+            "x64"
+          ]
+        }
       ],
       "artifactName": "${productName}-${version}-win-${arch}.${ext}",
       "icon": "assets/icon.ico",
@@ -82,14 +108,20 @@
       "artifactName": "${productName}-${version}-win-${arch}-portable.${ext}"
     },
     "mac": {
-      "target": ["dmg", "zip"],
+      "target": [
+        "dmg",
+        "zip"
+      ],
       "category": "public.app-category.developer-tools",
       "artifactName": "${productName}-${version}-mac.${ext}",
       "hardenedRuntime": true,
       "gatekeeperAssess": false
     },
     "linux": {
-      "target": ["AppImage", "deb"],
+      "target": [
+        "AppImage",
+        "deb"
+      ],
       "category": "Development",
       "artifactName": "${productName}-${version}-linux.${ext}"
     }
