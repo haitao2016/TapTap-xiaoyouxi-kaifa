@@ -11,6 +11,7 @@ import type {
   EditorTab,
   AppSettings,
   Platform,
+  PluginInfo,
 } from '@tapdev/types';
 import {
   projectManager,
@@ -19,6 +20,7 @@ import {
   buildService,
   platformService,
   getNativeBridge,
+  pluginManager,
 } from '@tapdev/core';
 
 interface AppState {
@@ -41,6 +43,8 @@ interface AppState {
 
   editorTabs: EditorTab[];
   activeTabId: string | null;
+
+  plugins: PluginInfo[];
 
   setActiveView: (view: string) => void;
   toggleSidebar: () => void;
@@ -70,6 +74,10 @@ interface AppState {
   closeTab: (tabId: string) => void;
   setActiveTab: (tabId: string) => void;
   updateTabContent: (tabId: string, content: string) => void;
+  updateSettings: (settings: Partial<AppSettings>) => void;
+
+  setPlugins: (plugins: PluginInfo[]) => void;
+  togglePlugin: (pluginId: string) => Promise<void>;
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
@@ -92,6 +100,8 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   editorTabs: [],
   activeTabId: null,
+
+  plugins: [],
 
   setActiveView: (view) => set({ activeView: view }),
   toggleSidebar: () => set((s) => ({ sidebarOpen: !s.sidebarOpen })),
@@ -279,6 +289,27 @@ export const useAppStore = create<AppState>((set, get) => ({
         t.id === tabId ? { ...t, content, modified: true } : t
       ),
     }));
+  },
+
+  updateSettings: (newSettings) => {
+    set((s) => ({
+      settings: { ...s.settings, ...newSettings },
+    }));
+  },
+
+  setPlugins: (plugins) => set({ plugins }),
+
+  togglePlugin: async (pluginId) => {
+    const plugin = get().plugins.find((p) => p.meta.id === pluginId);
+    if (!plugin) return;
+
+    if (plugin.activated) {
+      await pluginManager.deactivatePlugin(pluginId);
+    } else {
+      await pluginManager.activatePlugin(pluginId);
+    }
+
+    set({ plugins: pluginManager.getAllPluginInfo() });
   },
 }));
 

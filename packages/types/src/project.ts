@@ -28,6 +28,7 @@ export interface ProjectMeta {
   path: string;
   status: ProjectStatus;
   lastOpenedAt?: string;
+  name: string;
 }
 
 /** 编辑器文件节点 */
