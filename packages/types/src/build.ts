@@ -21,6 +21,7 @@ export interface BuildConfig {
   androidKeystoreAlias?: string;
   iosTeamId?: string;
   iosBundleId?: string;
+  useCache?: boolean;
 }
 
 export interface BuildResult {
@@ -34,9 +35,22 @@ export interface BuildResult {
   timestamp: number;
   buildNumber?: string;
   buildHash?: string;
+  cacheInfo?: BuildCacheInfo;
 }
 
 export type BuildTaskStatus = 'pending' | 'running' | 'success' | 'failed' | 'cancelled';
+
+export interface BuildCacheInfo {
+  enabled: boolean;
+  hit: boolean;
+  cachedAt?: number;
+  cacheKey?: string;
+  hash?: string;
+  lastModified?: number;
+  valid?: boolean;
+  skippedSteps?: string[];
+  hitCount?: number;
+}
 
 export interface BuildTask {
   id: string;
@@ -47,25 +61,20 @@ export interface BuildTask {
   result?: BuildResult;
   startedAt?: number;
   finishedAt?: number;
+  cacheInfo?: BuildCacheInfo;
 }
 
-export type { UnityInstallation } from './server';
-
-export interface UnityProjectValidation {
-  valid: boolean;
-  tapTapSDK: {
-    installed: boolean;
-    version?: string;
-  };
-  errors: string[];
-  warnings: string[];
-}
+export type { UnityInstallation, UnityProjectValidation } from './server';
 
 export interface BuildStep {
   name: string;
-  weight: number;
+  weight?: number;
   message?: string;
   completed?: boolean;
+  status?: 'pending' | 'running' | 'success' | 'failed';
+  error?: string;
+  detail?: string;
+  cacheable?: boolean;
 }
 
 export interface BuildPlatformConfig {
