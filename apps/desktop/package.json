@@ -10,9 +10,13 @@
     "build:all": "pnpm --filter @tapdev/server build && pnpm --filter @tapdev/studio build && pnpm build:main && pnpm copy:studio",
     "build:main": "tsc",
     "copy:studio": "node scripts/copy-studio.js",
+    "generate:icon": "node scripts/generate-icon.js",
     "typecheck": "tsc --noEmit",
     "pack": "pnpm build:all && electron-builder --dir",
-    "dist:win": "pnpm build:all && electron-builder --win",
+    "pack:win": "pnpm generate:icon && pnpm build:all && electron-builder --win --dir",
+    "dist:win": "pnpm generate:icon && pnpm build:all && electron-builder --win",
+    "dist:win:zip": "pnpm generate:icon && pnpm build:all && electron-builder --win --x64 --zip",
+    "dist:win:portable": "pnpm generate:icon && pnpm build:all && electron-builder --win --x64 --portable",
     "dist:mac": "pnpm build:all && electron-builder --mac",
     "dist:linux": "pnpm build:all && electron-builder --linux"
   },
@@ -49,19 +53,32 @@
       }
     ],
     "asar": false,
+    "electronLanguages": ["zh-CN", "en-US"],
     "win": {
       "target": [
         { "target": "nsis", "arch": ["x64"] },
+        { "target": "portable", "arch": ["x64"] },
         { "target": "zip", "arch": ["x64"] }
       ],
-      "artifactName": "${productName}-${version}-win-${arch}.${ext}"
+      "artifactName": "${productName}-${version}-win-${arch}.${ext}",
+      "icon": "assets/icon.ico",
+      "requestedExecutionLevel": "asInvoker"
     },
     "nsis": {
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "TapDev Studio"
+      "shortcutName": "TapDev Studio",
+      "installerIcon": "assets/icon.ico",
+      "uninstallerIcon": "assets/icon.ico",
+      "installerHeaderIcon": "assets/icon.ico",
+      "allowElevation": true,
+      "perMachine": false,
+      "differentialPackage": true
+    },
+    "portable": {
+      "artifactName": "${productName}-${version}-win-${arch}-portable.${ext}"
     },
     "mac": {
       "target": ["dmg", "zip"],
