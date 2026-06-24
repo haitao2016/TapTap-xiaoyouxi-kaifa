@@ -273,11 +273,12 @@ export class ProjectManager {
   /** 导入项目（测试期望方法） */
   async importProject(data: { name: string; path: string }): Promise<ProjectMeta | null> {
     if (!data.name || !data.path) return null;
-    return this.createProject({
+    const flat = this.createProject({
       name: data.name,
       path: data.path,
       template: 'default',
     });
+    return this.toMeta(flat);
   }
 
   /** 导出项目为 JSON（测试期望方法） */
