@@ -194,28 +194,6 @@ export function activate(ctx: PluginContext) {
 - [Unity WebGL 适配方案](https://developer.taptap.cn/minigameapidoc/dev/engine/unity-adaptation/unity-webGL/)
 - [Unity SDK (GitHub)](https://github.com/taptap/minigame-sdk-unity)
 
-## 路线图
-
-| 版本 | 里程碑 | 状态 |
-|------|--------|------|
-| v0.2.0 | 稳定版发布 | ✅ 已发布 |
-| v0.3.0 | 功能增强版 | ✅ 已发布 |
-| v0.4.0 | 生态完善版 | ✅ 已发布 |
-| v1.0.0 | 正式版发布 | ✅ 已发布 |
-| v1.1.0 | 持续优化版 | ✅ 已发布 |
-| **v2.0.0** | **全能进化版** | **🚧 开发中** |
-
-### v2.0 "全能进化版" 规划
-
-| 阶段 | 名称 | 内容 |
-|------|------|------|
-| Phase 11 | 核心功能深化 | 编辑器重构、高级调试器、符号搜索 |
-| Phase 12 | AI 智能增强 | AI 智能重构、AI 测试生成、AI 文档生成 |
-| Phase 13 | 可视化工具 | 资源管理器增强、节点编辑器、对象检视器、2D 场景编辑器 |
-| Phase 14 | 性能与体验 | 编辑器性能优化、性能分析器、稳定性增强、可访问性 |
-
-详细开发计划请查看 [开发计划文档](docs/DEVELOPMENT_PLAN_README.md)。
-
 ## 技术栈
 
 - **前端**: React 18, TypeScript, Vite, Tailwind CSS
