@@ -51,7 +51,7 @@ export class LazyLoadService {
     const { loadingClass = 'lazy-loading', loadedClass = 'lazy-loaded', errorClass = 'lazy-error' } = options;
 
     const src = element.getAttribute('data-src');
-    const srcset = element.getAttribute('data-srcset');
+    const srcset = element.getAttribute('data-srcset') ?? undefined;
 
     if (!src) return;
 
@@ -95,8 +95,8 @@ export class LazyLoadService {
 
   private async loadIframe(iframe: HTMLIFrameElement, src: string): Promise<void> {
     return new Promise((resolve, reject) => {
-      iframe.onload = resolve;
-      iframe.onerror = reject;
+      iframe.onload = () => resolve();
+      iframe.onerror = () => reject(new Error('Failed to load iframe'));
       iframe.src = src;
     });
   }
@@ -138,7 +138,7 @@ export class LazyLoadService {
     this.loadModule(moduleId, loader).catch(() => {});
   }
 
-  getModuleLoadTime(moduleId: string): number | undefined {
+  getModuleLoadTime(moduleId: string): Promise<number | undefined> | undefined {
     const result = this.modules.get(moduleId);
     if (result) {
       return result.then(r => r.loadTime).catch(() => undefined);
