@@ -10,7 +10,7 @@ export interface AnimationKeyframes {
 }
 
 export class AnimationService {
-  private animations = new Map<string, AnimationFrame>();
+  private animations = new Map<string, number>();
 
   animate(
     element: HTMLElement,
@@ -240,8 +240,8 @@ export class AnimationService {
     }
 
     if (typeof from === 'string' && typeof to === 'string') {
-      const fromMatch = from.match(/^([\d.]+)(.*)$/);
-      const toMatch = to.match(/^([\d.]+)(.*)$/);
+      const fromMatch = from.match(/^([.]+)(.*)$/);
+      const toMatch = to.match(/^([.]+)(.*)$/);
 
       if (fromMatch && toMatch && fromMatch[2] === toMatch[2]) {
         const fromValue = parseFloat(fromMatch[1]);
