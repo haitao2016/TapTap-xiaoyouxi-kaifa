@@ -1,7 +1,7 @@
 {
   "name": "TapDev Studio",
-  "version": "1.1.0",
-  "description": "跨平台 TapTap 小游戏集成开发环境 - 所有计划阶段已完成",
+  "version": "2.0.0",
+  "description": "跨平台 TapTap 小游戏集成开发环境 - v2.0 全能进化版",
   "createdAt": "2026-06-24",
   "lastUpdated": "2026-06-24",
   "phases": {
@@ -538,6 +538,160 @@
           "status": "completed"
         }
       ]
+    },
+    "phase11": {
+      "name": "核心功能深化",
+      "duration": "3周",
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "P11-1",
+          "name": "编辑器重构能力",
+          "priority": "high",
+          "category": "editor",
+          "description": "符号重命名、提取方法/变量、代码自动修复、Go to Definition/References",
+          "expectedResult": "支持 C#/TS/JS 的重构操作，F12 跳转定义",
+          "status": "pending"
+        },
+        {
+          "id": "P11-2",
+          "name": "高级调试器",
+          "priority": "high",
+          "category": "debug",
+          "description": "单步进入/跳过/跳出、表达式求值面板、调用栈跳转、内存变量实时检查",
+          "expectedResult": "完整的调试控制流，支持在断点处执行任意表达式",
+          "status": "pending"
+        },
+        {
+          "id": "P11-3",
+          "name": "代码符号搜索",
+          "priority": "medium",
+          "category": "editor",
+          "description": "全局符号搜索、文件大纲视图、快速跳转（Ctrl+P / Ctrl+Shift+O）",
+          "expectedResult": "模糊搜索函数/类/变量，毫秒级跳转",
+          "status": "pending"
+        }
+      ]
+    },
+    "phase12": {
+      "name": "AI 智能增强",
+      "duration": "3周",
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "P12-1",
+          "name": "AI 智能重构",
+          "priority": "high",
+          "category": "ai",
+          "description": "性能优化建议、安全漏洞扫描、代码质量评分、一键自动重构",
+          "expectedResult": "AI 分析代码并给出重构建议，可一键应用",
+          "status": "pending"
+        },
+        {
+          "id": "P12-2",
+          "name": "AI 测试生成",
+          "priority": "medium",
+          "category": "ai",
+          "description": "自动生成单元测试用例、边界条件测试、Mock 数据生成",
+          "expectedResult": "选中函数即可生成完整测试文件",
+          "status": "pending"
+        },
+        {
+          "id": "P12-3",
+          "name": "AI 文档生成",
+          "priority": "low",
+          "category": "ai",
+          "description": "自动生成代码注释、API 文档、项目 README、架构说明",
+          "expectedResult": "选中代码块一键生成文档注释",
+          "status": "pending"
+        }
+      ]
+    },
+    "phase13": {
+      "name": "可视化工具与资源管理",
+      "duration": "3周",
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "P13-1",
+          "name": "资源管理器增强",
+          "priority": "high",
+          "category": "assets",
+          "description": "图片/音频/精灵图集预览、资源批量处理、依赖分析、搜索过滤",
+          "expectedResult": "资源面板支持缩略图预览、批量重命名、依赖查找",
+          "status": "pending"
+        },
+        {
+          "id": "P13-2",
+          "name": "可视化节点编辑器",
+          "priority": "high",
+          "category": "visual",
+          "description": "状态机/行为树/对话树可视化编辑，拖拽连线，实时预览运行",
+          "expectedResult": "可视化节点编辑器，支持导出为代码",
+          "status": "pending"
+        },
+        {
+          "id": "P13-3",
+          "name": "游戏对象检视器",
+          "priority": "medium",
+          "category": "debug",
+          "description": "运行时对象树、属性面板、实时修改属性、组件可视化",
+          "expectedResult": "调试时可查看和修改游戏对象属性",
+          "status": "pending"
+        },
+        {
+          "id": "P13-4",
+          "name": "2D 场景编辑器",
+          "priority": "medium",
+          "category": "visual",
+          "description": "2D 场景可视化编辑，精灵/碰撞体/灯光/层级管理、坐标编辑",
+          "expectedResult": "拖拽式 2D 场景编辑，实时预览",
+          "status": "pending"
+        }
+      ]
+    },
+    "phase14": {
+      "name": "性能与体验终极打磨",
+      "duration": "3周",
+      "status": "pending",
+      "tasks": [
+        {
+          "id": "P14-1",
+          "name": "编辑器性能优化",
+          "priority": "high",
+          "category": "performance",
+          "description": "大文件滚动优化、冷启动 < 1.5s、内存泄漏治理、虚拟列表全面深化",
+          "expectedResult": "10MB 大文件编辑无卡顿，P95 启动 < 1.5s",
+          "status": "pending"
+        },
+        {
+          "id": "P14-2",
+          "name": "性能分析器",
+          "priority": "high",
+          "category": "performance",
+          "description": "CPU/内存/GPU 采样分析、火焰图、热点函数定位、性能基线对比",
+          "expectedResult": "独立的 Profiler 面板，火焰图可视化",
+          "status": "pending"
+        },
+        {
+          "id": "P14-3",
+          "name": "稳定性增强",
+          "priority": "medium",
+          "category": "stability",
+          "description": "Crash 日志收集上报、自动恢复上次会话、异常状态降级策略、优雅错误处理",
+          "expectedResult": "崩溃后自动恢复，错误率降低 50%",
+          "status": "pending"
+        },
+        {
+          "id": "P14-4",
+          "name": "可访问性完善",
+          "priority": "low",
+          "category": "a11y",
+          "description": "屏幕阅读器支持、键盘导航全覆盖、高对比度主题、颜色无障碍",
+          "expectedResult": "通过 WCAG 2.1 AA 标准",
+          "status": "pending"
+        }
+      ]
     }
   },
   "techDebts": [
@@ -609,7 +763,7 @@
     {
       "version": "v0.2.0",
       "name": "稳定版发布",
-      "targetDate": "2周后",
+      "targetDate": "已完成",
       "phases": [
         "phase1"
       ]
@@ -617,7 +771,7 @@
     {
       "version": "v0.3.0",
       "name": "功能增强版",
-      "targetDate": "6周后",
+      "targetDate": "已完成",
       "phases": [
         "phase1",
         "phase2"
@@ -626,7 +780,7 @@
     {
       "version": "v0.4.0",
       "name": "生态完善版",
-      "targetDate": "10周后",
+      "targetDate": "已完成",
       "phases": [
         "phase1",
         "phase2",
@@ -637,7 +791,7 @@
     {
       "version": "v1.0.0",
       "name": "正式版发布",
-      "targetDate": "4个月后",
+      "targetDate": "已完成",
       "phases": [
         "phase1",
         "phase2",
@@ -649,7 +803,7 @@
     {
       "version": "v0.3.1",
       "name": "多引擎版",
-      "targetDate": "v0.3.0+3周",
+      "targetDate": "已完成",
       "phases": [
         "phase6"
       ]
@@ -657,7 +811,7 @@
     {
       "version": "v0.4.1",
       "name": "AI 辅助版",
-      "targetDate": "v0.3.1+4周",
+      "targetDate": "已完成",
       "phases": [
         "phase6",
         "phase7"
@@ -666,7 +820,7 @@
     {
       "version": "v0.5.0",
       "name": "协作云端版",
-      "targetDate": "v0.4.1+4周",
+      "targetDate": "已完成",
       "phases": [
         "phase6",
         "phase7",
@@ -676,7 +830,7 @@
     {
       "version": "v0.6.0",
       "name": "TapTap 集成版",
-      "targetDate": "v0.5.0+3周",
+      "targetDate": "已完成",
       "phases": [
         "phase6",
         "phase7",
@@ -687,13 +841,51 @@
     {
       "version": "v1.1.0",
       "name": "持续优化版",
-      "targetDate": "持续",
+      "targetDate": "已完成",
       "phases": [
         "phase6",
         "phase7",
         "phase8",
         "phase9",
         "phase10"
+      ]
+    },
+    {
+      "version": "v2.0.0-alpha",
+      "name": "功能预览版",
+      "targetDate": "第 3 周",
+      "phases": [
+        "phase11"
+      ]
+    },
+    {
+      "version": "v2.0.0-beta",
+      "name": "AI 增强版",
+      "targetDate": "第 6 周",
+      "phases": [
+        "phase11",
+        "phase12"
+      ]
+    },
+    {
+      "version": "v2.0.0-rc",
+      "name": "可视化工具版",
+      "targetDate": "第 9 周",
+      "phases": [
+        "phase11",
+        "phase12",
+        "phase13"
+      ]
+    },
+    {
+      "version": "v2.0.0",
+      "name": "全能进化正式版",
+      "targetDate": "第 12 周",
+      "phases": [
+        "phase11",
+        "phase12",
+        "phase13",
+        "phase14"
       ]
     }
   ],
@@ -728,10 +920,10 @@
     }
   ],
   "statistics": {
-    "totalTasks": 52,
+    "totalTasks": 66,
     "completedTasks": 52,
-    "pendingTasks": 0,
-    "totalPhases": 10,
+    "pendingTasks": 14,
+    "totalPhases": 14,
     "completedPhases": 10,
     "techDebtsTotal": 9,
     "techDebtsCompleted": 9,
