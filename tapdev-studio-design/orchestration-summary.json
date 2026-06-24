@@ -1,0 +1,153 @@
+{
+  "project": {
+    "name": "TapDev Studio UI 设计",
+    "operation": "create",
+    "deviceType": "desktop",
+    "designRead": "Developer IDE / game developers / industrial utilitarian dark theme / high density / avoid generic blue-purple",
+    "designDials": {
+      "layoutVariance": 2,
+      "motionIntensity": 1,
+      "visualDensity": 4
+    },
+    "styleDefinitionBrief": "Developer tool IDE, dark surface system with orange accent, monospace code elements, compact information-dense panels, industrial/utilitarian tone."
+  },
+  "designSource": {
+    "styleConstraints": {
+      "radiusMax": 16,
+      "staticShadowAlphaMax": 0.05
+    }
+  },
+  "pages": [
+    {
+      "nodeId": "page-dashboard",
+      "title": "工作台",
+      "htmlSrc": "pages/dashboard.html",
+      "pageType": "information-dense",
+      "visualNorthStar": "IDE welcome screen with quick-action cards and project status",
+      "compositionPattern": "sidebar-shell + centered content grid",
+      "soulElement": "Quick action cards with orange icon accents on dark surface, creating a command-center feel",
+      "continuityAnchors": {
+        "sidebar": "Dark sidebar with orange logo mark, nav items with active orange highlight",
+        "header": "Compact top bar with platform badge and project indicator",
+        "surfaceSystem": "Layered dark surfaces (surface-0/1/2) with subtle borders"
+      }
+    },
+    {
+      "nodeId": "page-editor",
+      "title": "编辑器",
+      "htmlSrc": "pages/editor.html",
+      "pageType": "information-dense",
+      "visualNorthStar": "VS Code-like code editor with file tree and tab bar",
+      "compositionPattern": "three-panel layout (file tree | tab bar + editor | status bar)",
+      "soulElement": "Monaco-style dark editor with syntax-highlighted code, orange tab indicator, and file tree with folder icons",
+      "continuityAnchors": {
+        "sidebar": "Dark sidebar with orange logo mark, nav items with active orange highlight",
+        "header": "Compact top bar with platform badge and project indicator",
+        "surfaceSystem": "Layered dark surfaces (surface-0/1/2) with subtle borders"
+      }
+    },
+    {
+      "nodeId": "page-debug",
+      "title": "调试",
+      "htmlSrc": "pages/debug.html",
+      "pageType": "information-dense",
+      "visualNorthStar": "Debug console with server status and QR code for device testing",
+      "compositionPattern": "sidebar-shell + tabbed content area with console/server/breakpoints",
+      "soulElement": "Terminal-style console log with color-coded severity levels and QR code for real-device debugging",
+      "continuityAnchors": {
+        "sidebar": "Dark sidebar with orange logo mark, nav items with active orange highlight",
+        "header": "Compact top bar with platform badge and project indicator",
+        "surfaceSystem": "Layered dark surfaces (surface-0/1/2) with subtle borders"
+      }
+    },
+    {
+      "nodeId": "page-monitor",
+      "title": "监控",
+      "htmlSrc": "pages/monitor.html",
+      "pageType": "information-dense",
+      "visualNorthStar": "Performance dashboard with real-time metrics cards and SVG charts",
+      "compositionPattern": "sidebar-shell + metrics grid + chart cards + request table",
+      "soulElement": "Six metric cards with status-colored borders, SVG sparkline charts in orange/indigo, and a live network request table",
+      "continuityAnchors": {
+        "sidebar": "Dark sidebar with orange logo mark, nav items with active orange highlight",
+        "header": "Compact top bar with platform badge and project indicator",
+        "surfaceSystem": "Layered dark surfaces (surface-0/1/2) with subtle borders"
+      }
+    },
+    {
+      "nodeId": "page-build",
+      "title": "构建",
+      "htmlSrc": "pages/build.html",
+      "pageType": "task-driven",
+      "visualNorthStar": "Build configuration panel with platform selection and progress tracking",
+      "compositionPattern": "sidebar-shell + two-column config layout + build history",
+      "soulElement": "Platform selection cards with orange active border, progress bar during build, and Unity environment detection panel",
+      "continuityAnchors": {
+        "sidebar": "Dark sidebar with orange logo mark, nav items with active orange highlight",
+        "header": "Compact top bar with platform badge and project indicator",
+        "surfaceSystem": "Layered dark surfaces (surface-0/1/2) with subtle borders"
+      }
+    },
+    {
+      "nodeId": "page-docs",
+      "title": "文档",
+      "htmlSrc": "pages/docs.html",
+      "pageType": "information-dense",
+      "visualNorthStar": "In-app documentation reader with sidebar navigation and search",
+      "compositionPattern": "sidebar-shell + doc sidebar with categories + article content area",
+      "soulElement": "Search-focused doc sidebar with category pills, clean article typography on dark background with orange link accents",
+      "continuityAnchors": {
+        "sidebar": "Dark sidebar with orange logo mark, nav items with active orange highlight",
+        "header": "Compact top bar with platform badge and project indicator",
+        "surfaceSystem": "Layered dark surfaces (surface-0/1/2) with subtle borders"
+      }
+    },
+    {
+      "nodeId": "page-plugins",
+      "title": "插件",
+      "htmlSrc": "pages/plugins.html",
+      "pageType": "information-dense",
+      "visualNorthStar": "Plugin marketplace with command palette and development guide",
+      "compositionPattern": "sidebar-shell + tabbed plugin list/commands/dev guide",
+      "soulElement": "Plugin cards with icon badges and hook tags, command palette with keyboard shortcut badges",
+      "continuityAnchors": {
+        "sidebar": "Dark sidebar with orange logo mark, nav items with active orange highlight",
+        "header": "Compact top bar with platform badge and project indicator",
+        "surfaceSystem": "Layered dark surfaces (surface-0/1/2) with subtle borders"
+      }
+    },
+    {
+      "nodeId": "page-settings",
+      "title": "设置",
+      "htmlSrc": "pages/settings.html",
+      "pageType": "task-driven",
+      "visualNorthStar": "Settings panel with grouped sections and theme selector",
+      "compositionPattern": "sidebar-shell + centered settings form with grouped sections",
+      "soulElement": "Clean form sections with dark surface cards, orange active theme button, and compact input fields",
+      "continuityAnchors": {
+        "sidebar": "Dark sidebar with orange logo mark, nav items with active orange highlight",
+        "header": "Compact top bar with platform badge and project indicator",
+        "surfaceSystem": "Layered dark surfaces (surface-0/1/2) with subtle borders"
+      }
+    }
+  ],
+  "wiringPlan": [
+    { "from": "page-dashboard", "to": "page-editor", "domId": "nav-editor", "label": "打开编辑器" },
+    { "from": "page-dashboard", "to": "page-debug", "domId": "nav-debug", "label": "启动调试" },
+    { "from": "page-editor", "to": "page-debug", "domId": "nav-debug", "label": "调试" },
+    { "from": "page-debug", "to": "page-monitor", "domId": "nav-monitor", "label": "监控" },
+    { "from": "page-monitor", "to": "page-build", "domId": "nav-build", "label": "构建" },
+    { "from": "page-build", "to": "page-docs", "domId": "nav-docs", "label": "文档" },
+    { "from": "page-docs", "to": "page-plugins", "domId": "nav-plugins", "label": "插件" },
+    { "from": "page-plugins", "to": "page-settings", "domId": "nav-settings", "label": "设置" }
+  ],
+  "hiddenInteractionPlan": [
+    { "from": "page-editor", "to": "page-dashboard", "domId": "nav-dashboard", "hideEdge": true },
+    { "from": "page-debug", "to": "page-dashboard", "domId": "nav-dashboard", "hideEdge": true },
+    { "from": "page-monitor", "to": "page-dashboard", "domId": "nav-dashboard", "hideEdge": true },
+    { "from": "page-build", "to": "page-dashboard", "domId": "nav-dashboard", "hideEdge": true },
+    { "from": "page-docs", "to": "page-dashboard", "domId": "nav-dashboard", "hideEdge": true },
+    { "from": "page-plugins", "to": "page-dashboard", "domId": "nav-dashboard", "hideEdge": true },
+    { "from": "page-settings", "to": "page-dashboard", "domId": "nav-dashboard", "hideEdge": true }
+  ]
+}

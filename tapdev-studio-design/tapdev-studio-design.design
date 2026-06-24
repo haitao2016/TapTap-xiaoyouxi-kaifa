@@ -1,0 +1,258 @@
+{
+  "data": [
+    {
+      "id": "page-dashboard",
+      "title": "工作台",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1782292293000,
+      "canvasData": {
+        "x": 0,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/dashboard.html",
+        "interactions": [
+          {
+            "domId": "nav-editor",
+            "targetPageId": "page-editor",
+            "transitionLabel": "打开编辑器"
+          },
+          {
+            "domId": "nav-debug",
+            "targetPageId": "page-debug",
+            "transitionLabel": "启动调试"
+          },
+          {
+            "domId": "nav-monitor",
+            "targetPageId": "page-monitor",
+            "transitionLabel": "监控"
+          },
+          {
+            "domId": "nav-build",
+            "targetPageId": "page-build",
+            "transitionLabel": "构建发布"
+          },
+          {
+            "domId": "nav-docs",
+            "targetPageId": "page-docs",
+            "transitionLabel": "文档"
+          },
+          {
+            "domId": "nav-plugins",
+            "targetPageId": "page-plugins",
+            "transitionLabel": "插件"
+          },
+          {
+            "domId": "nav-settings",
+            "targetPageId": "page-settings",
+            "transitionLabel": "设置"
+          }
+        ]
+      }
+    },
+    {
+      "id": "page-editor",
+      "title": "编辑器",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1782292293000,
+      "canvasData": {
+        "x": 620,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/editor.html",
+        "interactions": [
+          {
+            "domId": "nav-dashboard",
+            "targetPageId": "page-dashboard",
+            "hideEdge": true,
+            "transitionLabel": "工作台"
+          },
+          {
+            "domId": "nav-debug",
+            "targetPageId": "page-debug",
+            "transitionLabel": "调试"
+          }
+        ]
+      }
+    },
+    {
+      "id": "page-debug",
+      "title": "调试",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1782292293000,
+      "canvasData": {
+        "x": 1240,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/debug.html",
+        "interactions": [
+          {
+            "domId": "nav-dashboard",
+            "targetPageId": "page-dashboard",
+            "hideEdge": true,
+            "transitionLabel": "工作台"
+          },
+          {
+            "domId": "nav-monitor",
+            "targetPageId": "page-monitor",
+            "transitionLabel": "监控"
+          }
+        ]
+      }
+    },
+    {
+      "id": "page-monitor",
+      "title": "监控",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1782292293000,
+      "canvasData": {
+        "x": 1860,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/monitor.html",
+        "interactions": [
+          {
+            "domId": "nav-dashboard",
+            "targetPageId": "page-dashboard",
+            "hideEdge": true,
+            "transitionLabel": "工作台"
+          },
+          {
+            "domId": "nav-build",
+            "targetPageId": "page-build",
+            "transitionLabel": "构建"
+          }
+        ]
+      }
+    },
+    {
+      "id": "page-build",
+      "title": "构建",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1782292293000,
+      "canvasData": {
+        "x": 2480,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/build.html",
+        "interactions": [
+          {
+            "domId": "nav-dashboard",
+            "targetPageId": "page-dashboard",
+            "hideEdge": true,
+            "transitionLabel": "工作台"
+          },
+          {
+            "domId": "nav-docs",
+            "targetPageId": "page-docs",
+            "transitionLabel": "文档"
+          }
+        ]
+      }
+    },
+    {
+      "id": "page-docs",
+      "title": "文档",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1782292293000,
+      "canvasData": {
+        "x": 3100,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/docs.html",
+        "interactions": [
+          {
+            "domId": "nav-dashboard",
+            "targetPageId": "page-dashboard",
+            "hideEdge": true,
+            "transitionLabel": "工作台"
+          },
+          {
+            "domId": "nav-plugins",
+            "targetPageId": "page-plugins",
+            "transitionLabel": "插件"
+          }
+        ]
+      }
+    },
+    {
+      "id": "page-plugins",
+      "title": "插件",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1782292293000,
+      "canvasData": {
+        "x": 3720,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/plugins.html",
+        "interactions": [
+          {
+            "domId": "nav-dashboard",
+            "targetPageId": "page-dashboard",
+            "hideEdge": true,
+            "transitionLabel": "工作台"
+          },
+          {
+            "domId": "nav-settings",
+            "targetPageId": "page-settings",
+            "transitionLabel": "设置"
+          }
+        ]
+      }
+    },
+    {
+      "id": "page-settings",
+      "title": "设置",
+      "type": "page",
+      "version": 1,
+      "createdAt": 1782292293000,
+      "canvasData": {
+        "x": 4340,
+        "y": 0,
+        "group": 0
+      },
+      "devMetadata": {
+        "htmlSrc": "pages/settings.html",
+        "interactions": [
+          {
+            "domId": "nav-dashboard",
+            "targetPageId": "page-dashboard",
+            "hideEdge": true,
+            "transitionLabel": "工作台"
+          }
+        ]
+      }
+    }
+  ],
+  "config": {
+    "autoLayout": true,
+    "deviceType": "desktop",
+    "projectName": "TapDev Studio UI 设计",
+    "designLibrary": null,
+    "windowSize": {
+      "width": 800,
+      "height": 600
+    },
+    "showEdge": false
+  }
+}

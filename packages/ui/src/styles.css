@@ -1,0 +1,25 @@
+:root {
+  --tap-orange: #ff6b00;
+  --tap-orange-light: #ff8533;
+  --surface-0: #0d0d0f;
+  --surface-1: #16161a;
+  --surface-2: #1e1e24;
+  --surface-3: #2a2a32;
+  --border: #2e2e38;
+  --text-primary: #f0f0f5;
+  --text-secondary: #a0a0b0;
+  --text-muted: #6b6b7b;
+}
+
+.bg-tap-orange { background-color: var(--tap-orange); }
+.bg-tap-orange-light { background-color: var(--tap-orange-light); }
+.text-tap-orange { color: var(--tap-orange); }
+.border-tap-orange { border-color: var(--tap-orange); }
+.bg-surface-0 { background-color: var(--surface-0); }
+.bg-surface-1 { background-color: var(--surface-1); }
+.bg-surface-2 { background-color: var(--surface-2); }
+.bg-surface-3 { background-color: var(--surface-3); }
+.border-border { border-color: var(--border); }
+.text-text-primary { color: var(--text-primary); }
+.text-text-secondary { color: var(--text-secondary); }
+.text-text-muted { color: var(--text-muted); }

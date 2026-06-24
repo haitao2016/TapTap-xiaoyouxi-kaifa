@@ -1,0 +1,81 @@
+{
+  "name": "@tapdev/desktop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "TapDev Studio 桌面端 (Electron)",
+  "main": "dist/main.js",
+  "scripts": {
+    "dev": "concurrently -k \"pnpm --filter @tapdev/studio dev\" \"wait-on http://localhost:3000 && pnpm build:main && electron .\"",
+    "build": "pnpm build:all && electron-builder",
+    "build:all": "pnpm --filter @tapdev/server build && pnpm --filter @tapdev/studio build && pnpm build:main && pnpm copy:studio",
+    "build:main": "tsc",
+    "copy:studio": "node scripts/copy-studio.js",
+    "typecheck": "tsc --noEmit",
+    "pack": "pnpm build:all && electron-builder --dir",
+    "dist:win": "pnpm build:all && electron-builder --win",
+    "dist:mac": "pnpm build:all && electron-builder --mac",
+    "dist:linux": "pnpm build:all && electron-builder --linux"
+  },
+  "dependencies": {
+    "@tapdev/server": "workspace:*",
+    "@tapdev/types": "workspace:*"
+  },
+  "devDependencies": {
+    "@tapdev/studio": "workspace:*",
+    "concurrently": "^9.1.0",
+    "electron": "^33.2.1",
+    "electron-builder": "^25.1.8",
+    "typescript": "^5.7.2",
+    "wait-on": "^8.0.1"
+  },
+  "build": {
+    "appId": "com.tapdev.studio",
+    "productName": "TapDev Studio",
+    "copyright": "Copyright © 2026 TapDev Studio",
+    "directories": {
+      "output": "release",
+      "buildResources": "assets"
+    },
+    "files": [
+      "dist/**/*",
+      "studio-dist/**/*",
+      "package.json"
+    ],
+    "extraResources": [
+      {
+        "from": "../../templates/unity",
+        "to": "templates/unity",
+        "filter": ["**/*"]
+      }
+    ],
+    "asar": true,
+    "asarUnpack": [
+      "node_modules/@tapdev/server/**/*"
+    ],
+    "win": {
+      "target": [
+        { "target": "nsis", "arch": ["x64"] }
+      ],
+      "artifactName": "${productName}-${version}-win-${arch}.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "TapDev Studio"
+    },
+    "mac": {
+      "target": ["dmg", "zip"],
+      "category": "public.app-category.developer-tools",
+      "artifactName": "${productName}-${version}-mac.${ext}",
+      "hardenedRuntime": true,
+      "gatekeeperAssess": false
+    },
+    "linux": {
+      "target": ["AppImage", "deb"],
+      "category": "Development",
+      "artifactName": "${productName}-${version}-linux.${ext}"
+    }
+  }
+}

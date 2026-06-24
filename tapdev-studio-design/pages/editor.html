@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TapDev Studio - 编辑器</title>
+    <style id="theme-vars">
+/* TapDev Studio Brand CSS */
+:root {
+  /* Brand Colors */
+  --color-primary: #ff6b00;
+  --color-primary-light: #ff8533;
+  --color-primary-dark: #e05e00;
+  --color-primary-muted: rgba(255, 107, 0, 0.1);
+
+  /* Surface System */
+  --surface-0: #0d0d0f;
+  --surface-1: #16161a;
+  --surface-2: #1e1e24;
+  --surface-3: #2a2a32;
+
+  /* Border */
+  --color-border: #2e2e38;
+  --color-border-hover: #3e3e4a;
+
+  /* Text */
+  --color-text-primary: #f0f0f5;
+  --color-text-secondary: #a0a0b0;
+  --color-text-muted: #6b6b7b;
+
+  /* State Colors */
+  --state-success: #22c55e;
+  --state-warning: #eab308;
+  --state-error: #ef4444;
+  --state-info: #3b82f6;
+
+  /* Radius Scale */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* Typography */
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans SC', sans-serif;
+  --font-mono: 'SF Mono', 'Fira Code', 'Cascadia Code', Consolas, 'Liberation Mono', Menlo, monospace;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.625;
+
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.4);
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-primary: var(--color-primary);
+    --color-border: var(--color-border);
+  }
+  @layer base {
+    body { background: var(--color-background); color: var(--color-text-primary); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+      /* Code editor custom styles */
+      .code-line { line-height: 1.6; }
+      .syn-keyword { color: #c586c0; }
+      .syn-type { color: #4ec9b0; }
+      .syn-string { color: #ff6b00; }
+      .syn-comment { color: #6a9955; font-style: italic; }
+      .syn-method { color: #dcdcaa; }
+      .syn-number { color: #b5cea8; }
+      .syn-class { color: #4ec9b0; }
+      .syn-param { color: #9cdcfe; }
+      .syn-bracket { color: #f0f0f5; }
+      .syn-attribute { color: #d7ba7d; }
+      .syn-enum { color: #4fc1ff; }
+      .syn-operator { color: #d4d4d4; }
+      .syn-plain { color: #d4d4d4; }
+      .file-tree-item:hover { background: rgba(255, 255, 255, 0.04); }
+      .file-tree-item.active { background: rgba(255, 107, 0, 0.08); }
+      .tab-item { cursor: pointer; user-select: none; }
+      .tab-item:hover { background: rgba(255, 255, 255, 0.04); }
+      .tab-item.active { background: #1e1e24; border-top: 2px solid #ff6b00; }
+      .tab-item:not(.active) { border-top: 2px solid transparent; }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased" style="background: var(--surface-0); color: var(--color-text-primary); overflow: hidden;">
+    <main class="flex h-screen">
+        <!-- Left Sidebar -->
+        <aside class="w-56 flex flex-col border-r" style="background: var(--surface-1); border-color: var(--color-border); min-width: 14rem;">
+            <!-- Logo -->
+            <div class="flex items-center gap-2 px-4 h-14 border-b" style="border-color: var(--color-border);">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <rect x="2" y="2" width="20" height="20" rx="4" fill="#ff6b00"/>
+                    <path d="M7 8h10M7 12h6M7 16h8" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>
+                <span class="text-sm font-semibold" style="color: var(--color-text-primary);">TapDev Studio</span>
+            </div>
+
+            <!-- Nav Items -->
+            <nav class="flex-1 py-2">
+                <a href="#" class="flex items-center gap-3 px-4 py-2 text-sm" style="color: var(--color-text-secondary);" data-dom-id="nav-dashboard">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>
+                    </svg>
+                    工作台
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-2 text-sm" style="color: var(--color-text-primary); background: var(--color-primary-muted);">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ff6b00" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>
+                    </svg>
+                    编辑器
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-2 text-sm" style="color: var(--color-text-secondary);" data-dom-id="nav-debug">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+                    </svg>
+                    调试
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-2 text-sm" style="color: var(--color-text-secondary);">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/>
+                    </svg>
+                    监控
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-2 text-sm" style="color: var(--color-text-secondary);">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    构建
+                </a>
+                <a href="#" class="flex items-center gap-3 px-4 py-2 text-sm" style="color: var(--color-text-secondary);">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+                    </svg>
+                    设置
+                </a>
+            </nav>
+
+            <!-- Current Project -->
+            <div class="border-t px-4 py-3" style="border-color: var(--color-border);">
+                <div class="text-xs mb-1" style="color: var(--color-text-muted);">当前项目</div>
+                <div class="flex items-center gap-2">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#ff6b00" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                    </svg>
+                    <span class="text-xs truncate" style="color: var(--color-text-primary);">TapTap 小游戏 Demo</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <div class="flex-1 flex flex-col">
+            <!-- Top Header -->
+            <header class="h-14 flex items-center px-4 border-b" style="border-color: var(--color-border); background: var(--surface-1);">
+                <!-- Hamburger -->
+                <button class="p-1.5 rounded" style="color: var(--color-text-secondary);">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round">
+                        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+                    </svg>
+                </button>
+                <div class="flex-1"></div>
+                <!-- Badges -->
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium mr-2" style="background: var(--surface-3); color: var(--color-text-secondary);">PC</span>
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium" style="background: var(--surface-3); color: var(--color-text-secondary);">UNITY</span>
+            </header>
+
+            <!-- Editor Area -->
+            <div class="flex" style="height: calc(100vh - 3.5rem);">
+                <!-- File Explorer -->
+                <div class="w-56 border-r flex flex-col" style="background: var(--surface-1); border-color: var(--color-border); min-width: 14rem;">
+                    <!-- Explorer Header -->
+                    <div class="px-3 py-2 text-xs font-medium border-b flex items-center justify-between" style="color: var(--color-text-muted); border-color: var(--color-border);">
+                        <span>资源管理器</span>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/>
+                        </svg>
+                    </div>
+                    <!-- File Tree -->
+                    <div class="flex-1 overflow-y-auto py-1 text-xs" style="color: var(--color-text-secondary);">
+                        <!-- Assets (expanded) -->
+                        <div class="file-tree-item flex items-center gap-1.5 px-2 py-1 cursor-pointer" style="padding-left: 0.5rem;">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(90deg);">
+                                <polyline points="9 18 15 12 9 6"/>
+                            </svg>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="#ff6b00" stroke="none">
+                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                            </svg>
+                            <span style="color: var(--color-text-primary);">Assets</span>
+                        </div>
+                        <!-- Scripts (expanded) -->
+                        <div class="file-tree-item flex items-center gap-1.5 px-2 py-1 cursor-pointer" style="padding-left: 1.75rem;">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(90deg);">
+                                <polyline points="9 18 15 12 9 6"/>
+                            </svg>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="#ff6b00" stroke="none">
+                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                            </svg>
+                            <span style="color: var(--color-text-primary);">Scripts</span>
+                        </div>
+                        <!-- GameManager.cs (active) -->
+                        <div class="file-tree-item active flex items-center gap-1.5 px-2 py-1 cursor-pointer" style="padding-left: 3rem;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ec9b0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+                            </svg>
+                            <span style="color: var(--color-text-primary);">GameManager.cs</span>
+                        </div>
+                        <!-- PlayerController.cs -->
+                        <div class="file-tree-item flex items-center gap-1.5 px-2 py-1 cursor-pointer" style="padding-left: 3rem;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ec9b0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+                            </svg>
+                            <span>PlayerController.cs</span>
+                        </div>
+                        <!-- UIManager.cs -->
+                        <div class="file-tree-item flex items-center gap-1.5 px-2 py-1 cursor-pointer" style="padding-left: 3rem;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ec9b0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+                            </svg>
+                            <span>UIManager.cs</span>
+                        </div>
+                        <!-- Scenes (collapsed) -->
+                        <div class="file-tree-item flex items-center gap-1.5 px-2 py-1 cursor-pointer" style="padding-left: 1.75rem;">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="9 18 15 12 9 6"/>
+                            </svg>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="#ff6b00" stroke="none">
+                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                            </svg>
+                            <span>Scenes</span>
+                        </div>
+                        <!-- Prefabs (collapsed) -->
+                        <div class="file-tree-item flex items-center gap-1.5 px-2 py-1 cursor-pointer" style="padding-left: 1.75rem;">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="9 18 15 12 9 6"/>
+                            </svg>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="#ff6b00" stroke="none">
+                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                            </svg>
+                            <span>Prefabs</span>
+                        </div>
+                        <!-- Resources (collapsed) -->
+                        <div class="file-tree-item flex items-center gap-1.5 px-2 py-1 cursor-pointer" style="padding-left: 1.75rem;">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="9 18 15 12 9 6"/>
+                            </svg>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="#ff6b00" stroke="none">
+                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                            </svg>
+                            <span>Resources</span>
+                        </div>
+                        <!-- ProjectSettings (collapsed) -->
+                        <div class="file-tree-item flex items-center gap-1.5 px-2 py-1 cursor-pointer" style="padding-left: 0.5rem;">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="9 18 15 12 9 6"/>
+                            </svg>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="#ff6b00" stroke="none">
+                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/>
+                            </svg>
+                            <span>ProjectSettings</span>
+                        </div>
+                        <!-- TapDevBuildRunner.cs -->
+                        <div class="file-tree-item flex items-center gap-1.5 px-2 py-1 cursor-pointer" style="padding-left: 0.5rem;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ec9b0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+                            </svg>
+                            <span>TapDevBuildRunner.cs</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Editor Main Area -->
+                <div class="flex-1 flex flex-col">
+                    <!-- Tab Bar -->
+                    <div class="flex items-center border-b" style="background: var(--surface-1); border-color: var(--color-border);">
+                        <!-- Active Tab -->
+                        <div class="tab-item active flex items-center gap-2 px-3 py-2 text-xs" style="min-width: 0;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ec9b0" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+                            </svg>
+                            <span style="color: var(--color-text-primary);">GameManager.cs</span>
+                            <span style="color: #ff6b00;">&#9679;</span>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="ml-1 opacity-50">
+                                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                            </svg>
+                        </div>
+                        <!-- Inactive Tab: PlayerController.cs -->
+                        <div class="tab-item flex items-center gap-2 px-3 py-2 text-xs" style="min-width: 0; border-right: 1px solid var(--color-border);">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.5;">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+                            </svg>
+                            <span style="color: var(--color-text-secondary);">PlayerController.cs</span>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="ml-1 opacity-30">
+                                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                            </svg>
+                        </div>
+                        <!-- Inactive Tab: UIManager.cs -->
+                        <div class="tab-item flex items-center gap-2 px-3 py-2 text-xs" style="min-width: 0;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.5;">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+                            </svg>
+                            <span style="color: var(--color-text-secondary);">UIManager.cs</span>
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" class="ml-1 opacity-30">
+                                <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+                            </svg>
+                        </div>
+                        <div class="flex-1"></div>
+                        <!-- Cursor count -->
+                        <span class="text-xs px-3 py-1" style="color: var(--color-text-muted);">3 个光标</span>
+                    </div>
+
+                    <!-- Code Editor Area -->
+                    <div class="flex-1 overflow-auto" style="background: #1e1e1e;">
+                        <div class="flex" style="font-family: var(--font-mono); font-size: 13px;">
+                            <!-- Line Numbers -->
+                            <div class="text-right pr-4 pl-4 select-none py-3" style="color: var(--color-text-muted); min-width: 3.5rem; line-height: 1.6;">
+                                <div>1</div><div>2</div><div>3</div><div>4</div><div>5</div><div>6</div><div>7</div><div>8</div><div>9</div><div>10</div><div>11</div><div>12</div><div>13</div><div>14</div><div>15</div><div>16</div><div>17</div><div>18</div><div>19</div><div>20</div><div>21</div><div>22</div><div>23</div><div>24</div><div>25</div><div>26</div><div>27</div><div>28</div><div>29</div><div>30</div>
+                            </div>
+                            <!-- Code Content -->
+                            <div class="flex-1 py-3 pr-6 overflow-x-auto" style="line-height: 1.6;">
+                                <div class="code-line"><span class="syn-keyword">using</span> <span class="syn-plain">UnityEngine</span><span class="syn-bracket">;</span></div>
+                                <div class="code-line"><span class="syn-keyword">using</span> <span class="syn-plain">UnityEngine.SceneManagement</span><span class="syn-bracket">;</span></div>
+                                <div class="code-line"><span class="syn-keyword">using</span> <span class="syn-plain">TapDev.Sdk</span><span class="syn-bracket">;</span></div>
+                                <div class="code-line">&nbsp;</div>
+                                <div class="code-line"><span class="syn-keyword">namespace</span> <span class="syn-plain">TapTapGame</span></div>
+                                <div class="code-line"><span class="syn-bracket">{</span></div>
+                                <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="syn-bracket">[</span><span class="syn-attribute">RequireComponent</span><span class="syn-bracket">(</span><span class="syn-keyword">typeof</span><span class="syn-bracket">(</span><span class="syn-type">Rigidbody</span><span class="syn-bracket">))]</span></div>
+                                <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="syn-keyword">public class</span> <span class="syn-class">GameManager</span> <span class="syn-bracket">:</span> <span class="syn-type">MonoBehaviour</span></div>
+                                <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;<span class="syn-bracket">{</span></div>
+                                <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="syn-comment">// 单例实例</span></div>
+                                <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="syn-keyword">public static</span> <span class="syn-class">GameManager</span> <span class="syn-plain">Instance</span> <span class="syn-bracket">{</span> <span class="syn-keyword">get</span><span class="syn-bracket">;</span> <span class="syn-keyword">private set</span><span class="syn-bracket">;</span> <span class="syn-bracket">}</span></div>
+                                <div class="code-line">&nbsp;</div>
+                                <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="syn-bracket">[</span><span class="syn-attribute">Header</span><span class="syn-bracket">(</span><span class="syn-string">"游戏设置"</span><span class="syn-bracket">)]</span></div>
+                                <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="syn-bracket">[</span><span class="syn-attribute">SerializeField</span><span class="syn-bracket">]</span> <span class="syn-keyword">private int</span> <span class="syn-plain">maxLives</span> <span class="syn-operator">=</span> <span class="syn-number">3</span><span class="syn-bracket">;</span></div>
+                                <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="syn-bracket">[</span><span class="syn-attribute">SerializeField</span><span class="syn-bracket">]</span> <span class="syn-keyword">private float</span> <span class="syn-plain">gameDuration</span> <span class="syn-operator">=</span> <span class="syn-number">60f</span><span class="syn-bracket">;</span></div>
+                                <div class="code-line">&nbsp;</div>
+                                <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="syn-keyword">public</span> <span class="syn-keyword">event</span> <span class="syn-type">System.Action</span><span class="syn-bracket">&lt;</span><span class="syn-type">GameState</span><span class="syn-bracket">&gt;</span> <span class="syn-plain">OnStateChanged</span><span class="syn-bracket">;</span></div>
+                                <div class="code-line">&nbsp;</div>
+                                <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="syn-keyword">private</span> <span class="syn-type">GameState</span> <span class="syn-plain">currentState</span><span class="syn-bracket">;</span></div>
+                                <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="syn-keyword">private</span> <span class="syn-keyword">int</span> <span class="syn-plain">currentScore</span><span class="syn-bracket">;</span></div>
+                                <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="syn-keyword">private</span> <span class="syn-type">TapDevAnalytics</span> <span class="syn-plain">analytics</span><span class="syn-bracket">;</span></div>
+                                <div class="code-line">&nbsp;</div>
+                                <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="syn-keyword">private void</span> <span class="syn-method">Awake</span><span class="syn-bracket">()</span></div>
+                                <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="syn-bracket">{</span></div>
+                                <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="syn-keyword">if</span> <span class="syn-bracket">(</span><span class="syn-plain">Instance</span> <span class="syn-operator">!=</span> <span class="syn-keyword">null</span> <span class="syn-operator">&&</span> <span class="syn-plain">Instance</span> <span class="syn-operator">!=</span> <span class="syn-keyword">this</span><span class="syn-bracket">)</span></div>
+                                <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="syn-bracket">{</span></div>
+                                <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="syn-type">Destroy</span><span class="syn-bracket">(</span><span class="syn-plain">gameObject</span><span class="syn-bracket">);</span></div>
+                                <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="syn-keyword">return</span><span class="syn-bracket">;</span></div>
+                                <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="syn-bracket">}</span></div>
+                                <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="syn-plain">Instance</span> <span class="syn-operator">=</span> <span class="syn-keyword">this</span><span class="syn-bracket">;</span></div>
+                                <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="syn-plain">DontDestroyOnLoad</span><span class="syn-bracket">(</span><span class="syn-plain">gameObject</span><span class="syn-bracket">);</span></div>
+                                <div class="code-line">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="syn-bracket">}</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Status Bar -->
+                    <div class="flex items-center justify-between px-3 py-1 border-t text-xs" style="background: var(--surface-1); border-color: var(--color-border);">
+                        <div class="flex items-center gap-3">
+                            <span style="color: var(--color-text-secondary);">GameManager.cs</span>
+                            <span style="color: var(--color-text-muted);">|</span>
+                            <span style="color: var(--color-text-secondary);">C#</span>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span style="color: var(--color-text-muted);">按 Ctrl+空格 打开代码片段</span>
+                            <span style="color: var(--color-text-muted);">|</span>
+                            <span style="color: var(--color-text-secondary);">多光标: 3</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script>lucide.createIcons();</script>
+</body>
+</html>

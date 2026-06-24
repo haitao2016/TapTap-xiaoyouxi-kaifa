@@ -1,0 +1,116 @@
+{
+  "generatedAt": "2026-06-24T07:50:43.187Z",
+  "summary": {
+    "testFiles": 6,
+    "testCases": 102,
+    "testSuites": 64,
+    "sourceFiles": 52,
+    "estimatedCoverage": "12%"
+  },
+  "testFiles": [
+    {
+      "name": "build-service.test.ts",
+      "path": "\\tests\\build-service.test.ts"
+    },
+    {
+      "name": "debug-service.test.ts",
+      "path": "\\tests\\debug-service.test.ts"
+    },
+    {
+      "name": "event-bus.test.ts",
+      "path": "\\tests\\event-bus.test.ts"
+    },
+    {
+      "name": "monitor-service.test.ts",
+      "path": "\\tests\\monitor-service.test.ts"
+    },
+    {
+      "name": "plugin-manager.test.ts",
+      "path": "\\tests\\plugin-manager.test.ts"
+    },
+    {
+      "name": "project-manager.test.ts",
+      "path": "\\tests\\project-manager.test.ts"
+    }
+  ],
+  "sourceFilesByDir": {
+    "\\packages\\core\\src": [
+      "build-service.ts",
+      "debug-client.ts",
+      "debug-service.ts",
+      "doc-service.ts",
+      "event-bus.ts",
+      "index.ts",
+      "monitor-service.ts",
+      "platform-service.ts",
+      "plugin-manager.ts",
+      "project-manager.ts"
+    ],
+    "\\packages\\server\\src": [
+      "cli.ts",
+      "debug-server.ts",
+      "index.ts",
+      "unity-build-runner.ts"
+    ],
+    "\\packages\\types\\src": [
+      "build.ts",
+      "debug.ts",
+      "docs.ts",
+      "index.ts",
+      "monitor.ts",
+      "platform.ts",
+      "plugin.ts",
+      "project.ts",
+      "server.ts"
+    ],
+    "\\packages\\ui\\src": [
+      "badge.tsx",
+      "button.tsx",
+      "card.tsx",
+      "icon.tsx",
+      "index.ts",
+      "input.tsx",
+      "progress.tsx",
+      "tabs.tsx",
+      "utils.ts"
+    ],
+    "\\apps\\desktop\\src": [
+      "main.ts",
+      "native-service.ts",
+      "preload.ts"
+    ],
+    "\\apps\\mobile": [
+      "capacitor.config.ts"
+    ],
+    "\\apps\\mobile\\src": [
+      "index.ts",
+      "native-bridge.ts"
+    ],
+    "\\apps\\studio\\src": [
+      "App.tsx",
+      "main.tsx"
+    ],
+    "\\apps\\studio\\src\\layouts": [
+      "AppLayout.tsx"
+    ],
+    "\\apps\\studio\\src\\lib": [
+      "native-bridge.ts"
+    ],
+    "\\apps\\studio\\src\\pages": [
+      "BuildPage.tsx",
+      "DashboardPage.tsx",
+      "DebugPage.tsx",
+      "DocsPage.tsx",
+      "EditorPage.tsx",
+      "MonitorPage.tsx",
+      "PluginsPage.tsx",
+      "SettingsPage.tsx"
+    ],
+    "\\apps\\studio\\src\\store": [
+      "app-store.ts"
+    ],
+    "\\apps\\studio": [
+      "vite.config.ts"
+    ]
+  }
+}

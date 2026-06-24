@@ -1,0 +1,741 @@
+{
+  "name": "TapDev Studio",
+  "version": "1.1.0",
+  "description": "跨平台 TapTap 小游戏集成开发环境 - 所有计划阶段已完成",
+  "createdAt": "2026-06-24",
+  "lastUpdated": "2026-06-24",
+  "phases": {
+    "phase1": {
+      "name": "稳定性提升",
+      "duration": "2周",
+      "status": "completed",
+      "tasks": [
+        {
+          "id": "P1-1",
+          "name": "依赖安全审计",
+          "priority": "high",
+          "description": "检查并更新所有依赖的安全漏洞",
+          "expectedResult": "无高危漏洞",
+          "status": "completed"
+        },
+        {
+          "id": "P1-2",
+          "name": "单元测试覆盖",
+          "priority": "high",
+          "description": "为核心服务编写完整测试",
+          "expectedResult": "覆盖率 > 80%",
+          "status": "completed"
+        },
+        {
+          "id": "P1-3",
+          "name": "E2E 测试",
+          "priority": "medium",
+          "description": "使用 Playwright 编写端到端测试",
+          "expectedResult": "核心流程自动化",
+          "status": "completed"
+        },
+        {
+          "id": "P1-4",
+          "name": "错误边界处理",
+          "priority": "high",
+          "description": "添加 React 错误边界，防止白屏",
+          "expectedResult": "用户体验提升",
+          "status": "completed"
+        }
+      ]
+    },
+    "phase2": {
+      "name": "核心功能增强",
+      "duration": "4周",
+      "status": "completed",
+      "tasks": [
+        {
+          "id": "P2-1",
+          "name": "代码片段（Snippet）",
+          "priority": "high",
+          "category": "editor",
+          "description": "支持自定义代码模板",
+          "expectedResult": "提升开发效率",
+          "status": "completed"
+        },
+        {
+          "id": "P2-2",
+          "name": "多光标编辑",
+          "priority": "high",
+          "category": "editor",
+          "description": "支持多光标同时编辑",
+          "expectedResult": "批量修改能力",
+          "status": "completed"
+        },
+        {
+          "id": "P2-3",
+          "name": "代码格式化",
+          "priority": "high",
+          "category": "editor",
+          "description": "集成 Prettier/ESLint",
+          "expectedResult": "代码风格统一",
+          "status": "completed"
+        },
+        {
+          "id": "P2-4",
+          "name": "条件断点",
+          "priority": "high",
+          "category": "debug",
+          "description": "支持断点条件表达式",
+          "expectedResult": "精确定位问题",
+          "status": "completed"
+        },
+        {
+          "id": "P2-5",
+          "name": "监视变量面板",
+          "priority": "high",
+          "category": "debug",
+          "description": "实时监视变量值变化",
+          "expectedResult": "调试体验提升",
+          "status": "completed"
+        },
+        {
+          "id": "P2-6",
+          "name": "调用堆栈视图",
+          "priority": "high",
+          "category": "debug",
+          "description": "显示完整调用链",
+          "expectedResult": "问题追溯能力",
+          "status": "completed"
+        },
+        {
+          "id": "P2-7",
+          "name": "构建缓存",
+          "priority": "medium",
+          "category": "build",
+          "description": "增量构建，只编译改动",
+          "expectedResult": "构建速度提升",
+          "status": "completed"
+        },
+        {
+          "id": "P2-8",
+          "name": "构建历史",
+          "priority": "medium",
+          "category": "build",
+          "description": "保存历史构建记录",
+          "expectedResult": "版本回溯能力",
+          "status": "completed"
+        },
+        {
+          "id": "P2-9",
+          "name": "构建对比",
+          "priority": "low",
+          "category": "build",
+          "description": "对比两次构建差异",
+          "expectedResult": "问题定位辅助",
+          "status": "completed"
+        }
+      ]
+    },
+    "phase3": {
+      "name": "用户体验",
+      "duration": "3周",
+      "status": "completed",
+      "tasks": [
+        {
+          "id": "P3-1",
+          "name": "主题系统",
+          "priority": "high",
+          "category": "ui",
+          "description": "支持亮/暗/自定义主题",
+          "expectedResult": "视觉个性化",
+          "status": "completed"
+        },
+        {
+          "id": "P3-2",
+          "name": "响应式布局",
+          "priority": "high",
+          "category": "ui",
+          "description": "优化平板/手机适配",
+          "expectedResult": "全设备支持",
+          "status": "completed"
+        },
+        {
+          "id": "P3-3",
+          "name": "动画过渡",
+          "priority": "medium",
+          "category": "ui",
+          "description": "添加流畅的 UI 动画",
+          "expectedResult": "交互体验提升",
+          "status": "completed"
+        },
+        {
+          "id": "P3-4",
+          "name": "懒加载",
+          "priority": "high",
+          "category": "performance",
+          "description": "路由/组件按需加载",
+          "expectedResult": "首屏加载 < 2s",
+          "status": "completed"
+        },
+        {
+          "id": "P3-5",
+          "name": "虚拟列表",
+          "priority": "high",
+          "category": "performance",
+          "description": "大列表虚拟滚动",
+          "expectedResult": "内存占用降低",
+          "status": "completed"
+        },
+        {
+          "id": "P3-6",
+          "name": "Web Worker",
+          "priority": "medium",
+          "category": "performance",
+          "description": "耗时计算移至 Worker",
+          "expectedResult": "UI 流畅度提升",
+          "status": "completed"
+        },
+        {
+          "id": "P3-7",
+          "name": "全局快捷键",
+          "priority": "medium",
+          "category": "shortcut",
+          "description": "自定义快捷键绑定",
+          "expectedResult": "效率提升",
+          "status": "completed"
+        },
+        {
+          "id": "P3-8",
+          "name": "命令面板增强",
+          "priority": "medium",
+          "category": "shortcut",
+          "description": "Vim 风格命令搜索",
+          "expectedResult": "极客体验",
+          "status": "completed"
+        }
+      ]
+    },
+    "phase4": {
+      "name": "生态扩展",
+      "duration": "4周",
+      "status": "completed",
+      "tasks": [
+        {
+          "id": "P4-1",
+          "name": "插件市场",
+          "priority": "high",
+          "category": "plugin",
+          "description": "在线插件浏览/安装",
+          "expectedResult": "生态建设",
+          "status": "completed"
+        },
+        {
+          "id": "P4-2",
+          "name": "插件沙箱",
+          "priority": "high",
+          "category": "plugin",
+          "description": "安全隔离的插件环境",
+          "expectedResult": "安全性保障",
+          "status": "completed"
+        },
+        {
+          "id": "P4-3",
+          "name": "官方插件",
+          "priority": "medium",
+          "category": "plugin",
+          "description": "发布 5+ 官方插件",
+          "expectedResult": "功能丰富",
+          "status": "completed"
+        },
+        {
+          "id": "P4-4",
+          "name": "项目模板",
+          "priority": "medium",
+          "category": "template",
+          "description": "提供多种游戏模板",
+          "expectedResult": "快速启动",
+          "status": "completed"
+        },
+        {
+          "id": "P4-5",
+          "name": "模板市场",
+          "priority": "low",
+          "category": "template",
+          "description": "用户分享/下载模板",
+          "expectedResult": "社区建设",
+          "status": "completed"
+        },
+        {
+          "id": "P4-6",
+          "name": "云端同步",
+          "priority": "low",
+          "category": "cloud",
+          "description": "配置/插件云同步",
+          "expectedResult": "多设备协作",
+          "status": "completed"
+        },
+        {
+          "id": "P4-7",
+          "name": "团队协作",
+          "priority": "low",
+          "category": "cloud",
+          "description": "项目共享/权限管理",
+          "expectedResult": "团队开发支持",
+          "status": "completed"
+        }
+      ]
+    },
+    "phase5": {
+      "name": "平台扩展",
+      "duration": "持续",
+      "status": "completed",
+      "tasks": [
+        {
+          "id": "P5-1",
+          "name": "iOS App",
+          "priority": "high",
+          "category": "mobile",
+          "description": "App Store 发布",
+          "expectedResult": "iOS 开发者支持",
+          "status": "completed"
+        },
+        {
+          "id": "P5-2",
+          "name": "Android App",
+          "priority": "high",
+          "category": "mobile",
+          "description": "Google Play 发布",
+          "expectedResult": "Android 开发者支持",
+          "status": "completed"
+        },
+        {
+          "id": "P5-3",
+          "name": "PWA 支持",
+          "priority": "medium",
+          "category": "web",
+          "description": "可安装的 Web 应用",
+          "expectedResult": "免安装使用",
+          "status": "completed"
+        },
+        {
+          "id": "P5-4",
+          "name": "tapdev-cli",
+          "priority": "low",
+          "category": "cli",
+          "description": "命令行项目创建/构建",
+          "expectedResult": "无头模式支持",
+          "status": "completed"
+        }
+      ]
+    },
+    "phase6": {
+      "name": "引擎支持扩展",
+      "duration": "3周",
+      "status": "completed",
+      "tasks": [
+        {
+          "id": "P6-1",
+          "name": "HTML5 2D 引擎适配器",
+          "priority": "high",
+          "category": "engine",
+          "description": "支持原生 HTML5/Canvas 2D 项目的创建、预览、构建",
+          "expectedResult": "2D 项目从模板到真机预览全流程打通",
+          "status": "completed"
+        },
+        {
+          "id": "P6-2",
+          "name": "HTML5 3D 引擎适配器",
+          "priority": "high",
+          "category": "engine",
+          "description": "支持 WebGL/Three.js/Babylon.js 3D 小游戏",
+          "expectedResult": "创建 3D 小游戏并预览",
+          "status": "completed"
+        },
+        {
+          "id": "P6-3",
+          "name": "Cocos Creator 项目适配",
+          "priority": "medium",
+          "category": "engine",
+          "description": "支持 Cocos Creator 项目的打开和构建",
+          "expectedResult": "打开 Cocos 项目可一键构建",
+          "status": "completed"
+        },
+        {
+          "id": "P6-4",
+          "name": "TypeScript / Shader 语言增强",
+          "priority": "medium",
+          "category": "editor",
+          "description": "TS 项目配置、GLSL/WGSL Shader 语法高亮",
+          "expectedResult": "编写 TS/Shader 体验提升",
+          "status": "completed"
+        }
+      ]
+    },
+    "phase7": {
+      "name": "AI 辅助开发",
+      "duration": "4周",
+      "status": "completed",
+      "tasks": [
+        {
+          "id": "P7-1",
+          "name": "AI 代码补全",
+          "priority": "high",
+          "category": "ai",
+          "description": "集成 AI 引擎提供实时代码补全（多后端）",
+          "expectedResult": "Tab 键触发 AI 补全",
+          "status": "completed"
+        },
+        {
+          "id": "P7-2",
+          "name": "AI 错误诊断",
+          "priority": "high",
+          "category": "ai",
+          "description": "自动分析运行时错误并给出修复建议",
+          "expectedResult": "AI 诊断按钮出现在错误旁",
+          "status": "completed"
+        },
+        {
+          "id": "P7-3",
+          "name": "AI 代码生成/重构",
+          "priority": "medium",
+          "category": "ai",
+          "description": "用自然语言生成代码 / 重构 / 添加注释",
+          "expectedResult": "中文描述功能即可生成代码",
+          "status": "completed"
+        },
+        {
+          "id": "P7-4",
+          "name": "AI 助手面板",
+          "priority": "medium",
+          "category": "ai",
+          "description": "侧边栏常驻 AI 对话窗口",
+          "expectedResult": "随时询问 SDK 用法和代码问题",
+          "status": "completed"
+        }
+      ]
+    },
+    "phase8": {
+      "name": "协作与云端",
+      "duration": "4周",
+      "status": "completed",
+      "tasks": [
+        {
+          "id": "P8-1",
+          "name": "实时协作编辑",
+          "priority": "medium",
+          "category": "collaboration",
+          "description": "Yjs/CRDT 集成 + 多人同时编辑",
+          "expectedResult": "邀请链接邀请协作者，实时看到对方光标",
+          "status": "completed"
+        },
+        {
+          "id": "P8-2",
+          "name": "云端项目存储",
+          "priority": "medium",
+          "category": "cloud",
+          "description": "项目云端备份与同步",
+          "expectedResult": "多设备无缝衔接项目",
+          "status": "completed"
+        },
+        {
+          "id": "P8-3",
+          "name": "Git 集成深化",
+          "priority": "medium",
+          "category": "vcs",
+          "description": "图形化 diff、冲突解决、PR 集成",
+          "expectedResult": "无需命令行完成 Git 操作",
+          "status": "completed"
+        },
+        {
+          "id": "P8-4",
+          "name": "团队工作空间",
+          "priority": "low",
+          "category": "collaboration",
+          "description": "团队成员管理、角色权限",
+          "expectedResult": "团队成员列表、权限分配",
+          "status": "completed"
+        }
+      ]
+    },
+    "phase9": {
+      "name": "TapTap 平台深度集成",
+      "duration": "3周",
+      "status": "completed",
+      "tasks": [
+        {
+          "id": "P9-1",
+          "name": "TapTap 开发者平台登录",
+          "priority": "high",
+          "category": "platform",
+          "description": "IDE 内 TapTap 账号 OAuth 登录",
+          "expectedResult": "登录后可见自己的小游戏列表",
+          "status": "completed"
+        },
+        {
+          "id": "P9-2",
+          "name": "一键上传发布",
+          "priority": "high",
+          "category": "platform",
+          "description": "构建后直接上传到 TapTap 平台",
+          "expectedResult": "一键从构建到发布到 TapTap 后台",
+          "status": "completed"
+        },
+        {
+          "id": "P9-3",
+          "name": "小游戏数据分析",
+          "priority": "medium",
+          "category": "platform",
+          "description": "在 IDE 内查看 DAU/留存/付费等运营数据",
+          "expectedResult": "Dashboard 页面直接看到游戏数据",
+          "status": "completed"
+        },
+        {
+          "id": "P9-4",
+          "name": "TapTap 公告与 SDK 更新",
+          "priority": "low",
+          "category": "platform",
+          "description": "SDK 版本管理和公告推送",
+          "expectedResult": "SDK 新版本有红点提醒",
+          "status": "completed"
+        }
+      ]
+    },
+    "phase10": {
+      "name": "性能与质量",
+      "duration": "持续",
+      "status": "completed",
+      "tasks": [
+        {
+          "id": "P10-1",
+          "name": "启动性能优化",
+          "priority": "high",
+          "category": "performance",
+          "description": "冷启动 < 3 秒",
+          "expectedResult": "P95 冷启动 < 3s",
+          "status": "completed"
+        },
+        {
+          "id": "P10-2",
+          "name": "内存与 CPU 优化",
+          "priority": "high",
+          "category": "performance",
+          "description": "大文件编辑、长列表、Worker 卸载",
+          "expectedResult": "内存占用降低 30%",
+          "status": "completed"
+        },
+        {
+          "id": "P10-3",
+          "name": "国际化 (i18n) 完善",
+          "priority": "medium",
+          "category": "i18n",
+          "description": "完整中英双语切换",
+          "expectedResult": "全 UI 中英切换无遗漏",
+          "status": "completed"
+        },
+        {
+          "id": "P10-4",
+          "name": "CI/CD 与自动发布",
+          "priority": "medium",
+          "category": "devops",
+          "description": "GitHub Actions 多平台构建、桌面端自动更新",
+          "expectedResult": "tag 推送触发全平台发布",
+          "status": "completed"
+        }
+      ]
+    }
+  },
+  "techDebts": [
+    {
+      "id": "TD-1",
+      "name": "TypeScript 严格模式",
+      "priority": "high",
+      "description": "启用 strict: true",
+      "status": "completed"
+    },
+    {
+      "id": "TD-2",
+      "name": "ESLint 规则完善",
+      "priority": "medium",
+      "description": "统一代码规范",
+      "status": "completed"
+    },
+    {
+      "id": "TD-3",
+      "name": "代码注释补全",
+      "priority": "low",
+      "description": "公共 API 文档化",
+      "status": "completed"
+    },
+    {
+      "id": "TD-4",
+      "name": "性能监控集成",
+      "priority": "low",
+      "description": "添加 Web Vitals 追踪",
+      "status": "completed"
+    },
+    {
+      "id": "TD-5",
+      "name": "WebView 性能基线",
+      "priority": "high",
+      "description": "建立 WebView 渲染性能基线和回归测试",
+      "status": "completed"
+    },
+    {
+      "id": "TD-6",
+      "name": "Unity 构建稳定性",
+      "priority": "high",
+      "description": "Unity BatchMode 失败时提供更详细的错误诊断",
+      "status": "completed"
+    },
+    {
+      "id": "TD-7",
+      "name": "Electron 打包体积",
+      "priority": "medium",
+      "description": "拆包和按需加载",
+      "status": "completed"
+    },
+    {
+      "id": "TD-8",
+      "name": "TypeScript 6 升级适配",
+      "priority": "medium",
+      "description": "全面适配 TS 6 新特性",
+      "status": "completed"
+    },
+    {
+      "id": "TD-9",
+      "name": "错误信息本地化",
+      "priority": "low",
+      "description": "统一错误提示格式，提供解决方案链接",
+      "status": "completed"
+    }
+  ],
+  "milestones": [
+    {
+      "version": "v0.2.0",
+      "name": "稳定版发布",
+      "targetDate": "2周后",
+      "phases": [
+        "phase1"
+      ]
+    },
+    {
+      "version": "v0.3.0",
+      "name": "功能增强版",
+      "targetDate": "6周后",
+      "phases": [
+        "phase1",
+        "phase2"
+      ]
+    },
+    {
+      "version": "v0.4.0",
+      "name": "生态完善版",
+      "targetDate": "10周后",
+      "phases": [
+        "phase1",
+        "phase2",
+        "phase3",
+        "phase4"
+      ]
+    },
+    {
+      "version": "v1.0.0",
+      "name": "正式版发布",
+      "targetDate": "4个月后",
+      "phases": [
+        "phase1",
+        "phase2",
+        "phase3",
+        "phase4",
+        "phase5"
+      ]
+    },
+    {
+      "version": "v0.3.1",
+      "name": "多引擎版",
+      "targetDate": "v0.3.0+3周",
+      "phases": [
+        "phase6"
+      ]
+    },
+    {
+      "version": "v0.4.1",
+      "name": "AI 辅助版",
+      "targetDate": "v0.3.1+4周",
+      "phases": [
+        "phase6",
+        "phase7"
+      ]
+    },
+    {
+      "version": "v0.5.0",
+      "name": "协作云端版",
+      "targetDate": "v0.4.1+4周",
+      "phases": [
+        "phase6",
+        "phase7",
+        "phase8"
+      ]
+    },
+    {
+      "version": "v0.6.0",
+      "name": "TapTap 集成版",
+      "targetDate": "v0.5.0+3周",
+      "phases": [
+        "phase6",
+        "phase7",
+        "phase8",
+        "phase9"
+      ]
+    },
+    {
+      "version": "v1.1.0",
+      "name": "持续优化版",
+      "targetDate": "持续",
+      "phases": [
+        "phase6",
+        "phase7",
+        "phase8",
+        "phase9",
+        "phase10"
+      ]
+    }
+  ],
+  "community": [
+    {
+      "id": "CM-1",
+      "name": "GitHub Issues 模板",
+      "priority": "medium",
+      "description": "Bug/Feature 模板",
+      "status": "completed"
+    },
+    {
+      "id": "CM-2",
+      "name": "Contributing 指南",
+      "priority": "medium",
+      "description": "贡献者指南",
+      "status": "completed"
+    },
+    {
+      "id": "CM-3",
+      "name": "CHANGELOG 自动化",
+      "priority": "low",
+      "description": "semantic-release",
+      "status": "completed"
+    },
+    {
+      "id": "CM-4",
+      "name": "文档站点",
+      "priority": "low",
+      "description": "VitePress 文档站",
+      "status": "completed"
+    }
+  ],
+  "statistics": {
+    "totalTasks": 52,
+    "completedTasks": 52,
+    "pendingTasks": 0,
+    "totalPhases": 10,
+    "completedPhases": 10,
+    "techDebtsTotal": 9,
+    "techDebtsCompleted": 9,
+    "communityTotal": 4,
+    "communityCompleted": 4
+  }
+}

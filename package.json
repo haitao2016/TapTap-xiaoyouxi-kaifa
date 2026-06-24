@@ -1,0 +1,48 @@
+{
+  "name": "tapdev-studio",
+  "version": "0.2.0",
+  "private": true,
+  "description": "跨平台 TapTap 小游戏开发软件 - 支持 PC、手机，平板",
+  "scripts": {
+    "dev": "pnpm --filter @tapdev/studio dev",
+    "dev:desktop": "pnpm --filter @tapdev/desktop dev",
+    "dev:mobile": "pnpm --filter @tapdev/mobile dev",
+    "dev:server": "pnpm --filter @tapdev/server build && pnpm --filter @tapdev/server start",
+    "build": "pnpm -r build",
+    "build:studio": "pnpm --filter @tapdev/studio build",
+    "build:server": "pnpm --filter @tapdev/server build",
+    "build:desktop": "pnpm --filter @tapdev/desktop build",
+    "build:mobile": "pnpm --filter @tapdev/mobile sync",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "pnpm -r lint",
+    "test": "node --experimental-vm-modules node_modules/.bin/jest",
+    "test:watch": "node --experimental-vm-modules node_modules/.bin/jest --watch",
+    "test:coverage": "node --experimental-vm-modules node_modules/.bin/jest --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:report": "playwright show-report",
+    "test:stats": "node scripts/test-stats.js",
+    "security:audit": "node scripts/security-audit.js",
+    "plan": "node scripts/dev-plan.js",
+    "plan:status": "node scripts/dev-plan.js --status",
+    "plan:next": "node scripts/dev-plan.js --next",
+    "plan:complete": "node scripts/dev-plan.js --complete",
+    "plan:save": "node scripts/dev-plan.js --save",
+    "verify": "node scripts/verify.js",
+    "verify:mobile": "node scripts/verify-mobile.js",
+    "verify:build": "node scripts/verify-build-fixes.js"
+  },
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "packageManager": "pnpm@9.15.0",
+  "devDependencies": {
+    "@playwright/test": "^1.61.1",
+    "@types/jest": "^29.5.14",
+    "jest": "^29.7.0",
+    "playwright": "^1.61.1",
+    "ts-jest": "^29.4.11",
+    "typescript": "^6.0.3"
+  }
+}

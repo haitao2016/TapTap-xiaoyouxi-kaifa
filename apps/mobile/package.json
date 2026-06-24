@@ -1,0 +1,33 @@
+{
+  "name": "@tapdev/mobile",
+  "version": "0.1.0",
+  "private": true,
+  "description": "TapDev Studio 移动端 (Capacitor)",
+  "scripts": {
+    "dev": "pnpm --filter @tapdev/studio dev",
+    "build:web": "pnpm --filter @tapdev/studio build",
+    "sync": "pnpm build:web && npx cap sync",
+    "sync:android": "pnpm build:web && npx cap sync android",
+    "sync:ios": "pnpm build:web && npx cap sync ios",
+    "open:android": "npx cap open android",
+    "open:ios": "npx cap open ios",
+    "run:android": "pnpm sync:android && npx cap run android",
+    "run:ios": "pnpm sync:ios && npx cap run ios",
+    "release:android": "pnpm sync:android && cd android && ./gradlew assembleRelease",
+    "release:android:bundle": "pnpm sync:android && cd android && ./gradlew bundleRelease",
+    "release:ios": "pnpm sync:ios && npx cap open ios"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.2.0",
+    "@capacitor/core": "^6.2.0",
+    "@capacitor/ios": "^6.2.0",
+    "@capacitor/splash-screen": "^6.0.3",
+    "@capacitor/status-bar": "^6.0.2",
+    "@capacitor/keyboard": "^6.0.3",
+    "@capacitor/haptics": "^6.0.2"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.2.0",
+    "typescript": "^5.7.2"
+  }
+}

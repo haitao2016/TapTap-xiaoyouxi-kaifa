@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TapDev Studio - 监控</title>
+    <style id="theme-vars">
+/* TapDev Studio Brand CSS */
+:root {
+  /* Brand Colors */
+  --color-primary: #ff6b00;
+  --color-primary-light: #ff8533;
+  --color-primary-dark: #e05e00;
+  --color-primary-muted: rgba(255, 107, 0, 0.1);
+
+  /* Surface System */
+  --surface-0: #0d0d0f;
+  --surface-1: #16161a;
+  --surface-2: #1e1e24;
+  --surface-3: #2a2a32;
+
+  /* Border */
+  --color-border: #2e2e38;
+  --color-border-hover: #3e3e4a;
+
+  /* Text */
+  --color-text-primary: #f0f0f5;
+  --color-text-secondary: #a0a0b0;
+  --color-text-muted: #6b6b7b;
+
+  /* State Colors */
+  --state-success: #22c55e;
+  --state-warning: #eab308;
+  --state-error: #ef4444;
+  --state-info: #3b82f6;
+
+  /* Radius Scale */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* Typography */
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans SC', sans-serif;
+  --font-mono: 'SF Mono', 'Fira Code', 'Cascadia Code', Consolas, 'Liberation Mono', Menlo, monospace;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.625;
+
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.4);
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-primary: var(--color-primary);
+    --color-border: var(--color-border);
+  }
+  @layer base {
+    body { background: var(--surface-0); color: var(--color-text-primary); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+      body { font-family: var(--font-sans); }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased" style="background: var(--surface-0); color: var(--color-text-primary);">
+    <main class="flex h-screen overflow-hidden">
+
+        <!-- Left Sidebar -->
+        <aside class="w-56 flex-shrink-0 flex flex-col border-r" style="background: var(--surface-1); border-color: var(--color-border);">
+            <!-- Logo -->
+            <div class="flex items-center gap-2 px-4 h-14 border-b" style="border-color: var(--color-border);">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                    <rect x="2" y="2" width="20" height="20" rx="4" fill="#ff6b00"/>
+                    <path d="M8 8h8v2H8zM8 12h5v2H8zM8 16h3v2H8z" fill="white"/>
+                </svg>
+                <span class="text-sm font-semibold" style="color: var(--color-text-primary);">TapDev Studio</span>
+            </div>
+
+            <!-- Nav Items -->
+            <nav class="flex-1 py-2 space-y-0.5 px-2">
+                <a href="#" data-dom-id="nav-dashboard" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors" style="color: var(--color-text-secondary);">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                    工作台
+                </a>
+                <a href="#" data-dom-id="nav-build" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors" style="color: var(--color-text-secondary);">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+                    构建
+                </a>
+                <a href="#" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium" style="background: var(--color-primary-muted); color: var(--color-primary);">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                    监控
+                </a>
+                <a href="#" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors" style="color: var(--color-text-secondary);">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                    调试
+                </a>
+                <a href="#" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors" style="color: var(--color-text-secondary);">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>
+                    插件
+                </a>
+                <a href="#" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors" style="color: var(--color-text-secondary);">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+                    文档
+                </a>
+                <a href="#" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors" style="color: var(--color-text-secondary);">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+                    设置
+                </a>
+            </nav>
+
+            <!-- Current Project -->
+            <div class="px-3 py-3 border-t" style="border-color: var(--color-border);">
+                <div class="flex items-center gap-2 px-2 py-2 rounded-lg" style="background: var(--surface-2);">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-text-muted);"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>
+                    <span class="text-xs truncate" style="color: var(--color-text-secondary);">我的游戏项目</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+
+            <!-- Top Header -->
+            <header class="flex items-center h-14 px-4 border-b flex-shrink-0" style="border-color: var(--color-border); background: var(--surface-1);">
+                <button class="p-1.5 rounded-md" style="color: var(--color-text-muted);">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                </button>
+                <div class="flex-1"></div>
+                <span class="px-2 py-0.5 rounded text-xs font-medium" style="background: var(--surface-3); color: var(--color-text-secondary);">PC</span>
+                <span class="px-2 py-0.5 rounded text-xs font-medium ml-2" style="background: var(--surface-3); color: var(--color-text-secondary);">UNITY</span>
+            </header>
+
+            <!-- Content Area -->
+            <div class="flex-1 overflow-y-auto p-4 space-y-4">
+
+                <!-- Title Bar -->
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-xl font-semibold" style="color: var(--color-text-primary);">性能监控</h1>
+                        <p class="text-sm mt-0.5" style="color: var(--color-text-muted);">实时 FPS、内存、网络指标追踪</p>
+                    </div>
+                    <button class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors" style="background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3);">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
+                        停止监控
+                    </button>
+                </div>
+
+                <!-- Stats Bar -->
+                <div class="flex items-center gap-4 px-4 py-3 rounded-xl" style="background: var(--surface-1); border: 1px solid var(--color-border);">
+                    <div class="flex items-center gap-2">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-text-muted);"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        <span class="text-sm" style="color: var(--color-text-muted);">运行时间</span>
+                        <span class="text-sm font-semibold font-mono" style="color: var(--color-text-primary);">12:34</span>
+                    </div>
+                    <div class="w-px h-4" style="background: var(--color-border);"></div>
+                    <div class="flex items-center gap-2">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-text-muted);"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                        <span class="text-sm" style="color: var(--color-text-muted);">总请求</span>
+                        <span class="text-sm font-semibold font-mono" style="color: var(--color-text-primary);">1,247</span>
+                    </div>
+                    <div class="w-px h-4" style="background: var(--color-border);"></div>
+                    <div class="flex items-center gap-2">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-text-muted);"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+                        <span class="text-sm" style="color: var(--color-text-muted);">失败</span>
+                        <span class="px-1.5 py-0.5 rounded text-xs font-semibold" style="background: rgba(239, 68, 68, 0.15); color: #ef4444;">3</span>
+                    </div>
+                </div>
+
+                <!-- 6 Metric Cards -->
+                <div class="grid grid-cols-6 gap-3">
+                    <!-- FPS -->
+                    <div class="rounded-xl p-3" style="background: var(--surface-1); border: 1px solid rgba(34, 197, 94, 0.3);">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-medium" style="color: var(--color-text-muted);">FPS</span>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #22c55e;"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+                        </div>
+                        <div class="text-2xl font-bold font-mono" style="color: #22c55e;">60</div>
+                        <div class="text-xs mt-1" style="color: var(--color-text-muted);">平均: 58</div>
+                    </div>
+
+                    <!-- 内存 -->
+                    <div class="rounded-xl p-3" style="background: var(--surface-1); border: 1px solid rgba(34, 197, 94, 0.3);">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-medium" style="color: var(--color-text-muted);">内存</span>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #22c55e;"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M6 12h.01M10 12h.01"/></svg>
+                        </div>
+                        <div class="text-2xl font-bold font-mono" style="color: #22c55e;">256 <span class="text-sm font-normal" style="color: var(--color-text-muted);">MB</span></div>
+                        <div class="text-xs mt-1" style="color: var(--color-text-muted);">使用率: 50%</div>
+                    </div>
+
+                    <!-- CPU -->
+                    <div class="rounded-xl p-3" style="background: var(--surface-1); border: 1px solid rgba(34, 197, 94, 0.3);">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-medium" style="color: var(--color-text-muted);">CPU</span>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #22c55e;"><rect x="4" y="4" width="16" height="16" rx="2"/><rect x="9" y="9" width="6" height="6"/><path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 15h3M1 9h3M1 15h3"/></svg>
+                        </div>
+                        <div class="text-2xl font-bold font-mono" style="color: #22c55e;">23<span class="text-sm font-normal" style="color: var(--color-text-muted);">%</span></div>
+                        <div class="text-xs mt-1" style="color: var(--color-text-muted);">处理器使用率</div>
+                    </div>
+
+                    <!-- GPU内存 -->
+                    <div class="rounded-xl p-3" style="background: var(--surface-1); border: 1px solid var(--color-border);">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-medium" style="color: var(--color-text-muted);">GPU内存</span>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-text-muted);"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 6V4M8 6V4M16 6V4"/><path d="M6 18h12"/></svg>
+                        </div>
+                        <div class="text-2xl font-bold font-mono" style="color: var(--color-text-primary);">128 <span class="text-sm font-normal" style="color: var(--color-text-muted);">MB</span></div>
+                        <div class="text-xs mt-1" style="color: var(--color-text-muted);">显存使用</div>
+                    </div>
+
+                    <!-- Draw Calls -->
+                    <div class="rounded-xl p-3" style="background: var(--surface-1); border: 1px solid var(--color-border);">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-medium" style="color: var(--color-text-muted);">Draw Calls</span>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-text-muted);"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+                        </div>
+                        <div class="text-2xl font-bold font-mono" style="color: var(--color-text-primary);">42</div>
+                        <div class="text-xs mt-1" style="color: var(--color-text-muted);">渲染批次</div>
+                    </div>
+
+                    <!-- 延迟 -->
+                    <div class="rounded-xl p-3" style="background: var(--surface-1); border: 1px solid rgba(34, 197, 94, 0.3);">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="text-xs font-medium" style="color: var(--color-text-muted);">延迟</span>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #22c55e;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 8 14"/></svg>
+                        </div>
+                        <div class="text-2xl font-bold font-mono" style="color: #22c55e;">45<span class="text-sm font-normal" style="color: var(--color-text-muted);">ms</span></div>
+                        <div class="text-xs mt-1" style="color: var(--color-text-muted);">网络延迟</div>
+                    </div>
+                </div>
+
+                <!-- Two Chart Cards -->
+                <div class="grid grid-cols-2 gap-3">
+                    <!-- FPS Trend -->
+                    <div class="rounded-xl p-4" style="background: var(--surface-1); border: 1px solid var(--color-border);">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-sm font-medium" style="color: var(--color-text-primary);">FPS 趋势</span>
+                            <div class="flex items-center gap-3">
+                                <div class="flex items-center gap-1">
+                                    <span class="w-2.5 h-0.5 rounded" style="background: #ff6b00;"></span>
+                                    <span class="text-xs" style="color: var(--color-text-muted);">实时</span>
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    <span class="w-2.5 h-0.5 rounded border-b border-dashed" style="border-color: var(--color-text-muted);"></span>
+                                    <span class="text-xs" style="color: var(--color-text-muted);">平均</span>
+                                </div>
+                            </div>
+                        </div>
+                        <svg viewBox="0 0 400 160" class="w-full" style="height: 160px;">
+                            <!-- Grid lines -->
+                            <line x1="0" y1="0" x2="400" y2="0" stroke="#2e2e38" stroke-width="0.5"/>
+                            <line x1="0" y1="40" x2="400" y2="40" stroke="#2e2e38" stroke-width="0.5"/>
+                            <line x1="0" y1="80" x2="400" y2="80" stroke="#2e2e38" stroke-width="0.5"/>
+                            <line x1="0" y1="120" x2="400" y2="120" stroke="#2e2e38" stroke-width="0.5"/>
+                            <line x1="0" y1="160" x2="400" y2="160" stroke="#2e2e38" stroke-width="0.5"/>
+
+                            <!-- Y-axis labels -->
+                            <text x="2" y="4" fill="#6b6b7b" font-size="8" font-family="monospace">120</text>
+                            <text x="2" y="44" fill="#6b6b7b" font-size="8" font-family="monospace">90</text>
+                            <text x="2" y="84" fill="#6b6b7b" font-size="8" font-family="monospace">60</text>
+                            <text x="2" y="124" fill="#6b6b7b" font-size="8" font-family="monospace">30</text>
+                            <text x="2" y="156" fill="#6b6b7b" font-size="8" font-family="monospace">0</text>
+
+                            <!-- 60 FPS reference line -->
+                            <line x1="30" y1="80" x2="400" y2="80" stroke="#22c55e" stroke-width="0.5" stroke-dasharray="4 4" opacity="0.5"/>
+                            <text x="402" y="83" fill="#22c55e" font-size="7" font-family="monospace" opacity="0.7">60</text>
+
+                            <!-- 30 FPS reference line -->
+                            <line x1="30" y1="120" x2="400" y2="120" stroke="#eab308" stroke-width="0.5" stroke-dasharray="4 4" opacity="0.5"/>
+                            <text x="402" y="123" fill="#eab308" font-size="7" font-family="monospace" opacity="0.7">30</text>
+
+                            <!-- Average line (58 FPS ~ y=85) -->
+                            <line x1="30" y1="85" x2="400" y2="85" stroke="#a0a0b0" stroke-width="0.5" stroke-dasharray="6 3" opacity="0.4"/>
+
+                            <!-- FPS polyline (orange) -->
+                            <polyline
+                                fill="none"
+                                stroke="#ff6b00"
+                                stroke-width="1.5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                points="
+                                    30,82 50,78 70,80 90,76 110,82 130,84
+                                    150,79 170,77 190,81 210,83 230,78
+                                    250,80 270,76 290,82 310,79 330,77
+                                    350,80 370,81 390,78
+                                "
+                            />
+                        </svg>
+                    </div>
+
+                    <!-- Memory Usage Trend -->
+                    <div class="rounded-xl p-4" style="background: var(--surface-1); border: 1px solid var(--color-border);">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-sm font-medium" style="color: var(--color-text-primary);">内存使用趋势</span>
+                            <div class="flex items-center gap-3">
+                                <div class="flex items-center gap-1">
+                                    <span class="w-2.5 h-2.5 rounded-sm" style="background: rgba(99, 102, 241, 0.3);"></span>
+                                    <span class="text-xs" style="color: var(--color-text-muted);">已用</span>
+                                </div>
+                                <div class="flex items-center gap-1">
+                                    <span class="w-2.5 h-0.5 rounded border-b border-dashed" style="border-color: #ef4444;"></span>
+                                    <span class="text-xs" style="color: var(--color-text-muted);">85%</span>
+                                </div>
+                            </div>
+                        </div>
+                        <svg viewBox="0 0 400 160" class="w-full" style="height: 160px;">
+                            <!-- Grid lines -->
+                            <line x1="0" y1="0" x2="400" y2="0" stroke="#2e2e38" stroke-width="0.5"/>
+                            <line x1="0" y1="40" x2="400" y2="40" stroke="#2e2e38" stroke-width="0.5"/>
+                            <line x1="0" y1="80" x2="400" y2="80" stroke="#2e2e38" stroke-width="0.5"/>
+                            <line x1="0" y1="120" x2="400" y2="120" stroke="#2e2e38" stroke-width="0.5"/>
+                            <line x1="0" y1="160" x2="400" y2="160" stroke="#2e2e38" stroke-width="0.5"/>
+
+                            <!-- Y-axis labels -->
+                            <text x="2" y="4" fill="#6b6b7b" font-size="8" font-family="monospace">512MB</text>
+                            <text x="2" y="44" fill="#6b6b7b" font-size="8" font-family="monospace">384MB</text>
+                            <text x="2" y="84" fill="#6b6b7b" font-size="8" font-family="monospace">256MB</text>
+                            <text x="2" y="124" fill="#6b6b7b" font-size="8" font-family="monospace">128MB</text>
+                            <text x="2" y="156" fill="#6b6b7b" font-size="8" font-family="monospace">0</text>
+
+                            <!-- 85% reference line (~ y=24) -->
+                            <line x1="30" y1="24" x2="400" y2="24" stroke="#ef4444" stroke-width="0.5" stroke-dasharray="4 4" opacity="0.5"/>
+                            <text x="402" y="27" fill="#ef4444" font-size="7" font-family="monospace" opacity="0.7">85%</text>
+
+                            <!-- Filled area (indigo) -->
+                            <defs>
+                                <linearGradient id="memGrad" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stop-color="#6366f1" stop-opacity="0.3"/>
+                                    <stop offset="100%" stop-color="#6366f1" stop-opacity="0.02"/>
+                                </linearGradient>
+                            </defs>
+                            <polygon
+                                fill="url(#memGrad)"
+                                stroke="none"
+                                points="
+                                    30,160
+                                    30,100 50,98 70,95 90,92 110,88 130,90
+                                    150,86 170,84 190,82 210,80 230,78
+                                    250,82 270,79 290,76 310,74 330,72
+                                    350,70 370,68 390,66
+                                    390,160
+                                "
+                            />
+
+                            <!-- Memory polyline (indigo) -->
+                            <polyline
+                                fill="none"
+                                stroke="#6366f1"
+                                stroke-width="1.5"
+                                stroke-linecap="round"
+                                stroke-linejoin="round"
+                                points="
+                                    30,100 50,98 70,95 90,92 110,88 130,90
+                                    150,86 170,84 190,82 210,80 230,78
+                                    250,82 270,79 290,76 310,74 330,72
+                                    350,70 370,68 390,66
+                                "
+                            />
+                        </svg>
+                    </div>
+                </div>
+
+                <!-- Network Requests Table -->
+                <div class="rounded-xl" style="background: var(--surface-1); border: 1px solid var(--color-border);">
+                    <div class="flex items-center justify-between px-4 py-3 border-b" style="border-color: var(--color-border);">
+                        <div class="flex items-center gap-2">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-text-muted);"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+                            <span class="text-sm font-medium" style="color: var(--color-text-primary);">网络请求</span>
+                        </div>
+                        <span class="px-2 py-0.5 rounded-full text-xs font-medium" style="background: var(--surface-3); color: var(--color-text-secondary);">20</span>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr style="border-bottom: 1px solid var(--color-border);">
+                                    <th class="text-left px-4 py-2 text-xs font-medium" style="color: var(--color-text-muted);">状态</th>
+                                    <th class="text-left px-4 py-2 text-xs font-medium" style="color: var(--color-text-muted);">方法</th>
+                                    <th class="text-left px-4 py-2 text-xs font-medium" style="color: var(--color-text-muted);">URL</th>
+                                    <th class="text-right px-4 py-2 text-xs font-medium" style="color: var(--color-text-muted);">耗时</th>
+                                    <th class="text-right px-4 py-2 text-xs font-medium" style="color: var(--color-text-muted);">大小</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr style="border-bottom: 1px solid var(--color-border);">
+                                    <td class="px-4 py-2"><span class="px-1.5 py-0.5 rounded text-xs font-mono font-medium" style="background: rgba(34, 197, 94, 0.15); color: #22c55e;">200</span></td>
+                                    <td class="px-4 py-2 font-mono text-xs" style="color: var(--color-text-secondary);">GET</td>
+                                    <td class="px-4 py-2 font-mono text-xs truncate max-w-xs" style="color: var(--color-text-primary);">/api/v1/user/profile</td>
+                                    <td class="px-4 py-2 text-right font-mono text-xs" style="color: var(--color-text-secondary);">45ms</td>
+                                    <td class="px-4 py-2 text-right font-mono text-xs" style="color: var(--color-text-secondary);">2.3 KB</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid var(--color-border);">
+                                    <td class="px-4 py-2"><span class="px-1.5 py-0.5 rounded text-xs font-mono font-medium" style="background: rgba(34, 197, 94, 0.15); color: #22c55e;">200</span></td>
+                                    <td class="px-4 py-2 font-mono text-xs" style="color: var(--color-text-secondary);">POST</td>
+                                    <td class="px-4 py-2 font-mono text-xs truncate max-w-xs" style="color: var(--color-text-primary);">/api/v1/game/save</td>
+                                    <td class="px-4 py-2 text-right font-mono text-xs" style="color: var(--color-text-secondary);">128ms</td>
+                                    <td class="px-4 py-2 text-right font-mono text-xs" style="color: var(--color-text-secondary);">1.1 KB</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid var(--color-border);">
+                                    <td class="px-4 py-2"><span class="px-1.5 py-0.5 rounded text-xs font-mono font-medium" style="background: rgba(234, 179, 8, 0.15); color: #eab308;">301</span></td>
+                                    <td class="px-4 py-2 font-mono text-xs" style="color: var(--color-text-secondary);">GET</td>
+                                    <td class="px-4 py-2 font-mono text-xs truncate max-w-xs" style="color: var(--color-text-primary);">/api/v1/asset/texture.png</td>
+                                    <td class="px-4 py-2 text-right font-mono text-xs" style="color: var(--color-text-secondary);">12ms</td>
+                                    <td class="px-4 py-2 text-right font-mono text-xs" style="color: var(--color-text-secondary);">0 B</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid var(--color-border);">
+                                    <td class="px-4 py-2"><span class="px-1.5 py-0.5 rounded text-xs font-mono font-medium" style="background: rgba(34, 197, 94, 0.15); color: #22c55e;">200</span></td>
+                                    <td class="px-4 py-2 font-mono text-xs" style="color: var(--color-text-secondary);">GET</td>
+                                    <td class="px-4 py-2 font-mono text-xs truncate max-w-xs" style="color: var(--color-text-primary);">/api/v1/leaderboard/top</td>
+                                    <td class="px-4 py-2 text-right font-mono text-xs" style="color: var(--color-text-secondary);">89ms</td>
+                                    <td class="px-4 py-2 text-right font-mono text-xs" style="color: var(--color-text-secondary);">15.6 KB</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid var(--color-border);">
+                                    <td class="px-4 py-2"><span class="px-1.5 py-0.5 rounded text-xs font-mono font-medium" style="background: rgba(239, 68, 68, 0.15); color: #ef4444;">404</span></td>
+                                    <td class="px-4 py-2 font-mono text-xs" style="color: var(--color-text-secondary);">GET</td>
+                                    <td class="px-4 py-2 font-mono text-xs truncate max-w-xs" style="color: var(--color-text-primary);">/api/v1/config/feature_flags</td>
+                                    <td class="px-4 py-2 text-right font-mono text-xs" style="color: var(--color-text-secondary);">5ms</td>
+                                    <td class="px-4 py-2 text-right font-mono text-xs" style="color: var(--color-text-secondary);">0.2 KB</td>
+                                </tr>
+                                <tr style="border-bottom: 1px solid var(--color-border);">
+                                    <td class="px-4 py-2"><span class="px-1.5 py-0.5 rounded text-xs font-mono font-medium" style="background: rgba(34, 197, 94, 0.15); color: #22c55e;">200</span></td>
+                                    <td class="px-4 py-2 font-mono text-xs" style="color: var(--color-text-secondary);">POST</td>
+                                    <td class="px-4 py-2 font-mono text-xs truncate max-w-xs" style="color: var(--color-text-primary);">/api/v1/analytics/event</td>
+                                    <td class="px-4 py-2 text-right font-mono text-xs" style="color: var(--color-text-secondary);">67ms</td>
+                                    <td class="px-4 py-2 text-right font-mono text-xs" style="color: var(--color-text-secondary);">0.8 KB</td>
+                                </tr>
+                                <tr>
+                                    <td class="px-4 py-2"><span class="px-1.5 py-0.5 rounded text-xs font-mono font-medium" style="background: rgba(34, 197, 94, 0.15); color: #22c55e;">200</span></td>
+                                    <td class="px-4 py-2 font-mono text-xs" style="color: var(--color-text-secondary);">GET</td>
+                                    <td class="px-4 py-2 font-mono text-xs truncate max-w-xs" style="color: var(--color-text-primary);">/api/v1/chat/messages</td>
+                                    <td class="px-4 py-2 text-right font-mono text-xs" style="color: var(--color-text-secondary);">203ms</td>
+                                    <td class="px-4 py-2 text-right font-mono text-xs" style="color: var(--color-text-secondary);">8.4 KB</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Alerts Card -->
+                <div class="rounded-xl" style="background: var(--surface-1); border: 1px solid var(--color-border);">
+                    <div class="flex items-center justify-between px-4 py-3 border-b" style="border-color: var(--color-border);">
+                        <div class="flex items-center gap-2">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: #eab308;"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                            <span class="text-sm font-medium" style="color: var(--color-text-primary);">告警</span>
+                        </div>
+                        <span class="px-2 py-0.5 rounded-full text-xs font-medium" style="background: rgba(234, 179, 8, 0.15); color: #eab308;">2</span>
+                    </div>
+                    <div class="divide-y" style="--tw-divide-opacity: 1; border-color: var(--color-border);">
+                        <!-- Alert 1 -->
+                        <div class="flex items-start gap-3 px-4 py-3" style="border-bottom: 1px solid var(--color-border);">
+                            <span class="px-1.5 py-0.5 rounded text-xs font-medium flex-shrink-0 mt-0.5" style="background: rgba(239, 68, 68, 0.15); color: #ef4444;">严重</span>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm" style="color: var(--color-text-primary);">FPS 低于 30 帧，持续 2 秒</p>
+                                <p class="text-xs mt-0.5" style="color: var(--color-text-muted);">场景加载期间帧率下降，建议优化资源加载策略</p>
+                            </div>
+                            <span class="text-xs flex-shrink-0 font-mono" style="color: var(--color-text-muted);">12:32:15</span>
+                        </div>
+                        <!-- Alert 2 -->
+                        <div class="flex items-start gap-3 px-4 py-3">
+                            <span class="px-1.5 py-0.5 rounded text-xs font-medium flex-shrink-0 mt-0.5" style="background: rgba(234, 179, 8, 0.15); color: #eab308;">警告</span>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-sm" style="color: var(--color-text-primary);">内存使用率超过 75%</p>
+                                <p class="text-xs mt-0.5" style="color: var(--color-text-muted);">当前内存占用 384MB / 512MB，建议释放未使用的资源</p>
+                            </div>
+                            <span class="text-xs flex-shrink-0 font-mono" style="color: var(--color-text-muted);">12:30:42</span>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+    <script>lucide.createIcons();</script>
+</body>
+</html>

@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TapDev Studio - 工作台</title>
+    <style id="theme-vars">
+/* TapDev Studio Brand CSS */
+:root {
+  /* Brand Colors */
+  --color-primary: #ff6b00;
+  --color-primary-light: #ff8533;
+  --color-primary-dark: #e05e00;
+  --color-primary-muted: rgba(255, 107, 0, 0.1);
+
+  /* Surface System */
+  --surface-0: #0d0d0f;
+  --surface-1: #16161a;
+  --surface-2: #1e1e24;
+  --surface-3: #2a2a32;
+
+  /* Border */
+  --color-border: #2e2e38;
+  --color-border-hover: #3e3e4a;
+
+  /* Text */
+  --color-text-primary: #f0f0f5;
+  --color-text-secondary: #a0a0b0;
+  --color-text-muted: #6b6b7b;
+
+  /* State Colors */
+  --state-success: #22c55e;
+  --state-warning: #eab308;
+  --state-error: #ef4444;
+  --state-info: #3b82f6;
+
+  /* Radius Scale */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* Typography */
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans SC', sans-serif;
+  --font-mono: 'SF Mono', 'Fira Code', 'Cascadia Code', Consolas, 'Liberation Mono', Menlo, monospace;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.625;
+
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.4);
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-primary: var(--color-primary);
+    --color-border: var(--color-border);
+  }
+  @layer base {
+    body { background: var(--color-background); color: var(--color-text-primary); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased" style="background: var(--surface-0); color: var(--color-text-primary);">
+
+    <!-- Layout: sidebar + main -->
+    <div class="flex h-screen overflow-hidden">
+
+        <!-- ====== LEFT SIDEBAR ====== -->
+        <aside class="w-56 flex-shrink-0 flex flex-col border-r" style="background: var(--surface-1); border-color: var(--color-border);">
+
+            <!-- Logo area -->
+            <div class="flex items-center gap-3 px-4 py-4 border-b" style="border-color: var(--color-border);">
+                <div class="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm" style="background: var(--color-primary);">T</div>
+                <div>
+                    <div class="text-sm font-semibold" style="color: var(--color-text-primary);">TapDev Studio</div>
+                    <div class="text-xs" style="color: var(--color-text-muted);">TapTap 小游戏开发</div>
+                </div>
+            </div>
+
+            <!-- Navigation -->
+            <nav class="flex-1 py-2 px-2 space-y-0.5 overflow-y-auto no-scrollbar">
+
+                <!-- 工作台 (active) -->
+                <a href="#" data-dom-id="nav-dashboard" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium" style="background: var(--color-primary-muted); color: var(--color-primary);">
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="6" height="6" rx="1"/><rect x="10" y="2" width="6" height="6" rx="1"/><rect x="2" y="10" width="6" height="6" rx="1"/><rect x="10" y="10" width="6" height="6" rx="1"/></svg>
+                    工作台
+                </a>
+
+                <!-- 编辑器 -->
+                <a href="#" data-dom-id="nav-editor" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm" style="color: var(--color-text-secondary);">
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 3 3 9 8 15"/><polyline points="14 3 9 9 14 15"/><line x1="12" y1="3" x2="10" y2="15"/></svg>
+                    编辑器
+                </a>
+
+                <!-- 调试 -->
+                <a href="#" data-dom-id="nav-debug" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm" style="color: var(--color-text-secondary);">
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="6"/><line x1="9" y1="5" x2="9" y2="9"/><line x1="9" y1="9" x2="12" y2="11"/></svg>
+                    调试
+                </a>
+
+                <!-- 监控 -->
+                <a href="#" data-dom-id="nav-monitor" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm" style="color: var(--color-text-secondary);">
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 14 6 8 10 11 16 4"/><polyline points="12 4 16 4 16 8"/></svg>
+                    监控
+                </a>
+
+                <!-- 构建 -->
+                <a href="#" data-dom-id="nav-build" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm" style="color: var(--color-text-secondary);">
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 15 L9 3 L15 15 Z"/><line x1="9" y1="10" x2="9" y2="12"/></svg>
+                    构建
+                </a>
+
+                <!-- 文档 -->
+                <a href="#" data-dom-id="nav-docs" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm" style="color: var(--color-text-secondary);">
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2h7l4 4v10a1 1 0 01-1 1H4a1 1 0 01-1-1V3a1 1 0 011-1z"/><polyline points="11 2 11 6 15 6"/><line x1="6" y1="10" x2="12" y2="10"/><line x1="6" y1="13" x2="10" y2="13"/></svg>
+                    文档
+                </a>
+
+                <!-- 插件 -->
+                <a href="#" data-dom-id="nav-plugins" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm" style="color: var(--color-text-secondary);">
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="12" height="12" rx="2"/><circle cx="7" cy="7" r="1.5"/><circle cx="11" cy="7" r="1.5"/><circle cx="7" cy="11" r="1.5"/><circle cx="11" cy="11" r="1.5"/></svg>
+                    插件
+                </a>
+
+                <!-- 设置 -->
+                <a href="#" data-dom-id="nav-settings" class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm" style="color: var(--color-text-secondary);">
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="2.5"/><path d="M15.5 10.5a1.5 1.5 0 001.5-1.5 1.5 1.5 0 00-1.5-1.5"/><path d="M2.5 10.5A1.5 1.5 0 011 9a1.5 1.5 0 011.5-1.5"/><path d="M12.5 2.5a6 6 0 01-9 0"/><path d="M12.5 15.5a6 6 0 01-9 0"/></svg>
+                    设置
+                </a>
+
+            </nav>
+
+            <!-- Bottom: current project -->
+            <div class="px-4 py-3 border-t" style="border-color: var(--color-border);">
+                <div class="text-xs mb-1" style="color: var(--color-text-muted);">当前项目</div>
+                <div class="text-sm font-medium truncate" style="color: var(--color-text-secondary);">Demo TapTap Game</div>
+            </div>
+
+        </aside>
+
+        <!-- ====== MAIN AREA ====== -->
+        <div class="flex-1 flex flex-col overflow-hidden">
+
+            <!-- Top header -->
+            <header class="h-14 flex items-center px-4 border-b flex-shrink-0" style="border-color: var(--color-border); background: var(--surface-1);">
+                <!-- Hamburger menu -->
+                <button class="p-1.5 rounded-md" style="color: var(--color-text-secondary);">
+                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><line x1="3" y1="5" x2="17" y2="5"/><line x1="3" y1="10" x2="17" y2="10"/><line x1="3" y1="15" x2="17" y2="15"/></svg>
+                </button>
+
+                <div class="flex-1"></div>
+
+                <!-- Platform badges -->
+                <div class="flex items-center gap-2">
+                    <span class="px-2.5 py-1 rounded-md text-xs font-semibold tracking-wide" style="background: var(--surface-3); color: var(--color-text-secondary); border: 1px solid var(--color-border);">PC</span>
+                    <span class="px-2.5 py-1 rounded-md text-xs font-semibold tracking-wide" style="background: var(--surface-3); color: var(--color-text-secondary); border: 1px solid var(--color-border);">UNITY</span>
+                </div>
+            </header>
+
+            <!-- Content area -->
+            <main class="flex-1 overflow-y-auto p-6">
+                <div class="max-w-5xl mx-auto">
+
+                    <!-- Title section -->
+                    <div class="mb-8">
+                        <h1 class="text-2xl font-bold mb-1" style="color: var(--color-text-primary);">TapDev Studio</h1>
+                        <p class="text-sm" style="color: var(--color-text-secondary);">跨平台 TapTap 小游戏开发软件 — 支持 PC、手机、平板</p>
+                    </div>
+
+                    <!-- Quick action grid (4 columns) -->
+                    <div class="grid grid-cols-4 gap-4 mb-8">
+
+                        <!-- 新建项目 -->
+                        <a href="#" class="group flex flex-col items-center gap-3 p-5 rounded-xl border transition-colors" style="background: var(--surface-1); border-color: var(--color-border);" onmouseover="this.style.borderColor='var(--color-primary)'" onmouseout="this.style.borderColor='var(--color-border)'">
+                            <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background: var(--color-primary-muted);">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="var(--color-primary)" stroke-width="1.5" stroke-linecap="round"><line x1="10" y1="4" x2="10" y2="16"/><line x1="4" y1="10" x2="16" y2="10"/></svg>
+                            </div>
+                            <span class="text-sm font-medium" style="color: var(--color-text-primary);">新建项目</span>
+                        </a>
+
+                        <!-- 打开项目 -->
+                        <a href="#" class="group flex flex-col items-center gap-3 p-5 rounded-xl border transition-colors" style="background: var(--surface-1); border-color: var(--color-border);" onmouseover="this.style.borderColor='var(--color-primary)'" onmouseout="this.style.borderColor='var(--color-border)'">
+                            <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background: var(--color-primary-muted);">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="var(--color-primary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h5l2 2h7a1 1 0 011 1v9a1 1 0 01-1 1H3a1 1 0 01-1-1V5a1 1 0 011-1z"/></svg>
+                            </div>
+                            <span class="text-sm font-medium" style="color: var(--color-text-primary);">打开项目</span>
+                        </a>
+
+                        <!-- 启动调试 -->
+                        <a href="#" class="group flex flex-col items-center gap-3 p-5 rounded-xl border transition-colors" style="background: var(--surface-1); border-color: var(--color-border);" onmouseover="this.style.borderColor='var(--color-primary)'" onmouseout="this.style.borderColor='var(--color-border)'">
+                            <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background: var(--color-primary-muted);">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="var(--color-primary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="10" cy="10" r="2"/><line x1="10" y1="6" x2="10" y2="4"/><line x1="10" y1="16" x2="10" y2="14"/><line x1="6" y1="10" x2="4" y2="10"/><line x1="16" y1="10" x2="14" y2="10"/><line x1="7.2" y1="7.2" x2="5.8" y2="5.8"/><line x1="14.2" y1="14.2" x2="12.8" y2="12.8"/><line x1="7.2" y1="12.8" x2="5.8" y2="14.2"/><line x1="14.2" y1="5.8" x2="12.8" y2="7.2"/></svg>
+                            </div>
+                            <span class="text-sm font-medium" style="color: var(--color-text-primary);">启动调试</span>
+                        </a>
+
+                        <!-- 构建发布 -->
+                        <a href="#" class="group flex flex-col items-center gap-3 p-5 rounded-xl border transition-colors" style="background: var(--surface-1); border-color: var(--color-border);" onmouseover="this.style.borderColor='var(--color-primary)'" onmouseout="this.style.borderColor='var(--color-border)'">
+                            <div class="w-10 h-10 rounded-lg flex items-center justify-center" style="background: var(--color-primary-muted);">
+                                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="var(--color-primary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="10" width="4" height="7" rx="0.5"/><rect x="8" y="6" width="4" height="11" rx="0.5"/><rect x="13" y="3" width="4" height="14" rx="0.5"/><polyline points="3 3 7 3 7 5"/></svg>
+                            </div>
+                            <span class="text-sm font-medium" style="color: var(--color-text-primary);">构建发布</span>
+                        </a>
+
+                    </div>
+
+                    <!-- Current project card -->
+                    <div class="rounded-xl border p-5 mb-8" style="background: var(--surface-1); border-color: var(--color-border);">
+                        <div class="flex items-start justify-between mb-4">
+                            <div>
+                                <h2 class="text-base font-semibold mb-1" style="color: var(--color-text-primary);">Demo TapTap Game</h2>
+                                <div class="flex items-center gap-3 text-xs" style="color: var(--color-text-muted);">
+                                    <span class="flex items-center gap-1">
+                                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="6" cy="6" r="4"/></svg>
+                                        引擎: Unity
+                                    </span>
+                                    <span class="flex items-center gap-1">
+                                        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 4h5l1 1h2a1 1 0 011 1v2a1 1 0 01-1 1H2a1 1 0 01-1-1V5a1 1 0 011-1z"/></svg>
+                                        路径: ./projects/demo-game
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <button class="px-4 py-1.5 rounded-lg text-sm font-medium text-white transition-colors" style="background: var(--color-primary);" onmouseover="this.style.background='var(--color-primary-light)'" onmouseout="this.style.background='var(--color-primary)'">打开编辑器</button>
+                            <button class="px-4 py-1.5 rounded-lg text-sm font-medium border transition-colors" style="color: var(--color-text-secondary); border-color: var(--color-border); background: var(--surface-2);" onmouseover="this.style.borderColor='var(--color-primary)';this.style.color='var(--color-primary)'" onmouseout="this.style.borderColor='var(--color-border)';this.style.color='var(--color-text-secondary)'">调试</button>
+                            <button class="px-4 py-1.5 rounded-lg text-sm font-medium border transition-colors" style="color: var(--color-text-secondary); border-color: var(--color-border); background: var(--surface-2);" onmouseover="this.style.borderColor='var(--color-primary)';this.style.color='var(--color-primary)'" onmouseout="this.style.borderColor='var(--color-border)';this.style.color='var(--color-text-secondary)'">监控</button>
+                        </div>
+                    </div>
+
+                    <!-- Feature overview (3 columns) -->
+                    <div class="grid grid-cols-3 gap-4 mb-8">
+
+                        <!-- 调试工具 -->
+                        <div class="rounded-xl border p-5" style="background: var(--surface-1); border-color: var(--color-border);">
+                            <div class="flex items-center gap-2 mb-3">
+                                <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background: var(--color-primary-muted);">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="var(--color-primary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="5"/><line x1="8" y1="5" x2="8" y2="8"/><line x1="8" y1="8" x2="10.5" y2="9.5"/></svg>
+                                </div>
+                                <h3 class="text-sm font-semibold" style="color: var(--color-text-primary);">调试工具</h3>
+                            </div>
+                            <ul class="space-y-2 text-xs" style="color: var(--color-text-secondary);">
+                                <li class="flex items-start gap-2">
+                                    <span style="color: var(--color-primary);">&#8226;</span>
+                                    <span>实时断点调试与变量监视</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span style="color: var(--color-primary);">&#8226;</span>
+                                    <span>多设备同步调试支持</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span style="color: var(--color-primary);">&#8226;</span>
+                                    <span>日志过滤与错误追踪</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span style="color: var(--color-primary);">&#8226;</span>
+                                    <span>网络请求拦截与分析</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- 性能监控 -->
+                        <div class="rounded-xl border p-5" style="background: var(--surface-1); border-color: var(--color-border);">
+                            <div class="flex items-center gap-2 mb-3">
+                                <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background: var(--color-primary-muted);">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="var(--color-primary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 12 4 7 7 9 15 3"/><polyline points="11 3 15 3 15 7"/></svg>
+                                </div>
+                                <h3 class="text-sm font-semibold" style="color: var(--color-text-primary);">性能监控</h3>
+                            </div>
+                            <ul class="space-y-2 text-xs" style="color: var(--color-text-secondary);">
+                                <li class="flex items-start gap-2">
+                                    <span style="color: var(--color-primary);">&#8226;</span>
+                                    <span>帧率与内存实时监控</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span style="color: var(--color-primary);">&#8226;</span>
+                                    <span>GPU 渲染性能分析</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span style="color: var(--color-primary);">&#8226;</span>
+                                    <span>资源加载耗时追踪</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span style="color: var(--color-primary);">&#8226;</span>
+                                    <span>性能瓶颈智能诊断</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- 构建发布 -->
+                        <div class="rounded-xl border p-5" style="background: var(--surface-1); border-color: var(--color-border);">
+                            <div class="flex items-center gap-2 mb-3">
+                                <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background: var(--color-primary-muted);">
+                                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="var(--color-primary)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="8" width="3" height="6" rx="0.5"/><rect x="6.5" y="5" width="3" height="9" rx="0.5"/><rect x="11" y="2" width="3" height="12" rx="0.5"/></svg>
+                                </div>
+                                <h3 class="text-sm font-semibold" style="color: var(--color-text-primary);">构建发布</h3>
+                            </div>
+                            <ul class="space-y-2 text-xs" style="color: var(--color-text-secondary);">
+                                <li class="flex items-start gap-2">
+                                    <span style="color: var(--color-primary);">&#8226;</span>
+                                    <span>一键构建多平台包体</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span style="color: var(--color-primary);">&#8226;</span>
+                                    <span>自动化构建流水线</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span style="color: var(--color-primary);">&#8226;</span>
+                                    <span>版本管理与回滚支持</span>
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span style="color: var(--color-primary);">&#8226;</span>
+                                    <span>发布到 TapTap 平台</span>
+                                </li>
+                            </ul>
+                        </div>
+
+                    </div>
+
+                </div>
+            </main>
+
+        </div>
+
+    </div>
+
+    <script>lucide.createIcons();</script>
+</body>
+</html>

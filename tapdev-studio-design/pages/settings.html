@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TapDev Studio - 设置</title>
+    <style id="theme-vars">
+/* TapDev Studio Brand CSS */
+:root {
+  /* Brand Colors */
+  --color-primary: #ff6b00;
+  --color-primary-light: #ff8533;
+  --color-primary-dark: #e05e00;
+  --color-primary-muted: rgba(255, 107, 0, 0.1);
+
+  /* Surface System */
+  --surface-0: #0d0d0f;
+  --surface-1: #16161a;
+  --surface-2: #1e1e24;
+  --surface-3: #2a2a32;
+
+  /* Border */
+  --color-border: #2e2e38;
+  --color-border-hover: #3e3e4a;
+
+  /* Text */
+  --color-text-primary: #f0f0f5;
+  --color-text-secondary: #a0a0b0;
+  --color-text-muted: #6b6b7b;
+
+  /* State Colors */
+  --state-success: #22c55e;
+  --state-warning: #eab308;
+  --state-error: #ef4444;
+  --state-info: #3b82f6;
+
+  /* Radius Scale */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 9999px;
+
+  /* Typography */
+  --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans SC', sans-serif;
+  --font-mono: 'SF Mono', 'Fira Code', 'Cascadia Code', Consolas, 'Liberation Mono', Menlo, monospace;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+
+  --leading-tight: 1.25;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.625;
+
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.3);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.4);
+}
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.3.1/dist/index.global.js"></script>
+    <script src="https://unpkg.com/lucide@1.8.0/dist/umd/lucide.min.js"></script>
+    <style type="text/tailwindcss">
+  @theme inline {
+    --color-primary: var(--color-primary);
+    --color-border: var(--color-border);
+  }
+  @layer base {
+    body { background: var(--color-background); color: var(--color-text-primary); }
+    td, th { @apply break-words; word-break: break-all; word-break: auto-phrase; }
+    th { @apply whitespace-nowrap; }
+  }
+    </style>
+    <style>
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      [data-icon] {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+        background-color: currentColor;
+      }
+    </style>
+</head>
+<body class="min-h-screen font-sans antialiased" style="background: var(--surface-0); color: var(--color-text-primary);">
+    <main class="flex h-screen overflow-hidden">
+
+      <!-- Left Sidebar -->
+      <aside class="w-56 flex-shrink-0 flex flex-col border-r" style="background: var(--surface-1); border-color: var(--color-border);">
+        <!-- Logo -->
+        <div class="flex items-center gap-2.5 px-4 h-14 border-b" style="border-color: var(--color-border);">
+          <div class="w-7 h-7 rounded-lg flex items-center justify-center" style="background: var(--color-primary);">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M2 4L8 1L14 4V12L8 15L2 12V4Z" stroke="white" stroke-width="1.5" fill="none"/>
+              <path d="M8 1V15" stroke="white" stroke-width="1.5"/>
+              <path d="M2 4L14 12" stroke="white" stroke-width="1.5"/>
+              <path d="M14 4L2 12" stroke="white" stroke-width="1.5"/>
+            </svg>
+          </div>
+          <span class="text-sm font-semibold" style="color: var(--color-text-primary);">TapDev Studio</span>
+        </div>
+
+        <!-- Nav Items -->
+        <nav class="flex-1 py-3 px-2 space-y-0.5">
+          <a href="#" data-dom-id="nav-dashboard" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors" style="color: var(--color-text-secondary);" onmouseover="this.style.background='var(--surface-2)'" onmouseout="this.style.background='transparent'">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i>
+            <span>工作台</span>
+          </a>
+          <a href="#" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors" style="color: var(--color-text-secondary);" onmouseover="this.style.background='var(--surface-2)'" onmouseout="this.style.background='transparent'">
+            <i data-lucide="code-2" class="w-4 h-4"></i>
+            <span>编辑器</span>
+          </a>
+          <a href="#" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors" style="color: var(--color-text-secondary);" onmouseover="this.style.background='var(--surface-2)'" onmouseout="this.style.background='transparent'">
+            <i data-lucide="bug" class="w-4 h-4"></i>
+            <span>调试</span>
+          </a>
+          <a href="#" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors" style="color: var(--color-text-secondary);" onmouseover="this.style.background='var(--surface-2)'" onmouseout="this.style.background='transparent'">
+            <i data-lucide="hammer" class="w-4 h-4"></i>
+            <span>构建</span>
+          </a>
+          <a href="#" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors" style="color: var(--color-text-secondary);" onmouseover="this.style.background='var(--surface-2)'" onmouseout="this.style.background='transparent'">
+            <i data-lucide="activity" class="w-4 h-4"></i>
+            <span>监控</span>
+          </a>
+          <a href="#" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors" style="color: var(--color-text-secondary);" onmouseover="this.style.background='var(--surface-2)'" onmouseout="this.style.background='transparent'">
+            <i data-lucide="puzzle" class="w-4 h-4"></i>
+            <span>插件</span>
+          </a>
+          <a href="#" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors" style="color: var(--color-text-secondary);" onmouseover="this.style.background='var(--surface-2)'" onmouseout="this.style.background='transparent'">
+            <i data-lucide="book-open" class="w-4 h-4"></i>
+            <span>文档</span>
+          </a>
+          <!-- Active: 设置 -->
+          <a href="#" class="flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm font-medium" style="background: var(--color-primary-muted); color: var(--color-primary);">
+            <i data-lucide="settings" class="w-4 h-4"></i>
+            <span>设置</span>
+          </a>
+        </nav>
+
+        <!-- Current Project -->
+        <div class="px-3 pb-3">
+          <div class="rounded-lg p-3 border" style="background: var(--surface-2); border-color: var(--color-border);">
+            <div class="flex items-center gap-2 mb-1.5">
+              <div class="w-2 h-2 rounded-full" style="background: var(--state-success);"></div>
+              <span class="text-xs font-medium" style="color: var(--color-text-primary);">当前项目</span>
+            </div>
+            <p class="text-xs truncate" style="color: var(--color-text-secondary);">MyTapGame_v2</p>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main Content Area -->
+      <div class="flex-1 flex flex-col overflow-hidden">
+
+        <!-- Top Header -->
+        <header class="h-14 flex items-center px-4 border-b flex-shrink-0" style="border-color: var(--color-border);">
+          <!-- Hamburger -->
+          <button class="p-1.5 rounded-lg transition-colors" style="color: var(--color-text-secondary);" onmouseover="this.style.background='var(--surface-2)'" onmouseout="this.style.background='transparent'">
+            <i data-lucide="menu" class="w-5 h-5"></i>
+          </button>
+          <!-- Spacer -->
+          <div class="flex-1"></div>
+          <!-- Badges -->
+          <div class="flex items-center gap-2">
+            <span class="px-2.5 py-1 rounded-md text-xs font-medium border" style="background: var(--surface-2); border-color: var(--color-border); color: var(--color-text-secondary);">PC</span>
+            <span class="px-2.5 py-1 rounded-md text-xs font-medium border" style="background: var(--surface-2); border-color: var(--color-border); color: var(--color-text-secondary);">UNITY</span>
+          </div>
+        </header>
+
+        <!-- Scrollable Content -->
+        <div class="flex-1 overflow-y-auto">
+          <div class="max-w-2xl mx-auto px-6 py-6 space-y-6">
+
+            <!-- Page Title -->
+            <div>
+              <h1 class="text-2xl font-bold" style="color: var(--color-text-primary);">设置</h1>
+              <p class="text-sm mt-1" style="color: var(--color-text-muted);">应用偏好与开发环境配置</p>
+            </div>
+
+            <!-- Editor Section -->
+            <section class="rounded-xl border p-4 space-y-4" style="background: var(--surface-1); border-color: var(--color-border);">
+              <div class="flex items-center gap-2">
+                <i data-lucide="code-2" class="w-4 h-4" style="color: var(--color-text-muted);"></i>
+                <h3 class="text-sm font-semibold" style="color: var(--color-text-primary);">编辑器</h3>
+              </div>
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="block text-sm mb-1.5" style="color: var(--color-text-muted);">字体大小</label>
+                  <input type="number" value="14" class="w-full rounded-lg border px-3 py-2 text-sm outline-none transition-colors" style="background: var(--surface-2); border-color: var(--color-border); color: var(--color-text-primary);" onfocus="this.style.borderColor='var(--color-primary)'" onblur="this.style.borderColor='var(--color-border)'" />
+                </div>
+                <div>
+                  <label class="block text-sm mb-1.5" style="color: var(--color-text-muted);">Tab 宽度</label>
+                  <input type="number" value="4" class="w-full rounded-lg border px-3 py-2 text-sm outline-none transition-colors" style="background: var(--surface-2); border-color: var(--color-border); color: var(--color-text-primary);" onfocus="this.style.borderColor='var(--color-primary)'" onblur="this.style.borderColor='var(--color-border)'" />
+                </div>
+              </div>
+            </section>
+
+            <!-- Debug Section -->
+            <section class="rounded-xl border p-4 space-y-4" style="background: var(--surface-1); border-color: var(--color-border);">
+              <div class="flex items-center gap-2">
+                <i data-lucide="bug" class="w-4 h-4" style="color: var(--color-text-muted);"></i>
+                <h3 class="text-sm font-semibold" style="color: var(--color-text-primary);">调试</h3>
+              </div>
+              <div>
+                <label class="block text-sm mb-1.5" style="color: var(--color-text-muted);">调试服务器端口</label>
+                <input type="number" value="8080" class="w-full rounded-lg border px-3 py-2 text-sm outline-none transition-colors" style="background: var(--surface-2); border-color: var(--color-border); color: var(--color-text-primary);" onfocus="this.style.borderColor='var(--color-primary)'" onblur="this.style.borderColor='var(--color-border)'" />
+              </div>
+            </section>
+
+            <!-- Build Section -->
+            <section class="rounded-xl border p-4 space-y-4" style="background: var(--surface-1); border-color: var(--color-border);">
+              <div class="flex items-center gap-2">
+                <i data-lucide="hammer" class="w-4 h-4" style="color: var(--color-text-muted);"></i>
+                <h3 class="text-sm font-semibold" style="color: var(--color-text-primary);">构建</h3>
+              </div>
+              <div>
+                <label class="block text-sm mb-1.5" style="color: var(--color-text-muted);">默认输出路径</label>
+                <input type="text" value="./build-output" class="w-full rounded-lg border px-3 py-2 text-sm outline-none transition-colors font-mono" style="background: var(--surface-2); border-color: var(--color-border); color: var(--color-text-primary);" onfocus="this.style.borderColor='var(--color-primary)'" onblur="this.style.borderColor='var(--color-border)'" />
+              </div>
+            </section>
+
+            <!-- Appearance Section -->
+            <section class="rounded-xl border p-4 space-y-4" style="background: var(--surface-1); border-color: var(--color-border);">
+              <div class="flex items-center gap-2">
+                <i data-lucide="palette" class="w-4 h-4" style="color: var(--color-text-muted);"></i>
+                <h3 class="text-sm font-semibold" style="color: var(--color-text-primary);">外观</h3>
+              </div>
+              <div class="flex gap-2">
+                <button class="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors" style="background: var(--color-primary); color: white;">
+                  <i data-lucide="moon" class="w-3.5 h-3.5"></i>
+                  深色
+                </button>
+                <button class="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors" style="background: var(--surface-2); color: var(--color-text-secondary);" onmouseover="this.style.background='var(--surface-3)'" onmouseout="this.style.background='var(--surface-2)'">
+                  <i data-lucide="sun" class="w-3.5 h-3.5"></i>
+                  浅色
+                </button>
+                <button class="flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors" style="background: var(--surface-2); color: var(--color-text-secondary);" onmouseover="this.style.background='var(--surface-3)'" onmouseout="this.style.background='var(--surface-2)'">
+                  <i data-lucide="monitor" class="w-3.5 h-3.5"></i>
+                  跟随系统
+                </button>
+              </div>
+            </section>
+
+            <!-- Save Button -->
+            <div>
+              <button class="w-full flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors" style="background: var(--color-primary); color: white;" onmouseover="this.style.background='var(--color-primary-light)'" onmouseout="this.style.background='var(--color-primary)'">
+                <i data-lucide="save" class="w-4 h-4"></i>
+                保存设置
+              </button>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+    </main>
+    <script>lucide.createIcons();</script>
+</body>
+</html>
