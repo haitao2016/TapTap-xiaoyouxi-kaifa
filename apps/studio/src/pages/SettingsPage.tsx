@@ -1,20 +1,35 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Input, Button } from '@tapdev/ui';
 import { useAppStore } from '../store/app-store';
-import { projectManager } from '@tapdev/core';
+import { projectManager, i18n } from '@tapdev/core';
+import type { Locale } from '@tapdev/core';
+import { UpdateChecker } from '../components/UpdateChecker';
 
 export function SettingsPage() {
   const { settings } = useAppStore();
   const [localSettings, setLocalSettings] = useState(settings);
+  const [currentLocale, setCurrentLocale] = useState<Locale>(i18n.getCurrent());
+
+  useEffect(() => {
+    const unsubscribe = i18n.onChange((locale) => {
+      setCurrentLocale(locale);
+    });
+    return unsubscribe;
+  }, []);
 
   const handleSave = () => {
     projectManager.updateSettings(localSettings);
   };
 
+  const handleLocaleChange = (locale: Locale) => {
+    i18n.setLocale(locale);
+    setCurrentLocale(locale);
+  };
+
   return (
     <div className="mx-auto max-w-2xl space-y-6 p-6">
       <div>
-        <h2 className="text-lg font-semibold">设置</h2>
+        <h2 className="text-lg font-semibold">{i18n.t('settings.title') || '设置'}</h2>
         <p className="text-sm text-text-secondary">应用偏好与开发环境配置</p>
       </div>
 
@@ -81,6 +96,31 @@ export function SettingsPage() {
           ))}
         </div>
       </section>
+
+      <section className="space-y-4 rounded-xl border border-border bg-surface-1 p-4">
+        <h3 className="text-sm font-semibold">{i18n.t('settings.language') || '语言'}</h3>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+          {i18n.getAvailable().map((locale) => (
+            <button
+              key={locale}
+              onClick={() => handleLocaleChange(locale)}
+              className={`rounded-lg px-4 py-3 text-sm text-left transition-colors ${
+                currentLocale === locale
+                  ? 'bg-tap-orange text-white'
+                  : 'bg-surface-2 text-text-secondary hover:bg-surface-3'
+              }`}
+            >
+              <div className="font-medium">{i18n.getLabel(locale)}</div>
+              <div className="text-xs opacity-75">{locale}</div>
+            </button>
+          ))}
+        </div>
+        <p className="text-xs text-text-muted">
+          当前语言: {i18n.getLabel(currentLocale)} ({currentLocale})
+        </p>
+      </section>
+
+      <UpdateChecker />
 
       <Button onClick={handleSave}>保存设置</Button>
     </div>

@@ -1,9 +1,13 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
+import electronRenderer from 'vite-plugin-electron-renderer';
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    electronRenderer(),
+  ],
   resolve: {
     alias: {
       '@': path.resolve(__dirname, 'src'),

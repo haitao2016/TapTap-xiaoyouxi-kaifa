@@ -737,5 +737,113 @@
     "techDebtsCompleted": 9,
     "communityTotal": 4,
     "communityCompleted": 4
-  }
+  },
+  "newFeatures": {
+    "phase11": {
+      "name": "AI 智能增强",
+      "duration": "6周",
+      "status": "planned",
+      "tasks": [
+        {
+          "id": "P11-1",
+          "name": "智能代码审查",
+          "priority": "high",
+          "category": "ai",
+          "description": "自动分析代码质量、安全漏洞，结合本地+云端模型进行深度审查",
+          "expectedResult": "一键审查生成报告，发现潜在问题和安全漏洞",
+          "subtasks": [
+            "代码质量评分体系",
+            "安全漏洞检测规则库",
+            "审查报告生成器",
+            "本地+云端混合审查模式"
+          ],
+          "dependencies": ["P7-1", "P7-2"]
+        },
+        {
+          "id": "P11-2",
+          "name": "项目文档自动生成",
+          "priority": "high",
+          "category": "ai",
+          "description": "根据代码结构自动生成 README、API 文档、CHANGELOG",
+          "expectedResult": "输入项目目录，输出完整项目文档",
+          "subtasks": [
+            "README 自动生成",
+            "API 文档提取与生成",
+            "CHANGELOG 自动维护",
+            "代码注释规范化"
+          ],
+          "dependencies": ["P7-3"]
+        },
+        {
+          "id": "P11-3",
+          "name": "AI 代码导师",
+          "priority": "medium",
+          "category": "ai",
+          "description": "交互式编程教学，代码优化建议与演示，错误预防指导",
+          "expectedResult": "新手可通过 AI 导师快速学习编程",
+          "subtasks": [
+            "交互式编程教程引擎",
+            "代码优化建议与对比演示",
+            "错误预防知识库",
+            "学习进度追踪"
+          ],
+          "dependencies": ["P7-4"]
+        },
+        {
+          "id": "P11-4",
+          "name": "团队协作增强",
+          "priority": "medium",
+          "category": "collaboration",
+          "description": "多用户实时协作，共享 AI 会话上下文，团队代码规范检查",
+          "expectedResult": "团队成员可共享 AI 对话和代码审查结果",
+          "subtasks": [
+            "共享 AI 会话上下文",
+            "团队代码规范检查",
+            "团队知识库",
+            "协作编辑历史追溯"
+          ],
+          "dependencies": ["P8-1", "P8-4"]
+        },
+        {
+          "id": "P11-5",
+          "name": "本地模型微调支持",
+          "priority": "low",
+          "category": "ai",
+          "description": "支持对本地模型进行微调，自定义训练数据集，模型性能监控",
+          "expectedResult": "用户可微调自己的本地模型适配项目需求",
+          "subtasks": [
+            "微调数据收集与整理",
+            "LoRA/QLoRA 微调支持",
+            "微调任务管理界面",
+            "模型性能基准测试"
+          ],
+          "dependencies": ["P7-1"]
+        },
+        {
+          "id": "P11-6",
+          "name": "智能插件系统",
+          "priority": "medium",
+          "category": "plugin",
+          "description": "插件市场、自定义 AI 工作流、第三方服务集成",
+          "expectedResult": "用户可创建和分享自定义 AI 工作流插件",
+          "subtasks": [
+            "插件市场界面",
+            "AI 工作流可视化编辑器",
+            "第三方服务集成（GitHub、Jira等）",
+            "插件审核机制"
+          ],
+          "dependencies": ["P4-1", "P4-2"]
+        }
+      ]
+    }
+  },
+  "newMilestones": [
+    {
+      "version": "v1.2.0",
+      "name": "AI 智能增强版",
+      "targetDate": "v1.1.0+6周",
+      "phases": ["phase11"],
+      "features": ["P11-1", "P11-2", "P11-3", "P11-4", "P11-5", "P11-6"]
+    }
+  ]
 }

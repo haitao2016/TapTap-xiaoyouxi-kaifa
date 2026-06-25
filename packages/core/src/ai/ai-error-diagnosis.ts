@@ -7,6 +7,7 @@
  */
 import { globalEventBus } from '../event-bus';
 import { randomUUID } from 'node:crypto';
+import { AIProviderBase } from './ai-provider-base';
 
 export interface ErrorContext {
   /** 错误消息 */
@@ -58,7 +59,7 @@ export interface FixStep {
   references?: string[];
 }
 
-export class AIErrorDiagnosis {
+export class AIErrorDiagnosis extends AIProviderBase {
   private history: DiagnosisSuggestion[] = [];
   private readonly maxHistory = 50;
 
@@ -68,9 +69,10 @@ export class AIErrorDiagnosis {
   async diagnose(ctx: ErrorContext): Promise<DiagnosisSuggestion> {
     const start = Date.now();
     const id = randomUUID();
+    const category = this.classify(ctx);
     const suggestion: DiagnosisSuggestion = {
       id,
-      category: this.classify(ctx),
+      category,
       rootCause: '',
       fixes: [],
       confidence: 0,
@@ -79,14 +81,24 @@ export class AIErrorDiagnosis {
     };
 
     try {
-      // 模拟分析过程
-      const analysis = await this.analyze(ctx);
-      suggestion.rootCause = analysis.rootCause;
-      suggestion.fixes = analysis.fixes;
-      suggestion.confidence = analysis.confidence;
-      suggestion.references = analysis.references;
+      const config = this.getConfig();
+      if (config.provider === 'mock') {
+        const analysis = this.mockAnalyze(ctx, category);
+        suggestion.rootCause = analysis.rootCause;
+        suggestion.fixes = analysis.fixes;
+        suggestion.confidence = analysis.confidence;
+        suggestion.references = analysis.references;
+      } else {
+        const analysis = await this.aiAnalyze(ctx, category);
+        suggestion.rootCause = analysis.rootCause;
+        suggestion.fixes = analysis.fixes;
+        suggestion.confidence = analysis.confidence;
+        suggestion.references = analysis.references;
+      }
     } catch (err) {
       suggestion.rootCause = '诊断失败：' + (err instanceof Error ? err.message : String(err));
+      const fallback = this.mockAnalyze(ctx, category);
+      suggestion.fixes = fallback.fixes;
     } finally {
       suggestion.latency = Date.now() - start;
     }
@@ -128,29 +140,96 @@ export class AIErrorDiagnosis {
     return 'unknown';
   }
 
-  private async analyze(ctx: ErrorContext): Promise<Omit<DiagnosisSuggestion, 'id' | 'category' | 'latency'>> {
-    // 实际实现应调用 AI 接口
-    await new Promise((r) => setTimeout(r, 200));
+  private async aiAnalyze(
+    ctx: ErrorContext,
+    category: DiagnosisSuggestion['category']
+  ): Promise<Omit<DiagnosisSuggestion, 'id' | 'category' | 'latency'>> {
+    const systemPrompt = `你是一个专业的代码调试助手。请分析以下错误并提供修复建议。
+请严格以 JSON 格式返回，包含以下字段：
+- rootCause: 根本原因（字符串）
+- fixes: 修复步骤数组，每项包含 title, description, references（可选，字符串数组）
+- confidence: 置信度 0-1（数字）
+- references: 相关文档链接数组`;
 
+    const userPrompt = `错误类型: ${category}
+错误消息: ${ctx.message}
+${ctx.stack ? `堆栈: ${ctx.stack}` : ''}
+${ctx.filePath ? `文件: ${ctx.filePath}` : ''}
+${ctx.line ? `行号: ${ctx.line}` : ''}
+${ctx.codeSnippet ? `代码片段:\n\`\`\`\n${ctx.codeSnippet}\n\`\`\`` : ''}
+${ctx.projectTypes?.length ? `项目类型: ${ctx.projectTypes.join(', ')}` : ''}
+
+请提供详细的诊断和修复建议。`;
+
+    try {
+      const response = await this.callChat({
+        systemPrompt,
+        userPrompt,
+        temperature: 0.3,
+      });
+      return this.parseDiagnosisResponse(response, category);
+    } catch (err) {
+      console.warn('AI 诊断失败，使用 mock 兜底:', err);
+      return this.mockAnalyze(ctx, category);
+    }
+  }
+
+  private parseDiagnosisResponse(
+    response: string,
+    category: DiagnosisSuggestion['category']
+  ): Omit<DiagnosisSuggestion, 'id' | 'category' | 'latency'> {
+    try {
+      const jsonMatch = response.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[0]);
+        return {
+          rootCause: parsed.rootCause || '未知原因',
+          fixes: Array.isArray(parsed.fixes)
+            ? parsed.fixes.map((f: any) => ({
+                title: f.title || '修复步骤',
+                description: f.description || '',
+                references: f.references || [],
+              }))
+            : [],
+          confidence: typeof parsed.confidence === 'number' ? parsed.confidence : 0.5,
+          references: Array.isArray(parsed.references) ? parsed.references : [],
+        };
+      }
+    } catch {
+      // 解析失败，使用 mock 结果
+    }
+
+    return {
+      rootCause: response.slice(0, 200),
+      fixes: [{ title: '查看详细分析', description: response }],
+      confidence: 0.5,
+      references: [],
+    };
+  }
+
+  private mockAnalyze(
+    ctx: ErrorContext,
+    category: DiagnosisSuggestion['category']
+  ): Omit<DiagnosisSuggestion, 'id' | 'category' | 'latency'> {
     const fixes: FixStep[] = [];
-    if (ctx.category === 'syntax') {
+    if (category === 'syntax') {
       fixes.push({
         title: '检查语法',
         description: `错误 "${ctx.message}" 通常是语法问题。检查 ${ctx.filePath ?? '文件'} 第 ${ctx.line ?? '?'} 行附近。`,
       });
-    } else if (ctx.category === 'network') {
+    } else if (category === 'network') {
       fixes.push({
         title: '检查网络',
         description: '网络请求失败，请检查：1) URL 是否正确 2) 是否需要 HTTPS 3) CORS 配置 4) 真机调试的代理设置',
         references: ['https://developer.taptap.cn/minigameapidoc/'],
       });
-    } else if (ctx.category === 'sdk') {
+    } else if (category === 'sdk') {
       fixes.push({
         title: '检查 SDK 调用',
         description: '请确认已正确初始化 TapTap SDK 并在用户登录后调用相关 API。',
         references: ['https://developer.taptap.cn/minigameapidoc/api/'],
       });
-    } else if (ctx.category === 'runtime') {
+    } else if (category === 'runtime') {
       fixes.push({
         title: '检查空值',
         description: '运行时错误通常是访问未定义属性或空对象。检查变量初始化时机。',
