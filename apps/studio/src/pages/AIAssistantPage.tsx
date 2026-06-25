@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { Button, Card, CardHeader, CardTitle, CardContent, Icon, Input, Tabs, TabsList, TabsTrigger, TabsContent, Badge } from '@tapdev/ui';
-import { aiAssistantService, aiCompletionService, aiCodeGenService, aiErrorDiagnosis } from '@tapdev/core';
+import { aiAssistantService, aiCompletionService, aiCodeGenService, aiErrorDiagnosis, multiModelRouter } from '@tapdev/core';
 import type { ChatSession, ChatMessage, Reference, AIConfig } from '@tapdev/core';
+import type { ModelInstance, TaskType } from '@tapdev/core';
 import { useAppStore } from '../store/app-store';
 
 export function AIAssistantPage() {
@@ -131,6 +132,7 @@ export function AIAssistantPage() {
               <TabsTrigger value="chat">AI 对话</TabsTrigger>
               <TabsTrigger value="codegen">代码生成</TabsTrigger>
               <TabsTrigger value="diagnose">错误诊断</TabsTrigger>
+              <TabsTrigger value="models">多模型</TabsTrigger>
               <TabsTrigger value="settings">设置</TabsTrigger>
             </TabsList>
           </div>
@@ -185,6 +187,10 @@ export function AIAssistantPage() {
 
           <TabsContent value="diagnose" className="mt-0 p-4">
             <ErrorDiagnosisPanel />
+          </TabsContent>
+
+          <TabsContent value="models" className="mt-0 p-4">
+            <MultiModelConfigPanel />
           </TabsContent>
 
           <TabsContent value="settings" className="mt-0 p-4">
@@ -552,6 +558,310 @@ function ErrorDiagnosisPanel() {
           </CardContent>
         </Card>
       )}
+    </div>
+  );
+}
+
+/** 多模型配置面板 */
+function MultiModelConfigPanel() {
+  const [models, setModels] = useState<ModelInstance[]>([]);
+  const [selectedTask, setSelectedTask] = useState<TaskType>('code-completion');
+  const [testPrompt, setTestPrompt] = useState('');
+  const [testResult, setTestResult] = useState<any>(null);
+  const [isTesting, setIsTesting] = useState(false);
+  const [discoveredInstances, setDiscoveredInstances] = useState<any[]>([]);
+
+  useEffect(() => {
+    refreshModels();
+    discoverOllama();
+  }, []);
+
+  const refreshModels = () => {
+    setModels(multiModelRouter.listEnabledModels());
+  };
+
+  const discoverOllama = async () => {
+    const instances = await multiModelRouter.discoverOllamaInstances();
+    setDiscoveredInstances(instances);
+  };
+
+  const toggleModel = (modelId: string) => {
+    const model = multiModelRouter.getModel(modelId);
+    if (model) {
+      multiModelRouter.updateModel(modelId, { enabled: !model.enabled });
+      refreshModels();
+    }
+  };
+
+  const handleTestMultiModel = async () => {
+    if (!testPrompt.trim()) return;
+    setIsTesting(true);
+    setTestResult(null);
+
+    try {
+      const result = await multiModelRouter.execute(selectedTask, testPrompt);
+      setTestResult(result);
+    } catch (err) {
+      setTestResult({
+        error: err instanceof Error ? err.message : String(err),
+      });
+    } finally {
+      setIsTesting(false);
+    }
+  };
+
+  const taskTypes: { value: TaskType; label: string }[] = [
+    { value: 'code-completion', label: '代码补全' },
+    { value: 'code-generation', label: '代码生成' },
+    { value: 'code-refactor', label: '代码重构' },
+    { value: 'code-test', label: '生成测试' },
+    { value: 'error-diagnosis', label: '错误诊断' },
+    { value: 'chat', label: '对话问答' },
+    { value: 'review', label: '代码审查' },
+  ];
+
+  const routingRule = multiModelRouter.getRoutingRule(selectedTask);
+
+  return (
+    <div className="max-w-4xl space-y-6">
+      {/* Ollama 实例状态 */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <Icon name="server" size={16} />
+            Ollama 实例
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {discoveredInstances.length === 0 ? (
+            <div className="text-sm text-text-muted">
+              未检测到 Ollama 实例。请确保已在本地运行 Ollama。
+            </div>
+          ) : (
+            <div className="space-y-2">
+              {discoveredInstances.map((instance, idx) => (
+                <div key={idx} className="flex items-center gap-3 p-3 bg-surface-2 rounded-lg">
+                  <Badge variant="success">已连接</Badge>
+                  <span className="text-sm font-mono">{instance.baseUrl}</span>
+                  <div className="flex-1" />
+                  <span className="text-xs text-text-muted">
+                    {instance.installedModels.length} 个模型
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* 模型列表 */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <Icon name="layers" size={16} />
+            模型管理
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2">
+            {models.map((model) => (
+              <div
+                key={model.id}
+                className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${
+                  model.enabled
+                    ? 'border-tap-orange/30 bg-tap-orange/5'
+                    : 'border-border bg-surface-2 opacity-60'
+                }`}
+              >
+                <button
+                  onClick={() => toggleModel(model.id)}
+                  className={`w-10 h-6 rounded-full transition-colors relative ${
+                    model.enabled ? 'bg-tap-orange' : 'bg-gray-300'
+                  }`}
+                >
+                  <div
+                    className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
+                      model.enabled ? 'translate-x-5' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+
+                <div className="flex-1">
+                  <div className="font-medium text-sm">{model.name}</div>
+                  <div className="text-xs text-text-muted">
+                    {model.model} • {model.provider === 'ollama' ? '本地模型' : '云端模型'}
+                  </div>
+                </div>
+
+                <Badge variant={model.provider === 'ollama' ? 'success' : 'default'}>
+                  {model.priority}
+                </Badge>
+
+                <div className="flex gap-1">
+                  {model.capabilities.slice(0, 3).map((cap) => (
+                    <Badge key={cap} variant="default" className="text-xs">
+                      {taskTypes.find(t => t.value === cap)?.label || cap}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* 路由规则 */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <Icon name="git-branch" size={16} />
+            路由规则
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div>
+              <label className="text-sm text-text-secondary mb-2 block">任务类型</label>
+              <select
+                value={selectedTask}
+                onChange={(e) => setSelectedTask(e.target.value as TaskType)}
+                className="w-full rounded-lg border border-border bg-surface-1 px-3 py-2 text-sm"
+              >
+                {taskTypes.map((task) => (
+                  <option key={task.value} value={task.value}>
+                    {task.label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {routingRule && (
+              <div className="space-y-2">
+                <div className="flex items-center gap-2">
+                  <Badge variant="info">
+                    {routingRule.mode === 'single' ? '单模型' :
+                     routingRule.mode === 'parallel' ? '并行' : '级联'}
+                  </Badge>
+                  <span className="text-sm text-text-secondary">
+                    候选模型: {routingRule.modelIds.length}
+                  </span>
+                </div>
+
+                <div className="space-y-1">
+                  {routingRule.modelIds.map((modelId) => {
+                    const model = multiModelRouter.getModel(modelId);
+                    return model ? (
+                      <div
+                        key={modelId}
+                        className="flex items-center gap-2 p-2 bg-surface-2 rounded text-sm"
+                      >
+                        <Icon name="box" size={14} />
+                        <span className="font-medium">{model.name}</span>
+                        <span className="text-text-muted text-xs">{model.model}</span>
+                        <div className="flex-1" />
+                        <Badge variant="default" className="text-xs">
+                          优先级 {model.priority}
+                        </Badge>
+                      </div>
+                    ) : null;
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* 测试区域 */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <Icon name="play" size={16} />
+            测试多模型协同
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <label className="text-sm text-text-secondary mb-2 block">
+              测试提示词（将使用 {taskTypes.find(t => t.value === selectedTask)?.label} 任务的路由规则）
+            </label>
+            <textarea
+              value={testPrompt}
+              onChange={(e) => setTestPrompt(e.target.value)}
+              placeholder="输入测试内容..."
+              className="w-full rounded-lg border border-border bg-surface-1 px-3 py-2 text-sm resize-none h-24"
+            />
+          </div>
+
+          <Button onClick={handleTestMultiModel} disabled={isTesting || !testPrompt.trim()}>
+            {isTesting ? (
+              <>
+                <Icon name="loading" size={14} className="animate-spin" />
+                执行中...
+              </>
+            ) : (
+              <>
+                <Icon name="play" size={14} />
+                执行测试
+              </>
+            )}
+          </Button>
+
+          {testResult && (
+            <div className="space-y-3">
+              {testResult.error ? (
+                <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
+                  <div className="text-sm text-red-500">执行失败</div>
+                  <div className="text-xs text-text-muted mt-1">{testResult.error}</div>
+                </div>
+              ) : (
+                <>
+                  <div className="flex items-center gap-2 text-sm text-text-secondary">
+                    <Badge variant="success">
+                      {testResult.responses.length} 个模型参与
+                    </Badge>
+                    <span>聚合策略: {testResult.strategy}</span>
+                    <span>总耗时: {testResult.totalLatency}ms</span>
+                  </div>
+
+                  <div className="space-y-2">
+                    {testResult.responses.map((response: any, idx: number) => (
+                      <div
+                        key={idx}
+                        className={`p-3 rounded-lg border ${
+                          response.error
+                            ? 'bg-red-500/5 border-red-500/30'
+                            : 'bg-surface-2 border-border'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="default">
+                            {multiModelRouter.getModel(response.modelId)?.name || response.modelId}
+                          </Badge>
+                          <span className="text-xs text-text-muted">
+                            {response.latency}ms
+                          </span>
+                          {response.score !== undefined && (
+                            <Badge variant="info">
+                              评分 {Math.round(response.score * 100)}%
+                            </Badge>
+                          )}
+                          {response.error && (
+                            <Badge variant="error">失败</Badge>
+                          )}
+                        </div>
+                        <pre className="text-xs text-text-secondary whitespace-pre-wrap font-mono max-h-32 overflow-auto">
+                          {response.content || response.error}
+                        </pre>
+                      </div>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
