@@ -53,3 +53,74 @@ export type {
   TapDBRealtimeData,
   TapDBExportTask,
 } from './tapdb-service';
+
+export { multiplayerService, MultiplayerService } from './multiplayer-service';
+export type {
+  RoomStatus,
+  PlayerStatus,
+  MatchStatus,
+  MessageType,
+  LeaderboardType,
+  AchievementType,
+  Player,
+  RoomSettings,
+  Room,
+  RoomMessage,
+  MatchRequest,
+  MatchResult,
+  LeaderboardConfig,
+  LeaderboardEntry,
+  AchievementDefinition,
+  UserAchievement,
+  GameModeTemplate,
+} from './multiplayer-service';
+
+export { abTestService, ABTestService } from './ab-test-service';
+export type {
+  ExperimentStatus,
+  VariableType,
+  MetricType,
+  MetricRole,
+  ConfidenceLevel,
+  ExperimentConclusion,
+  ExperimentVariant,
+  ExperimentVariable,
+  ExperimentMetric,
+  MetricData,
+  VariantResult,
+  ExperimentResult,
+  Experiment,
+  MutexGroup,
+  BucketResult,
+} from './ab-test-service';
+
+export { communityService, CommunityService } from './community-service';
+export type {
+  CommentSort,
+  CommentStatus,
+  AnnouncementType,
+  FeedbackCategory,
+  FeedbackStatus,
+  FeedbackPriority,
+  Comment,
+  Announcement,
+  Feedback,
+  FAQ,
+  CommunityStats,
+} from './community-service';
+
+export { achievementLeaderboardService, AchievementLeaderboardService } from './achievement-leaderboard-service';
+export type {
+  AchievementRarity,
+  LeaderboardOrder,
+  LeaderboardResetPeriod,
+  RewardType,
+  AchievementCondition,
+  AchievementReward,
+  Achievement,
+  UserAchievementProgress,
+  LeaderboardConfig as ALLeaderboardConfig,
+  LeaderboardEntry as ALLeaderboardEntry,
+  LeaderboardReward,
+  PlayerRankInfo,
+} from './achievement-leaderboard-service';
