@@ -570,6 +570,9 @@ function MultiModelConfigPanel() {
   const [testResult, setTestResult] = useState<any>(null);
   const [isTesting, setIsTesting] = useState(false);
   const [discoveredInstances, setDiscoveredInstances] = useState<any[]>([]);
+  const [activeTab, setActiveTab] = useState<'local' | 'cloud' | 'rules' | 'test'>('local');
+  const [editingModel, setEditingModel] = useState<ModelInstance | null>(null);
+  const [apiKeyConfig, setApiKeyConfig] = useState<Record<string, string>>({});
 
   useEffect(() => {
     refreshModels();
@@ -591,6 +594,11 @@ function MultiModelConfigPanel() {
       multiModelRouter.updateModel(modelId, { enabled: !model.enabled });
       refreshModels();
     }
+  };
+
+  const updateModelConfig = (modelId: string, updates: Partial<ModelInstance>) => {
+    multiModelRouter.updateModel(modelId, updates);
+    refreshModels();
   };
 
   const handleTestMultiModel = async () => {
@@ -618,110 +626,242 @@ function MultiModelConfigPanel() {
     { value: 'error-diagnosis', label: '错误诊断' },
     { value: 'chat', label: '对话问答' },
     { value: 'review', label: '代码审查' },
+    { value: 'translation', label: '翻译' },
+    { value: 'summary', label: '总结摘要' },
   ];
 
   const routingRule = multiModelRouter.getRoutingRule(selectedTask);
 
+  const localModels = models.filter(m => m.provider === 'ollama');
+  const cloudModels = models.filter(m => m.provider !== 'ollama');
+
+  const providerLabels: Record<string, string> = {
+    openai: 'OpenAI',
+    claude: 'Anthropic',
+    ollama: 'Ollama',
+    qwen: '通义千问',
+    deepseek: 'DeepSeek',
+    doubao: '豆包',
+    zhipu: '智谱AI',
+    moonshot: '月之暗面',
+    gemini: 'Google Gemini',
+    mock: '模拟',
+  };
+
   return (
     <div className="max-w-4xl space-y-6">
-      {/* Ollama 实例状态 */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            <Icon name="server" size={16} />
-            Ollama 实例
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {discoveredInstances.length === 0 ? (
-            <div className="text-sm text-text-muted">
-              未检测到 Ollama 实例。请确保已在本地运行 Ollama。
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {discoveredInstances.map((instance, idx) => (
-                <div key={idx} className="flex items-center gap-3 p-3 bg-surface-2 rounded-lg">
-                  <Badge variant="success">已连接</Badge>
-                  <span className="text-sm font-mono">{instance.baseUrl}</span>
-                  <div className="flex-1" />
-                  <span className="text-xs text-text-muted">
-                    {instance.installedModels.length} 个模型
-                  </span>
+      {/* 标签页切换 */}
+      <div className="flex gap-2 border-b border-border">
+        {[
+          { key: 'local', label: '本地模型', icon: 'cpu' },
+          { key: 'cloud', label: '云端模型', icon: 'cloud' },
+          { key: 'rules', label: '路由规则', icon: 'git-branch' },
+          { key: 'test', label: '协同测试', icon: 'play' },
+        ].map((tab) => (
+          <button
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key as any)}
+            className={`px-4 py-2 text-sm font-medium border-b-2 transition-colors -mb-px ${
+              activeTab === tab.key
+                ? 'text-tap-orange border-tap-orange'
+                : 'text-text-secondary border-transparent hover:text-text-primary'
+            }`}
+          >
+            <Icon name={tab.icon as any} size={14} className="inline mr-1" />
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* 本地模型 */}
+      {activeTab === 'local' && (
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <Icon name="server" size={16} />
+                Ollama 实例状态
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {discoveredInstances.length === 0 ? (
+                <div className="text-sm text-text-muted">
+                  未检测到 Ollama 实例。请确保已在本地运行 Ollama。
                 </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* 模型列表 */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            <Icon name="layers" size={16} />
-            模型管理
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            {models.map((model) => (
-              <div
-                key={model.id}
-                className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${
-                  model.enabled
-                    ? 'border-tap-orange/30 bg-tap-orange/5'
-                    : 'border-border bg-surface-2 opacity-60'
-                }`}
-              >
-                <button
-                  onClick={() => toggleModel(model.id)}
-                  className={`w-10 h-6 rounded-full transition-colors relative ${
-                    model.enabled ? 'bg-tap-orange' : 'bg-gray-300'
-                  }`}
-                >
-                  <div
-                    className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                      model.enabled ? 'translate-x-5' : 'translate-x-1'
-                    }`}
-                  />
-                </button>
-
-                <div className="flex-1">
-                  <div className="font-medium text-sm">{model.name}</div>
-                  <div className="text-xs text-text-muted">
-                    {model.model} • {model.provider === 'ollama' ? '本地模型' : '云端模型'}
-                  </div>
-                </div>
-
-                <Badge variant={model.provider === 'ollama' ? 'success' : 'default'}>
-                  {model.priority}
-                </Badge>
-
-                <div className="flex gap-1">
-                  {model.capabilities.slice(0, 3).map((cap) => (
-                    <Badge key={cap} variant="default" className="text-xs">
-                      {taskTypes.find(t => t.value === cap)?.label || cap}
-                    </Badge>
+              ) : (
+                <div className="space-y-2">
+                  {discoveredInstances.map((instance, idx) => (
+                    <div key={idx} className="flex items-center gap-3 p-3 bg-surface-2 rounded-lg">
+                      <Badge variant="success">已连接</Badge>
+                      <span className="text-sm font-mono">{instance.baseUrl}</span>
+                      <div className="flex-1" />
+                      <span className="text-xs text-text-muted">
+                        {instance.installedModels.length} 个模型
+                      </span>
+                    </div>
                   ))}
                 </div>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <Icon name="cpu" size={16} />
+                本地模型 ({localModels.length})
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                {localModels.map((model) => (
+                  <ModelCard
+                    key={model.id}
+                    model={model}
+                    taskTypes={taskTypes}
+                    onToggle={() => toggleModel(model.id)}
+                    onEdit={() => setEditingModel(model)}
+                  />
+                ))}
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* 云端模型 */}
+      {activeTab === 'cloud' && (
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <Icon name="cloud" size={16} />
+                云端模型 ({cloudModels.length})
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {cloudModels.map((model) => (
+                  <ModelCard
+                    key={model.id}
+                    model={model}
+                    taskTypes={taskTypes}
+                    providerLabels={providerLabels}
+                    onToggle={() => toggleModel(model.id)}
+                    onEdit={() => setEditingModel(model)}
+                    apiKey={apiKeyConfig[model.id] || ''}
+                    onApiKeyChange={(key) => {
+                      setApiKeyConfig(prev => ({ ...prev, [model.id]: key }));
+                      updateModelConfig(model.id, { apiKey: key });
+                    }}
+                  />
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
 
       {/* 路由规则 */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            <Icon name="git-branch" size={16} />
-            路由规则
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
+      {activeTab === 'rules' && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              <Icon name="git-branch" size={16} />
+              路由规则配置
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm text-text-secondary mb-2 block">任务类型</label>
+                <select
+                  value={selectedTask}
+                  onChange={(e) => setSelectedTask(e.target.value as TaskType)}
+                  className="w-full rounded-lg border border-border bg-surface-1 px-3 py-2 text-sm"
+                >
+                  {taskTypes.map((task) => (
+                    <option key={task.value} value={task.value}>
+                      {task.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {routingRule && (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Badge variant="info">
+                      {routingRule.mode === 'single' ? '单模型' :
+                       routingRule.mode === 'parallel' ? '并行协同' : '级联容错'}
+                    </Badge>
+                    <span className="text-sm text-text-secondary">
+                      候选模型: {routingRule.modelIds.length} 个
+                    </span>
+                    {routingRule.parallelLimit && (
+                      <Badge variant="default">并行上限: {routingRule.parallelLimit}</Badge>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    {routingRule.modelIds.map((modelId, idx) => {
+                      const model = multiModelRouter.getModel(modelId);
+                      return model ? (
+                        <div
+                          key={modelId}
+                          className="flex items-center gap-2 p-3 bg-surface-2 rounded-lg"
+                        >
+                          <Badge variant="default">#{idx + 1}</Badge>
+                          <Icon name="box" size={14} />
+                          <span className="font-medium">{model.name}</span>
+                          <span className="text-text-muted text-xs">
+                            {providerLabels[model.provider] || model.provider}
+                          </span>
+                          <div className="flex-1" />
+                          <Badge variant={model.enabled ? 'success' : 'error'}>
+                            {model.enabled ? '已启用' : '未启用'}
+                          </Badge>
+                          <Badge variant="info" className="text-xs">
+                            优先级 {model.priority}
+                          </Badge>
+                        </div>
+                      ) : null;
+                    })}
+                  </div>
+
+                  <div className="p-3 bg-tap-orange/5 border border-tap-orange/20 rounded-lg text-sm text-text-secondary">
+                    <div className="font-medium text-tap-orange mb-1">路由策略说明</div>
+                    {routingRule.mode === 'single' && (
+                      <p>使用优先级最高的可用模型处理请求，速度最快。</p>
+                    )}
+                    {routingRule.mode === 'parallel' && (
+                      <p>同时调用多个模型，自动选择质量最高的结果。响应质量更好，但耗时和成本更高。</p>
+                    )}
+                    {routingRule.mode === 'cascade' && (
+                      <p>按优先级依次尝试模型，第一个成功即返回。提供最高的可用性和容错能力。</p>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* 协同测试 */}
+      {activeTab === 'test' && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base flex items-center gap-2">
+              <Icon name="play" size={16} />
+              多模型协同测试
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
             <div>
-              <label className="text-sm text-text-secondary mb-2 block">任务类型</label>
+              <label className="text-sm text-text-secondary mb-2 block">
+                任务类型
+              </label>
               <select
                 value={selectedTask}
                 onChange={(e) => setSelectedTask(e.target.value as TaskType)}
@@ -735,133 +875,282 @@ function MultiModelConfigPanel() {
               </select>
             </div>
 
-            {routingRule && (
-              <div className="space-y-2">
-                <div className="flex items-center gap-2">
-                  <Badge variant="info">
-                    {routingRule.mode === 'single' ? '单模型' :
-                     routingRule.mode === 'parallel' ? '并行' : '级联'}
-                  </Badge>
-                  <span className="text-sm text-text-secondary">
-                    候选模型: {routingRule.modelIds.length}
-                  </span>
-                </div>
+            <div>
+              <label className="text-sm text-text-secondary mb-2 block">
+                测试提示词
+              </label>
+              <textarea
+                value={testPrompt}
+                onChange={(e) => setTestPrompt(e.target.value)}
+                placeholder="输入测试内容..."
+                className="w-full rounded-lg border border-border bg-surface-1 px-3 py-2 text-sm resize-none h-24"
+              />
+            </div>
 
-                <div className="space-y-1">
-                  {routingRule.modelIds.map((modelId) => {
-                    const model = multiModelRouter.getModel(modelId);
-                    return model ? (
-                      <div
-                        key={modelId}
-                        className="flex items-center gap-2 p-2 bg-surface-2 rounded text-sm"
-                      >
-                        <Icon name="box" size={14} />
-                        <span className="font-medium">{model.name}</span>
-                        <span className="text-text-muted text-xs">{model.model}</span>
-                        <div className="flex-1" />
-                        <Badge variant="default" className="text-xs">
-                          优先级 {model.priority}
-                        </Badge>
-                      </div>
-                    ) : null;
-                  })}
-                </div>
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* 测试区域 */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-base flex items-center gap-2">
-            <Icon name="play" size={16} />
-            测试多模型协同
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div>
-            <label className="text-sm text-text-secondary mb-2 block">
-              测试提示词（将使用 {taskTypes.find(t => t.value === selectedTask)?.label} 任务的路由规则）
-            </label>
-            <textarea
-              value={testPrompt}
-              onChange={(e) => setTestPrompt(e.target.value)}
-              placeholder="输入测试内容..."
-              className="w-full rounded-lg border border-border bg-surface-1 px-3 py-2 text-sm resize-none h-24"
-            />
-          </div>
-
-          <Button onClick={handleTestMultiModel} disabled={isTesting || !testPrompt.trim()}>
-            {isTesting ? (
-              <>
-                <Icon name="loading" size={14} className="animate-spin" />
-                执行中...
-              </>
-            ) : (
-              <>
-                <Icon name="play" size={14} />
-                执行测试
-              </>
-            )}
-          </Button>
-
-          {testResult && (
-            <div className="space-y-3">
-              {testResult.error ? (
-                <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
-                  <div className="text-sm text-red-500">执行失败</div>
-                  <div className="text-xs text-text-muted mt-1">{testResult.error}</div>
-                </div>
+            <Button onClick={handleTestMultiModel} disabled={isTesting || !testPrompt.trim()}>
+              {isTesting ? (
+                <>
+                  <Icon name="loading" size={14} className="animate-spin" />
+                  执行中...
+                </>
               ) : (
                 <>
-                  <div className="flex items-center gap-2 text-sm text-text-secondary">
-                    <Badge variant="success">
-                      {testResult.responses.length} 个模型参与
-                    </Badge>
-                    <span>聚合策略: {testResult.strategy}</span>
-                    <span>总耗时: {testResult.totalLatency}ms</span>
-                  </div>
-
-                  <div className="space-y-2">
-                    {testResult.responses.map((response: any, idx: number) => (
-                      <div
-                        key={idx}
-                        className={`p-3 rounded-lg border ${
-                          response.error
-                            ? 'bg-red-500/5 border-red-500/30'
-                            : 'bg-surface-2 border-border'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2 mb-2">
-                          <Badge variant="default">
-                            {multiModelRouter.getModel(response.modelId)?.name || response.modelId}
-                          </Badge>
-                          <span className="text-xs text-text-muted">
-                            {response.latency}ms
-                          </span>
-                          {response.score !== undefined && (
-                            <Badge variant="info">
-                              评分 {Math.round(response.score * 100)}%
-                            </Badge>
-                          )}
-                          {response.error && (
-                            <Badge variant="error">失败</Badge>
-                          )}
-                        </div>
-                        <pre className="text-xs text-text-secondary whitespace-pre-wrap font-mono max-h-32 overflow-auto">
-                          {response.content || response.error}
-                        </pre>
-                      </div>
-                    ))}
-                  </div>
+                  <Icon name="play" size={14} />
+                  执行测试
                 </>
               )}
+            </Button>
+
+            {testResult && (
+              <div className="space-y-3">
+                {testResult.error ? (
+                  <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg">
+                    <div className="text-sm text-red-500">执行失败</div>
+                    <div className="text-xs text-text-muted mt-1">{testResult.error}</div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="flex flex-wrap items-center gap-2 text-sm">
+                      <Badge variant="success">
+                        {testResult.responses.length} 个模型参与
+                      </Badge>
+                      <Badge variant="info">
+                        策略: {testResult.strategy === 'best' ? '最优选择' :
+                               testResult.strategy === 'cascade' ? '级联容错' : '合并'}
+                      </Badge>
+                      <Badge variant="default">
+                        总耗时: {testResult.totalLatency}ms
+                      </Badge>
+                    </div>
+
+                    <div className="space-y-2">
+                      {testResult.responses.map((response: any, idx: number) => (
+                        <div
+                          key={idx}
+                          className={`p-3 rounded-lg border ${
+                            response.error
+                              ? 'bg-red-500/5 border-red-500/30'
+                              : 'bg-surface-2 border-border'
+                          }`}
+                        >
+                          <div className="flex flex-wrap items-center gap-2 mb-2">
+                            <Badge variant="default">
+                              {multiModelRouter.getModel(response.modelId)?.name || response.modelId}
+                            </Badge>
+                            <span className="text-xs text-text-muted">
+                              {response.latency}ms
+                            </span>
+                            {response.score !== undefined && (
+                              <Badge variant="info">
+                                评分 {Math.round(response.score * 100)}%
+                              </Badge>
+                            )}
+                            {response.error && (
+                              <Badge variant="error">失败</Badge>
+                            )}
+                          </div>
+                          <pre className="text-xs text-text-secondary whitespace-pre-wrap font-mono max-h-32 overflow-auto">
+                            {response.content || response.error}
+                          </pre>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* 编辑模型弹窗 */}
+      {editingModel && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-surface-1 rounded-lg p-6 w-full max-w-lg mx-4 max-h-[80vh] overflow-auto">
+            <h3 className="text-lg font-bold mb-4">模型配置 - {editingModel.name}</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="text-sm text-text-secondary mb-1 block">显示名称</label>
+                <input
+                  type="text"
+                  value={editingModel.name}
+                  onChange={(e) => setEditingModel({ ...editingModel, name: e.target.value })}
+                  className="w-full rounded-lg border border-border bg-surface-1 px-3 py-2 text-sm"
+                />
+              </div>
+              <div>
+                <label className="text-sm text-text-secondary mb-1 block">模型标识</label>
+                <input
+                  type="text"
+                  value={editingModel.model}
+                  onChange={(e) => setEditingModel({ ...editingModel, model: e.target.value })}
+                  className="w-full rounded-lg border border-border bg-surface-1 px-3 py-2 text-sm font-mono"
+                />
+              </div>
+              {editingModel.provider !== 'ollama' && (
+                <div>
+                  <label className="text-sm text-text-secondary mb-1 block">API Key</label>
+                  <input
+                    type="password"
+                    value={editingModel.apiKey || ''}
+                    onChange={(e) => setEditingModel({ ...editingModel, apiKey: e.target.value })}
+                    placeholder="输入 API Key"
+                    className="w-full rounded-lg border border-border bg-surface-1 px-3 py-2 text-sm"
+                  />
+                </div>
+              )}
+              <div>
+                <label className="text-sm text-text-secondary mb-1 block">基础地址</label>
+                <input
+                  type="text"
+                  value={editingModel.baseUrl || ''}
+                  onChange={(e) => setEditingModel({ ...editingModel, baseUrl: e.target.value })}
+                  placeholder="留空使用默认地址"
+                  className="w-full rounded-lg border border-border bg-surface-1 px-3 py-2 text-sm font-mono"
+                />
+              </div>
+              <div>
+                <label className="text-sm text-text-secondary mb-1 block">优先级 (0-100)</label>
+                <input
+                  type="number"
+                  value={editingModel.priority}
+                  onChange={(e) => setEditingModel({ ...editingModel, priority: parseInt(e.target.value) })}
+                  className="w-full rounded-lg border border-border bg-surface-1 px-3 py-2 text-sm"
+                />
+              </div>
+              <div>
+                <label className="text-sm text-text-secondary mb-1 block">上下文窗口</label>
+                <input
+                  type="number"
+                  value={editingModel.contextWindow || 4096}
+                  onChange={(e) => setEditingModel({ ...editingModel, contextWindow: parseInt(e.target.value) })}
+                  className="w-full rounded-lg border border-border bg-surface-1 px-3 py-2 text-sm"
+                />
+              </div>
             </div>
-          )}
-        </CardContent>
-      </Card>
+            <div className="flex gap-2 mt-6 justify-end">
+              <Button variant="secondary" onClick={() => setEditingModel(null)}>
+                取消
+              </Button>
+              <Button onClick={() => {
+                updateModelConfig(editingModel.id, editingModel);
+                setEditingModel(null);
+              }}>
+                保存
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
+
+function ModelCard({
+  model,
+  taskTypes,
+  providerLabels = {},
+  onToggle,
+  onEdit,
+  apiKey,
+  onApiKeyChange,
+}: {
+  model: ModelInstance;
+  taskTypes: { value: string; label: string }[];
+  providerLabels?: Record<string, string>;
+  onToggle: () => void;
+  onEdit: () => void;
+  apiKey?: string;
+  onApiKeyChange?: (key: string) => void;
+}) {
+  const [showApiKey, setShowApiKey] = useState(false);
+
+  return (
+    <div
+      className={`p-4 rounded-lg border transition-colors ${
+        model.enabled
+          ? 'border-tap-orange/30 bg-tap-orange/5'
+          : 'border-border bg-surface-2 opacity-70'
+      }`}
+    >
+      <div className="flex items-start gap-3">
+        <button
+          onClick={onToggle}
+          className={`w-10 h-6 rounded-full transition-colors relative flex-shrink-0 mt-1 ${
+            model.enabled ? 'bg-tap-orange' : 'bg-gray-300'
+          }`}
+        >
+          <div
+            className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
+              model.enabled ? 'translate-x-5' : 'translate-x-1'
+            }`}
+          />
+        </button>
+
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2">
+            <span className="font-medium text-sm">{model.name}</span>
+            <Badge variant="default" className="text-xs">
+              {providerLabels[model.provider] || model.provider}
+            </Badge>
+            <Badge variant="info" className="text-xs">
+              {model.priority}
+            </Badge>
+          </div>
+          <div className="text-xs text-text-muted mt-1 font-mono">
+            {model.model}
+          </div>
+          {model.strengths && model.strengths.length > 0 && (
+            <div className="flex gap-1 mt-2 flex-wrap">
+              {model.strengths.map((s, idx) => (
+                <span key={idx} className="text-xs px-2 py-0.5 bg-surface-2 rounded text-text-secondary">
+                  {s}
+                </span>
+              ))}
+            </div>
+          )}
+          <div className="flex gap-1 mt-2 flex-wrap">
+            {model.capabilities.slice(0, 4).map((cap) => (
+              <Badge key={cap} variant="default" className="text-xs">
+                {taskTypes.find(t => t.value === cap)?.label || cap}
+              </Badge>
+            ))}
+            {model.capabilities.length > 4 && (
+              <Badge variant="default" className="text-xs">
+                +{model.capabilities.length - 4}
+              </Badge>
+            )}
+          </div>
+
+          {onApiKeyChange !== undefined && model.provider !== 'ollama' && (
+            <div className="mt-3 flex items-center gap-2">
+              <div className="flex-1 relative">
+                <input
+                  type={showApiKey ? 'text' : 'password'}
+                  value={apiKey}
+                  onChange={(e) => onApiKeyChange(e.target.value)}
+                  placeholder={`输入 ${providerLabels[model.provider] || model.provider} API Key`}
+                  className="w-full rounded-lg border border-border bg-surface-1 px-3 py-1.5 text-xs pr-8"
+                />
+                <button
+                  onClick={() => setShowApiKey(!showApiKey)}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-primary"
+                >
+                  <Icon name={showApiKey ? 'eye-off' : 'eye'} size={14} />
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+
+        <button
+          onClick={onEdit}
+          className="p-1.5 text-text-muted hover:text-text-primary hover:bg-surface-2 rounded"
+        >
+          <Icon name="settings" size={16} />
+        </button>
+      </div>
+    </div>
+  );
+}
+

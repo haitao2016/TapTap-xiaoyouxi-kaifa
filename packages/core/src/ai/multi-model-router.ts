@@ -26,7 +26,7 @@ export interface ModelInstance {
   /** 显示名称 */
   name: string;
   /** 提供商 */
-  provider: 'ollama' | 'openai' | 'claude' | 'mock';
+  provider: 'ollama' | 'openai' | 'claude' | 'mock' | 'qwen' | 'deepseek' | 'doubao' | 'zhipu' | 'moonshot' | 'gemini';
   /** 模型名称 */
   model: string;
   /** 服务地址 */
@@ -170,17 +170,54 @@ export class MultiModelRouter extends AIProviderBase {
       strengths: ['数学推理', '错误分析', '逻辑推理'],
     });
 
-    // 云端模型作为备选
+    // 云端模型 - OpenAI 系列
+    this.registerModel({
+      id: 'openai-gpt4o',
+      name: 'GPT-4o',
+      provider: 'openai',
+      model: 'gpt-4o',
+      capabilities: ['code-generation', 'code-refactor', 'code-test', 'chat', 'review', 'error-diagnosis'],
+      priority: 98,
+      enabled: false,
+      contextWindow: 128000,
+      strengths: ['最强综合能力', '多模态', '高质量输出'],
+    });
+
     this.registerModel({
       id: 'openai-gpt4',
-      name: 'GPT-4',
+      name: 'GPT-4 Turbo',
       provider: 'openai',
-      model: 'gpt-4',
+      model: 'gpt-4-turbo',
       capabilities: ['code-generation', 'code-refactor', 'code-test', 'chat', 'review', 'error-diagnosis'],
       priority: 95,
       enabled: false,
       contextWindow: 128000,
-      strengths: ['全面能力', '高质量输出'],
+      strengths: ['全面能力', '高质量输出', '长上下文'],
+    });
+
+    this.registerModel({
+      id: 'openai-gpt35',
+      name: 'GPT-3.5 Turbo',
+      provider: 'openai',
+      model: 'gpt-3.5-turbo',
+      capabilities: ['code-generation', 'code-comment', 'chat', 'translation', 'summary'],
+      priority: 85,
+      enabled: false,
+      contextWindow: 16384,
+      strengths: ['速度快', '性价比高', '日常任务'],
+    });
+
+    // 云端模型 - Claude 系列
+    this.registerModel({
+      id: 'claude-opus',
+      name: 'Claude Opus',
+      provider: 'claude',
+      model: 'claude-opus-4-20250514',
+      capabilities: ['code-generation', 'code-refactor', 'chat', 'review', 'error-diagnosis'],
+      priority: 99,
+      enabled: false,
+      contextWindow: 200000,
+      strengths: ['最强推理', '超长上下文', '代码理解深'],
     });
 
     this.registerModel({
@@ -193,6 +230,115 @@ export class MultiModelRouter extends AIProviderBase {
       enabled: false,
       contextWindow: 200000,
       strengths: ['长上下文', '代码理解', '安全性高'],
+    });
+
+    this.registerModel({
+      id: 'claude-haiku',
+      name: 'Claude Haiku',
+      provider: 'claude',
+      model: 'claude-haiku-4-20250514',
+      capabilities: ['code-completion', 'code-generation', 'chat', 'summary', 'translation'],
+      priority: 82,
+      enabled: false,
+      contextWindow: 200000,
+      strengths: ['速度最快', '性价比高', '长上下文'],
+    });
+
+    // 云端模型 - 国内主流
+    this.registerModel({
+      id: 'qwen-plus',
+      name: '通义千问 Plus',
+      provider: 'qwen',
+      model: 'qwen-plus',
+      capabilities: ['code-generation', 'code-refactor', 'chat', 'review', 'error-diagnosis'],
+      priority: 92,
+      enabled: false,
+      contextWindow: 131072,
+      strengths: ['中文最好', '国内访问快', '性价比高'],
+    });
+
+    this.registerModel({
+      id: 'qwen-coder',
+      name: '通义千问 Coder',
+      provider: 'qwen',
+      model: 'qwen-coder-plus',
+      capabilities: ['code-completion', 'code-generation', 'code-refactor', 'code-test'],
+      priority: 90,
+      enabled: false,
+      contextWindow: 131072,
+      strengths: ['代码生成强', '中文理解好', '国内访问快'],
+    });
+
+    this.registerModel({
+      id: 'deepseek-v3',
+      name: 'DeepSeek V3',
+      provider: 'deepseek',
+      model: 'deepseek-chat',
+      capabilities: ['code-generation', 'code-refactor', 'chat', 'review', 'error-diagnosis'],
+      priority: 91,
+      enabled: false,
+      contextWindow: 65536,
+      strengths: ['推理强', '代码能力强', '性价比高'],
+    });
+
+    this.registerModel({
+      id: 'deepseek-coder-v2',
+      name: 'DeepSeek Coder V2',
+      provider: 'deepseek',
+      model: 'deepseek-coder',
+      capabilities: ['code-completion', 'code-generation', 'code-refactor', 'code-test'],
+      priority: 92,
+      enabled: false,
+      contextWindow: 131072,
+      strengths: ['顶级代码能力', '长上下文', '开源'],
+    });
+
+    this.registerModel({
+      id: 'doubao-pro',
+      name: '豆包 Pro',
+      provider: 'doubao',
+      model: 'doubao-pro-32k',
+      capabilities: ['code-generation', 'chat', 'translation', 'summary'],
+      priority: 88,
+      enabled: false,
+      contextWindow: 32768,
+      strengths: ['字节生态', '中文好', '国内访问快'],
+    });
+
+    this.registerModel({
+      id: 'zhipu-glm4',
+      name: '智谱 GLM-4',
+      provider: 'zhipu',
+      model: 'glm-4',
+      capabilities: ['code-generation', 'code-refactor', 'chat', 'review'],
+      priority: 89,
+      enabled: false,
+      contextWindow: 131072,
+      strengths: ['清华团队', '长上下文', '国内访问快'],
+    });
+
+    this.registerModel({
+      id: 'moonshot-v1',
+      name: '月之暗面 Kimi',
+      provider: 'moonshot',
+      model: 'moonshot-v1-128k',
+      capabilities: ['code-generation', 'chat', 'summary', 'review'],
+      priority: 90,
+      enabled: false,
+      contextWindow: 131072,
+      strengths: ['超长上下文', '中文好', '文档处理强'],
+    });
+
+    this.registerModel({
+      id: 'gemini-pro',
+      name: 'Gemini 2.0 Flash',
+      provider: 'gemini',
+      model: 'gemini-2.0-flash',
+      capabilities: ['code-generation', 'chat', 'review', 'translation'],
+      priority: 91,
+      enabled: false,
+      contextWindow: 1048576,
+      strengths: ['超长上下文', '多模态', '速度快'],
     });
   }
 
@@ -496,28 +642,82 @@ export class MultiModelRouter extends AIProviderBase {
   ): Promise<string> {
     const baseConfig = this.getConfig();
 
-    // 构建调用配置
     const config: any = {
       provider: model.provider,
       model: model.model,
-      baseUrl: model.baseUrl ?? (model.provider === 'ollama' ? this.defaultOllamaUrl : baseConfig.baseUrl),
+      baseUrl: model.baseUrl ?? this.getProviderBaseUrl(model.provider),
       apiKey: model.apiKey ?? baseConfig.apiKey,
       temperature: options?.temperature ?? baseConfig.temperature,
       maxTokens: options?.maxTokens ?? baseConfig.maxTokens,
     };
 
+    if (this.isOpenAICompatible(model.provider)) {
+      return this.callOpenAICompatibleModel(config, prompt, options?.systemPrompt);
+    }
+
     switch (model.provider) {
       case 'ollama':
         return this.callOllamaModel(config, prompt, options?.systemPrompt);
-      case 'openai':
-        return this.callOpenAIModel(config, prompt, options?.systemPrompt);
       case 'claude':
         return this.callClaudeModel(config, prompt, options?.systemPrompt);
+      case 'gemini':
+        return this.callGeminiModel(config, prompt, options?.systemPrompt);
       case 'mock':
         return this.mockResponse(prompt);
       default:
         throw new Error(`不支持的提供商: ${model.provider}`);
     }
+  }
+
+  private getProviderBaseUrl(provider: string): string {
+    const urls: Record<string, string> = {
+      openai: 'https://api.openai.com/v1',
+      claude: 'https://api.anthropic.com',
+      ollama: this.defaultOllamaUrl,
+      qwen: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+      deepseek: 'https://api.deepseek.com',
+      doubao: 'https://ark.cn-beijing.volces.com/api/v3',
+      zhipu: 'https://open.bigmodel.cn/api/paas/v4',
+      moonshot: 'https://api.moonshot.cn/v1',
+      gemini: 'https://generativelanguage.googleapis.com/v1beta',
+    };
+    return urls[provider] ?? '';
+  }
+
+  private isOpenAICompatible(provider: string): boolean {
+    return ['openai', 'qwen', 'deepseek', 'doubao', 'zhipu', 'moonshot'].includes(provider);
+  }
+
+  private async callOpenAICompatibleModel(
+    config: any,
+    prompt: string,
+    systemPrompt?: string
+  ): Promise<string> {
+    const url = `${config.baseUrl}/chat/completions`;
+    const messages: any[] = [];
+    if (systemPrompt) messages.push({ role: 'system', content: systemPrompt });
+    messages.push({ role: 'user', content: prompt });
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${config.apiKey}`,
+      },
+      body: JSON.stringify({
+        model: config.model,
+        temperature: config.temperature,
+        max_tokens: config.maxTokens,
+        messages,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`${config.provider} ${response.status}: ${await response.text()}`);
+    }
+
+    const data = await response.json() as { choices: { message: { content: string } }[] };
+    return data.choices?.[0]?.message?.content ?? '';
   }
 
   private async callOllamaModel(
@@ -550,38 +750,6 @@ export class MultiModelRouter extends AIProviderBase {
     return data.response ?? '';
   }
 
-  private async callOpenAIModel(
-    config: any,
-    prompt: string,
-    systemPrompt?: string
-  ): Promise<string> {
-    const url = `${config.baseUrl}/v1/chat/completions`;
-    const messages: any[] = [];
-    if (systemPrompt) messages.push({ role: 'system', content: systemPrompt });
-    messages.push({ role: 'user', content: prompt });
-
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${config.apiKey}`,
-      },
-      body: JSON.stringify({
-        model: config.model,
-        temperature: config.temperature,
-        max_tokens: config.maxTokens,
-        messages,
-      }),
-    });
-
-    if (!response.ok) {
-      throw new Error(`OpenAI ${response.status}: ${await response.text()}`);
-    }
-
-    const data = await response.json() as { choices: { message: { content: string } }[] };
-    return data.choices?.[0]?.message?.content ?? '';
-  }
-
   private async callClaudeModel(
     config: any,
     prompt: string,
@@ -610,6 +778,41 @@ export class MultiModelRouter extends AIProviderBase {
 
     const data = await response.json() as { content: { text: string }[] };
     return data.content?.[0]?.text ?? '';
+  }
+
+  private async callGeminiModel(
+    config: any,
+    prompt: string,
+    systemPrompt?: string
+  ): Promise<string> {
+    const url = `${config.baseUrl}/models/${config.model}:generateContent?key=${config.apiKey}`;
+    const contents = [
+      {
+        role: 'user',
+        parts: [{ text: systemPrompt ? systemPrompt + '\n\n' + prompt : prompt }],
+      },
+    ];
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents,
+        generationConfig: {
+          temperature: config.temperature,
+          maxOutputTokens: config.maxTokens,
+        },
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Gemini ${response.status}: ${await response.text()}`);
+    }
+
+    const data = await response.json() as {
+      candidates: { content: { parts: { text: string }[] } }[];
+    };
+    return data.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
   }
 
   /** 评分响应质量 */
