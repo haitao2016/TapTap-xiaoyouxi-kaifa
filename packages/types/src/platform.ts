@@ -27,6 +27,31 @@ export interface AppSettings {
   unityPath?: string;
   recentProjects: string[];
   enabledPlugins: string[];
+  restoreLastProject?: boolean;
+  autoCheckUpdates?: boolean;
+  sendTelemetry?: boolean;
+  autoSaveInterval?: number;
+  accentColor?: string;
+  compactMode?: boolean;
+  animationsEnabled?: boolean;
+  uiFontSize?: number;
+  editorUseSpaces?: boolean;
+  editorLineNumbers?: boolean;
+  editorMinimap?: boolean;
+  formatOnSave: boolean;
+  formatOnPaste: boolean;
+  editorLineWidth: number;
+  defaultCompress: boolean;
+  defaultWasmSplit: boolean;
+  buildNotification: boolean;
+  maxBuildHistory: number;
+  defaultBuildPath: string;
+  debugBreakOnStart: boolean;
+  debugBreakOnException: boolean;
+  debugInlineValues: boolean;
+  maxLogLines: number;
+  logTimestamps: boolean;
+  autoScrollLog: boolean;
 }
 
 /** 平台能力检测结果 */
