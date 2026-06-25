@@ -35,23 +35,47 @@ export class AIProviderBase {
       case 'mock':
         return this.mockResponse(options.userPrompt);
       case 'openai':
-        return this.callOpenAI(config, options, temperature, maxTokens);
+      case 'deepseek':
+      case 'moonshot':
+      case 'qwen':
+      case 'doubao':
+      case 'zhipu':
+        return this.callOpenAICompatible(config, options, temperature, maxTokens);
       case 'claude':
         return this.callClaude(config, options, temperature, maxTokens);
       case 'ollama':
         return this.callOllama(config, options, temperature, maxTokens);
+      case 'gemini':
+        return this.callGemini(config, options, temperature, maxTokens);
       default:
         throw new Error(`未知的 AI 提供商: ${config.provider}`);
     }
   }
 
-  private async callOpenAI(
+  private getBaseUrl(provider: AIProvider): string {
+    const urls: Record<AIProvider, string> = {
+      openai: 'https://api.openai.com',
+      claude: 'https://api.anthropic.com',
+      ollama: 'http://localhost:11434',
+      mock: '',
+      qwen: 'https://dashscope.aliyuncs.com/compatible-mode/v1',
+      deepseek: 'https://api.deepseek.com',
+      doubao: 'https://ark.cn-beijing.volces.com/api/v3',
+      zhipu: 'https://open.bigmodel.cn/api/paas/v4',
+      moonshot: 'https://api.moonshot.cn/v1',
+      gemini: 'https://generativelanguage.googleapis.com/v1beta',
+    };
+    return urls[provider] ?? '';
+  }
+
+  private async callOpenAICompatible(
     config: AIConfig,
     options: AICallOptions,
     temperature: number,
     maxTokens: number
   ): Promise<string> {
-    const url = (config.baseUrl ?? 'https://api.openai.com') + '/v1/chat/completions';
+    const baseUrl = config.baseUrl ?? this.getBaseUrl(config.provider);
+    const url = baseUrl + '/chat/completions';
     const messages: ChatMessage[] = [];
     if (options.systemPrompt) {
       messages.push({ role: 'system', content: options.systemPrompt });
@@ -71,7 +95,7 @@ export class AIProviderBase {
         messages,
       }),
     });
-    if (!res.ok) throw new Error(`OpenAI ${res.status}: ${await res.text()}`);
+    if (!res.ok) throw new Error(`${config.provider} ${res.status}: ${await res.text()}`);
     const data = (await res.json()) as { choices: { message: { content: string } }[] };
     return data.choices?.[0]?.message?.content ?? '';
   }
@@ -127,6 +151,39 @@ export class AIProviderBase {
     if (!res.ok) throw new Error(`Ollama ${res.status}: ${await res.text()}`);
     const data = (await res.json()) as { response: string };
     return data.response ?? '';
+  }
+
+  private async callGemini(
+    config: AIConfig,
+    options: AICallOptions,
+    temperature: number,
+    maxTokens: number
+  ): Promise<string> {
+    const baseUrl = config.baseUrl ?? this.getBaseUrl(config.provider);
+    const url = `${baseUrl}/models/${config.model}:generateContent?key=${config.apiKey}`;
+    const contents = [
+      {
+        role: 'user',
+        parts: [{ text: options.systemPrompt ? options.systemPrompt + '\n\n' + options.userPrompt : options.userPrompt }],
+      },
+    ];
+
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents,
+        generationConfig: {
+          temperature,
+          maxOutputTokens: maxTokens,
+        },
+      }),
+    });
+    if (!res.ok) throw new Error(`Gemini ${res.status}: ${await res.text()}`);
+    const data = (await res.json()) as {
+      candidates: { content: { parts: { text: string }[] } }[];
+    };
+    return data.candidates?.[0]?.content?.parts?.[0]?.text ?? '';
   }
 
   protected mockResponse(prompt: string): string {
