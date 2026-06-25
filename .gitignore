@@ -10,6 +10,8 @@ out/
 .DS_Store
 Thumbs.db
 *.log
+git-sync.log
+git-sync.pid
 .vite/
 coverage/
 *.tsbuildinfo
