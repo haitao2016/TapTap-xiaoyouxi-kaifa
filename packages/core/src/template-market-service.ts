@@ -25,8 +25,8 @@ export class TemplateMarketService {
     language?: string;
     sortBy?: 'downloads' | 'stars' | 'updated';
   }): Promise<ProjectTemplate[]> {
-    const templates = templateService.getTemplates({ query, ...filters });
-    return templates.map(template => ({
+    const result = templateService.getTemplates({ query, ...filters });
+    return result.templates.map(template => ({
       ...template,
       downloads: this.getDownloadCount(template.id),
     }));
@@ -108,8 +108,8 @@ export class TemplateMarketService {
   }
 
   async getPopularTemplates(limit: number = 10): Promise<ProjectTemplate[]> {
-    const templates = templateService.getTemplates();
-    return templates
+    const result = templateService.getTemplates();
+    return result.templates
       .map(t => ({
         ...t,
         downloads: this.getDownloadCount(t.id),
@@ -119,8 +119,8 @@ export class TemplateMarketService {
   }
 
   async getNewTemplates(limit: number = 10): Promise<ProjectTemplate[]> {
-    const templates = templateService.getTemplates({ sortBy: 'updated' });
-    return templates.slice(0, limit);
+    const result = templateService.getTemplates({ sortBy: 'updated' });
+    return result.templates.slice(0, limit);
   }
 }
 

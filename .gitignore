@@ -1,5 +1,4 @@
 node_modules/
-.pnpm-store/
 dist/
 build/
 out/
@@ -10,11 +9,16 @@ out/
 .DS_Store
 Thumbs.db
 *.log
-git-sync.log
-git-sync.pid
 .vite/
 coverage/
 *.tsbuildinfo
+.pnpm-store/
+studio-dist/
+*.pid
+git-sync.pid
+package-lock.json
+yarn.lock
+apps/desktop/studio-dist/
 apps/desktop/release/
 apps/mobile/android/
 apps/mobile/ios/
