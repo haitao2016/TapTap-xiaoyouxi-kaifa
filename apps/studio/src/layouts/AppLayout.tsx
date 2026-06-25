@@ -11,6 +11,7 @@ const NAV_ITEMS = [
   { id: 'build', label: '构建', icon: 'build', path: '/build' },
   { id: 'git', label: 'Git', icon: 'git-branch', path: '/git' },
   { id: 'ai', label: 'AI 助手', icon: 'bot', path: '/ai' },
+  { id: 'ai-features', label: 'AI 功能', icon: 'sparkles', path: '/ai-features' },
   { id: 'collab', label: '协作', icon: 'users', path: '/collab' },
   { id: 'taptap', label: 'TapTap', icon: 'rocket', path: '/taptap' },
   { id: 'market', label: '市场', icon: 'store', path: '/market' },

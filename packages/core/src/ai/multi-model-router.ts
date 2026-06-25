@@ -18,7 +18,12 @@ export type TaskType =
   | 'chat'               // 对话问答
   | 'translation'         // 翻译
   | 'summary'            // 总结摘要
-  | 'review'            // 代码审查
+  | 'review'             // 代码审查
+  | 'doc-generate'       // 文档生成
+  | 'tutor'              // 编程教学
+  | 'team-knowledge'     // 团队知识
+  | 'finetune'           // 模型微调
+  | 'plugin-install';    // 插件安装
 
 export interface ModelInstance {
   /** 模型唯一标识 */
@@ -519,7 +524,7 @@ export class MultiModelRouter extends AIProviderBase {
       mode: 'single',
     });
 
-    // 文档生成 - 本地coder
+    // 文档生成 - 本地coder + 云端长上下文模型
     this.setRoutingRule('code-document', {
       taskType: 'code-document',
       modelIds: [
@@ -529,6 +534,68 @@ export class MultiModelRouter extends AIProviderBase {
       ],
       mode: 'cascade',
       cascadeTimeout: 5000,
+    });
+
+    // 文档生成（独立任务）- 长上下文模型
+    this.setRoutingRule('doc-generate', {
+      taskType: 'doc-generate',
+      modelIds: [
+        'ollama-general-7b',
+        'moonshot-v1',
+        'qwen-plus',
+        'claude-sonnet',
+        'gemini-pro',
+      ],
+      mode: 'cascade',
+      cascadeTimeout: 10000,
+    });
+
+    // 编程教学 - 本地通用 + 云端深度
+    this.setRoutingRule('tutor', {
+      taskType: 'tutor',
+      modelIds: [
+        'ollama-general-7b',
+        'qwen-plus',
+        'deepseek-v3',
+        'claude-sonnet',
+        'openai-gpt4o',
+      ],
+      mode: 'cascade',
+      cascadeTimeout: 8000,
+    });
+
+    // 团队知识 - 长上下文模型
+    this.setRoutingRule('team-knowledge', {
+      taskType: 'team-knowledge',
+      modelIds: [
+        'moonshot-v1',
+        'qwen-plus',
+        'claude-sonnet',
+        'gemini-pro',
+        'openai-gpt4o',
+      ],
+      mode: 'cascade',
+      cascadeTimeout: 10000,
+    });
+
+    // 模型微调 - 本地模型处理
+    this.setRoutingRule('finetune', {
+      taskType: 'finetune',
+      modelIds: [
+        'ollama-general-7b',
+        'ollama-coder-14b',
+      ],
+      mode: 'single',
+    });
+
+    // 插件安装 - 轻量级任务
+    this.setRoutingRule('plugin-install', {
+      taskType: 'plugin-install',
+      modelIds: [
+        'ollama-general-7b',
+        'qwen-plus',
+      ],
+      mode: 'single',
     });
   }
 
