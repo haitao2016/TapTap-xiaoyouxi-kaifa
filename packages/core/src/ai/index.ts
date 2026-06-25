@@ -9,3 +9,6 @@ export type { CodeGenAction, CodeGenRequest, CodeDiff, CodeGenResult } from './a
 
 export { aiAssistantService, AIAssistantService } from './ai-assistant-service';
 export type { ChatMessage, ChatRole, ChatSession, Reference } from './ai-assistant-service';
+
+export { AIProviderBase } from './ai-provider-base';
+export type { AICallOptions } from './ai-provider-base';

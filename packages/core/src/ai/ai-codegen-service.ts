@@ -7,6 +7,7 @@
  */
 import { globalEventBus } from '../event-bus';
 import { randomUUID } from 'node:crypto';
+import { AIProviderBase } from './ai-provider-base';
 
 export type CodeGenAction = 'generate' | 'refactor' | 'comment' | 'test' | 'document';
 
@@ -53,7 +54,7 @@ export interface CodeGenResult {
   latency: number;
 }
 
-export class AICodeGenService {
+export class AICodeGenService extends AIProviderBase {
   private readonly templates: Record<CodeGenAction, string> = {
     generate: '请根据以下描述生成高质量的 {{language}} 代码:\n{{prompt}}',
     refactor: '请重构以下 {{language}} 代码，使其更清晰、更高效:\n```\n{{selection}}\n```\n要求: {{prompt}}',
@@ -73,7 +74,7 @@ export class AICodeGenService {
       code,
       diffs,
       explanation: this.explainResult(req, code),
-      confidence: 0.7,
+      confidence: code ? 0.7 : 0,
       latency: Date.now() - start,
     };
     globalEventBus.emit({ type: 'ai:codegen', payload: result });
@@ -81,8 +82,66 @@ export class AICodeGenService {
   }
 
   private async dispatch(req: CodeGenRequest): Promise<string> {
-    await new Promise((r) => setTimeout(r, 300));
-    // 实际应调用 AI 服务
+    const config = this.getConfig();
+    if (config.provider === 'mock') {
+      return this.mockGenerate(req);
+    }
+
+    const prompt = this.buildPrompt(req);
+    const systemPrompt = this.systemPrompt(req.action);
+
+    try {
+      const result = await this.callChat({
+        systemPrompt,
+        userPrompt: prompt,
+      });
+      return this.extractCode(result, req.action);
+    } catch (err) {
+      console.warn('AI 代码生成失败，使用 mock 兜底:', err);
+      return this.mockGenerate(req);
+    }
+  }
+
+  private buildPrompt(req: CodeGenRequest): string {
+    let template = this.templates[req.action];
+    template = template.replace(/\{\{language\}\}/g, req.language ?? 'javascript');
+    template = template.replace(/\{\{prompt\}\}/g, req.prompt);
+    template = template.replace(
+      /\{\{selection\}\}/g,
+      req.selection && req.fileContent
+        ? req.fileContent.slice(req.selection.start, req.selection.end)
+        : ''
+    );
+    template = template.replace(/\{\{fileContent\}\}/g, req.fileContent ?? '');
+    return template;
+  }
+
+  private systemPrompt(action: CodeGenAction): string {
+    const base = '你是一个专业的代码助手。';
+    switch (action) {
+      case 'generate':
+        return base + '只返回代码，不要解释，不要用 markdown 代码块包裹。';
+      case 'refactor':
+        return base + '只返回重构后的完整代码，不要解释，不要用 markdown 代码块包裹。';
+      case 'comment':
+        return base + '只返回添加注释后的完整代码，不要解释，不要用 markdown 代码块包裹。';
+      case 'test':
+        return base + '只返回测试代码，不要解释，不要用 markdown 代码块包裹。使用 describe/it 风格。';
+      case 'document':
+        return base + '只返回添加 JSDoc 后的完整代码，不要解释，不要用 markdown 代码块包裹。';
+    }
+  }
+
+  private extractCode(response: string, action: CodeGenAction): string {
+    let code = response.trim();
+    const fenceMatch = code.match(/```[\w]*\n([\s\S]*?)\n```/);
+    if (fenceMatch) {
+      code = fenceMatch[1];
+    }
+    return code;
+  }
+
+  private mockGenerate(req: CodeGenRequest): string {
     switch (req.action) {
       case 'generate':
         return `// ${req.prompt}\nfunction generated() {\n  // TODO: 实现\n}\n`;
