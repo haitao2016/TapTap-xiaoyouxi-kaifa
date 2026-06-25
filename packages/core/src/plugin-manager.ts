@@ -1,5 +1,34 @@
-import type { PluginMeta, PluginContext, PluginHook, PanelConfig, CommandConfig, PluginAction, PluginInfo, CommandPaletteItem } from '@tapdev/types';
+import type { PluginMeta, PluginContext, PluginHook, PanelConfig, CommandConfig, PluginAction, PluginInfo, CommandPaletteItem, ProjectMeta } from '@tapdev/types';
 import { globalEventBus } from './event-bus';
+
+export type PluginPermission =
+  | 'fileSystem:read'
+  | 'fileSystem:write'
+  | 'network:fetch'
+  | 'network:websocket'
+  | 'childProcess:spawn'
+  | 'clipboard:read'
+  | 'clipboard:write'
+  | 'notifications'
+  | 'commands'
+  | 'panels'
+  | 'project:read'
+  | 'project:write'
+  | 'settings:read'
+  | 'settings:write'
+  | 'theme:read'
+  | 'theme:write';
+
+export interface PluginPermissions {
+  allowed: PluginPermission[];
+  denied: PluginPermission[];
+}
+
+export interface PluginDependency {
+  id: string;
+  version?: string;
+  optional?: boolean;
+}
 
 type PluginActivateFn = (context: PluginContext) => void | Promise<void>;
 type PluginDeactivateFn = () => void | Promise<void>;
@@ -12,18 +41,42 @@ interface RegisteredPlugin {
   panels: Map<string, PanelConfig>;
   actions: Map<string, PluginAction>;
   activated: boolean;
+  permissions: PluginPermissions;
+  dependencies: PluginDependency[];
+  activationError?: string;
+  loadedAt?: number;
+  activatedAt?: number;
+}
+
+export interface PluginLoadOptions {
+  enable?: boolean;
+  project?: ProjectMeta;
+  permissions?: Partial<PluginPermissions>;
 }
 
 export class PluginManager {
   private plugins = new Map<string, RegisteredPlugin>();
   private hookHandlers = new Map<PluginHook, Set<(data?: unknown) => void>>();
   private commandPaletteItems: CommandPaletteItem[] = [];
+  private currentProject?: ProjectMeta;
 
   registerPlugin(
     meta: PluginMeta,
     activate?: PluginActivateFn,
-    deactivate?: PluginDeactivateFn
+    deactivate?: PluginDeactivateFn,
+    options?: { permissions?: PluginPermission[]; dependencies?: PluginDependency[] }
   ): void {
+    const permissions: PluginPermissions = {
+      allowed: options?.permissions ?? [
+        'commands',
+        'panels',
+        'notifications',
+        'project:read',
+        'theme:read',
+      ],
+      denied: [],
+    };
+
     this.plugins.set(meta.id, {
       meta,
       activate,
@@ -32,76 +85,81 @@ export class PluginManager {
       panels: new Map(),
       actions: new Map(),
       activated: false,
+      permissions,
+      dependencies: options?.dependencies ?? [],
+      loadedAt: Date.now(),
     });
-    globalEventBus.emit({ type: 'plugin:loaded', payload: meta });
+    globalEventBus.emit({ type: 'plugin:registered', payload: meta });
   }
 
   async activatePlugin(pluginId: string, project?: PluginContext['project']): Promise<void> {
     const plugin = this.plugins.get(pluginId);
     if (!plugin || !plugin.activate || plugin.activated) return;
 
-    const context: PluginContext = {
-      project,
-      emit: (_event, _data) => {
-      },
-      registerCommand: (id, handler, config) => {
-        plugin.commands.set(id, { handler, config });
-        if (config) {
-          this.commandPaletteItems.push({
-            id: `${pluginId}.${id}`,
-            pluginId,
-            title: config.title,
-            description: config.description,
-            icon: config.icon,
-            category: config.category,
-            shortcut: config.shortcut,
-            action: handler,
-          });
-        }
-      },
-      registerPanel: (id, config) => {
-        plugin.panels.set(id, config);
-      },
-      registerAction: (action) => {
-        plugin.actions.set(action.id, action);
-        if (action.type === 'command') {
-          this.commandPaletteItems.push({
-            id: `${pluginId}.${action.id}`,
-            pluginId,
-            title: action.label,
-            description: action.description,
-            icon: action.icon,
-            shortcut: action.shortcut,
-            action: action.handler,
-          });
-        }
-      },
-      showNotification: (message, type = 'info') => {
-        globalEventBus.emit({ type: 'plugin:notification', payload: { message, type } });
-      },
-      openUrl: (url) => {
-        globalEventBus.emit({ type: 'plugin:open-url', payload: { url } });
-      },
-    };
+    try {
+      await this.checkDependencies(pluginId);
+    } catch (error) {
+      plugin.activationError = error instanceof Error ? error.message : '依赖检查失败';
+      globalEventBus.emit({ type: 'plugin:activation-failed', payload: { pluginId, error: plugin.activationError } });
+      throw error;
+    }
 
-    await plugin.activate(context);
-    plugin.activated = true;
-    plugin.meta.enabled = true;
-    globalEventBus.emit({ type: 'plugin:activated', payload: plugin.meta });
+    const context = this.createPluginContext(pluginId, project ?? this.currentProject);
+
+    try {
+      await plugin.activate(context);
+      plugin.activated = true;
+      plugin.activatedAt = Date.now();
+      plugin.meta.enabled = true;
+      plugin.activationError = undefined;
+      this.registerPluginHooks(pluginId);
+      globalEventBus.emit({ type: 'plugin:activated', payload: plugin.meta });
+    } catch (error) {
+      plugin.activationError = error instanceof Error ? error.message : '插件激活失败';
+      globalEventBus.emit({ type: 'plugin:activation-failed', payload: { pluginId, error: plugin.activationError } });
+      throw error;
+    }
   }
 
   async deactivatePlugin(pluginId: string): Promise<void> {
     const plugin = this.plugins.get(pluginId);
     if (!plugin || !plugin.activated) return;
 
-    await plugin.deactivate?.();
+    try {
+      await plugin.deactivate?.();
+    } catch (error) {
+      console.error(`插件 ${pluginId} 停用时出错:`, error);
+    }
+
     plugin.activated = false;
+    plugin.activatedAt = undefined;
     plugin.meta.enabled = false;
     this.commandPaletteItems = this.commandPaletteItems.filter((item) => item.pluginId !== pluginId);
+    this.unregisterPluginHooks(pluginId);
     globalEventBus.emit({ type: 'plugin:deactivated', payload: plugin.meta });
   }
 
-  async loadPlugin(pluginId: string): Promise<void> {
+  async loadPlugin(pluginId: string, options?: PluginLoadOptions): Promise<void> {
+    const plugin = this.plugins.get(pluginId);
+    if (!plugin) {
+      throw new Error(`插件不存在: ${pluginId}`);
+    }
+
+    if (options?.permissions) {
+      Object.assign(plugin.permissions, options.permissions);
+    }
+
+    if (options?.enable !== false) {
+      await this.activatePlugin(pluginId, options?.project);
+    }
+  }
+
+  async unloadPlugin(pluginId: string): Promise<void> {
+    await this.deactivatePlugin(pluginId);
+  }
+
+  async reloadPlugin(pluginId: string): Promise<void> {
+    await this.deactivatePlugin(pluginId);
     await this.activatePlugin(pluginId);
   }
 
@@ -128,6 +186,52 @@ export class PluginManager {
 
   getAllPluginInfo(): PluginInfo[] {
     return [...this.plugins.keys()].map((id) => this.getPluginInfo(id)).filter((info): info is PluginInfo => !!info);
+  }
+
+  getPluginActivationError(pluginId: string): string | undefined {
+    return this.plugins.get(pluginId)?.activationError;
+  }
+
+  getPluginDependencies(pluginId: string): PluginDependency[] {
+    return this.plugins.get(pluginId)?.dependencies ?? [];
+  }
+
+  getPluginPermissions(pluginId: string): PluginPermissions | null {
+    return this.plugins.get(pluginId)?.permissions ?? null;
+  }
+
+  setPluginPermissions(pluginId: string, permissions: Partial<PluginPermissions>): void {
+    const plugin = this.plugins.get(pluginId);
+    if (plugin) {
+      if (permissions.allowed) plugin.permissions.allowed = permissions.allowed;
+      if (permissions.denied) plugin.permissions.denied = permissions.denied;
+      globalEventBus.emit({ type: 'plugin:permissions-updated', payload: { pluginId, permissions: plugin.permissions } });
+    }
+  }
+
+  hasPermission(pluginId: string, permission: PluginPermission): boolean {
+    const plugin = this.plugins.get(pluginId);
+    if (!plugin) return false;
+    if (plugin.permissions.denied.includes(permission)) return false;
+    return plugin.permissions.allowed.includes(permission);
+  }
+
+  grantPermission(pluginId: string, permission: PluginPermission): void {
+    const plugin = this.plugins.get(pluginId);
+    if (plugin && !plugin.permissions.allowed.includes(permission)) {
+      plugin.permissions.allowed.push(permission);
+      plugin.permissions.denied = plugin.permissions.denied.filter((p) => p !== permission);
+    }
+  }
+
+  revokePermission(pluginId: string, permission: PluginPermission): void {
+    const plugin = this.plugins.get(pluginId);
+    if (plugin) {
+      plugin.permissions.allowed = plugin.permissions.allowed.filter((p) => p !== permission);
+      if (!plugin.permissions.denied.includes(permission)) {
+        plugin.permissions.denied.push(permission);
+      }
+    }
   }
 
   executeCommand(pluginId: string, commandId: string): void {
@@ -186,6 +290,160 @@ export class PluginManager {
     this.hookHandlers.get(hook)?.forEach((handler) => handler(data));
   }
 
+  setCurrentProject(project?: ProjectMeta): void {
+    this.currentProject = project;
+    if (project) {
+      this.triggerHook('onProjectOpen', project);
+    }
+  }
+
+  getCurrentProject(): ProjectMeta | undefined {
+    return this.currentProject;
+  }
+
+  async activateAllEnabledPlugins(): Promise<void> {
+    const enabled = this.getPlugins().filter((p) => p.enabled);
+    for (const meta of enabled) {
+      try {
+        await this.activatePlugin(meta.id);
+      } catch (error) {
+        console.error(`激活插件 ${meta.id} 失败:`, error);
+      }
+    }
+  }
+
+  async deactivateAllPlugins(): Promise<void> {
+    const activated = [...this.plugins.values()].filter((p) => p.activated);
+    for (const plugin of activated) {
+      await this.deactivatePlugin(plugin.meta.id);
+    }
+  }
+
+  isPluginActivated(pluginId: string): boolean {
+    return this.plugins.get(pluginId)?.activated ?? false;
+  }
+
+  isPluginRegistered(pluginId: string): boolean {
+    return this.plugins.has(pluginId);
+  }
+
+  unregisterPlugin(pluginId: string): void {
+    const plugin = this.plugins.get(pluginId);
+    if (plugin?.activated) {
+      this.deactivatePlugin(pluginId);
+    }
+    this.plugins.delete(pluginId);
+    globalEventBus.emit({ type: 'plugin:unregistered', payload: pluginId });
+  }
+
+  getActivatedPluginsCount(): number {
+    return [...this.plugins.values()].filter((p) => p.activated).length;
+  }
+
+  getRegisteredPluginsCount(): number {
+    return this.plugins.size;
+  }
+
+  private createPluginContext(pluginId: string, project?: ProjectMeta): PluginContext {
+    const plugin = this.plugins.get(pluginId)!;
+
+    return {
+      project,
+      emit: (event: string, data?: unknown) => {
+        globalEventBus.emit({ type: `plugin:${pluginId}:${event}`, payload: data });
+      },
+      registerCommand: (id, handler, config) => {
+        if (!this.hasPermission(pluginId, 'commands')) {
+          console.warn(`插件 ${pluginId} 没有注册命令的权限`);
+          return;
+        }
+        plugin.commands.set(id, { handler, config });
+        if (config) {
+          this.commandPaletteItems.push({
+            id: `${pluginId}.${id}`,
+            pluginId,
+            title: config.title,
+            description: config.description,
+            icon: config.icon,
+            category: config.category,
+            shortcut: config.shortcut,
+            action: handler,
+          });
+        }
+      },
+      registerPanel: (id, config) => {
+        if (!this.hasPermission(pluginId, 'panels')) {
+          console.warn(`插件 ${pluginId} 没有注册面板的权限`);
+          return;
+        }
+        plugin.panels.set(id, config);
+        globalEventBus.emit({ type: 'panel:registered', payload: { pluginId, panel: config } });
+      },
+      registerAction: (action) => {
+        if (!this.hasPermission(pluginId, 'commands')) {
+          console.warn(`插件 ${pluginId} 没有注册操作的权限`);
+          return;
+        }
+        plugin.actions.set(action.id, action);
+        if (action.type === 'command') {
+          this.commandPaletteItems.push({
+            id: `${pluginId}.${action.id}`,
+            pluginId,
+            title: action.label,
+            description: action.description,
+            icon: action.icon,
+            shortcut: action.shortcut,
+            action: action.handler,
+          });
+        }
+      },
+      showNotification: (message, type = 'info') => {
+        if (!this.hasPermission(pluginId, 'notifications')) {
+          console.warn(`插件 ${pluginId} 没有发送通知的权限`);
+          return;
+        }
+        globalEventBus.emit({ type: 'plugin:notification', payload: { message, type, pluginId } });
+      },
+      openUrl: (url) => {
+        if (!this.hasPermission(pluginId, 'network:fetch')) {
+          console.warn(`插件 ${pluginId} 没有打开 URL 的权限`);
+          return;
+        }
+        globalEventBus.emit({ type: 'plugin:open-url', payload: { url, pluginId } });
+      },
+    };
+  }
+
+  private async checkDependencies(pluginId: string): Promise<void> {
+    const plugin = this.plugins.get(pluginId);
+    if (!plugin) return;
+
+    for (const dep of plugin.dependencies) {
+      const depPlugin = this.plugins.get(dep.id);
+      if (!depPlugin) {
+        if (dep.optional) continue;
+        throw new Error(`缺少必需的依赖插件: ${dep.id}`);
+      }
+      if (!depPlugin.activated) {
+        await this.activatePlugin(dep.id);
+      }
+    }
+  }
+
+  private registerPluginHooks(pluginId: string): void {
+    const plugin = this.plugins.get(pluginId);
+    if (!plugin?.meta.hooks) return;
+
+    for (const hook of plugin.meta.hooks) {
+      if (!this.hookHandlers.has(hook)) {
+        this.hookHandlers.set(hook, new Set());
+      }
+    }
+  }
+
+  private unregisterPluginHooks(_pluginId: string): void {
+  }
+
   loadBuiltinPlugins(): void {
     this.registerPlugin(
       {
@@ -231,6 +489,11 @@ export class PluginManager {
           defaultPosition: 'right',
           defaultSize: 400,
         });
+      },
+      undefined,
+      {
+        permissions: ['commands', 'panels', 'notifications', 'project:read', 'fileSystem:read'],
+        dependencies: [],
       }
     );
 
@@ -267,6 +530,11 @@ export class PluginManager {
           icon: 'activity',
           category: '网络',
         });
+      },
+      undefined,
+      {
+        permissions: ['commands', 'notifications', 'network:fetch'],
+        dependencies: [],
       }
     );
 
@@ -304,6 +572,11 @@ export class PluginManager {
           icon: 'list',
           category: '调试',
         });
+      },
+      undefined,
+      {
+        permissions: ['commands', 'panels', 'notifications', 'project:read'],
+        dependencies: [],
       }
     );
   }
