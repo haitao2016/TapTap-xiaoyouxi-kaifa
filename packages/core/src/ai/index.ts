@@ -12,3 +12,6 @@ export type { ChatMessage, ChatRole, ChatSession, Reference } from './ai-assista
 
 export { AIProviderBase } from './ai-provider-base';
 export type { AICallOptions } from './ai-provider-base';
+
+export { MultiModelRouter, multiModelRouter } from './multi-model-router';
+export type { TaskType, ModelInstance, RoutingRule, ModelResponse, AggregatedResult, OllamaInstance } from './multi-model-router';
