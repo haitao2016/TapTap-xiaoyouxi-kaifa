@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Button, Card, CardHeader, CardTitle, CardContent, Icon, Input, Tabs, TabsList, TabsTrigger, TabsContent, Badge } from '@tapdev/ui';
 import { aiAssistantService, aiCompletionService, aiCodeGenService, aiErrorDiagnosis, multiModelRouter } from '@tapdev/core';
 import type { ChatSession, ChatMessage, Reference, AIConfig } from '@tapdev/core';
-import type { ModelInstance, TaskType } from '@tapdev/core';
+import type { ModelInstance, TaskType, HybridMode } from '@tapdev/core';
 import { useAppStore } from '../store/app-store';
 
 export function AIAssistantPage() {
@@ -570,13 +570,22 @@ function MultiModelConfigPanel() {
   const [testResult, setTestResult] = useState<any>(null);
   const [isTesting, setIsTesting] = useState(false);
   const [discoveredInstances, setDiscoveredInstances] = useState<any[]>([]);
-  const [activeTab, setActiveTab] = useState<'local' | 'cloud' | 'rules' | 'test'>('local');
+  const [activeTab, setActiveTab] = useState<'local' | 'cloud' | 'rules' | 'hybrid' | 'test'>('local');
   const [editingModel, setEditingModel] = useState<ModelInstance | null>(null);
   const [apiKeyConfig, setApiKeyConfig] = useState<Record<string, string>>({});
+  const [hybridMode, setHybridMode] = useState<HybridMode>('local-first');
+  const [callStatus, setCallStatus] = useState<any>(null);
 
   useEffect(() => {
     refreshModels();
     discoverOllama();
+    setHybridMode(multiModelRouter.getHybridMode());
+    // 定期更新调用状态
+    const interval = setInterval(() => {
+      const status = multiModelRouter.getCallStatus();
+      setCallStatus(status);
+    }, 500);
+    return () => clearInterval(interval);
   }, []);
 
   const refreshModels = () => {
@@ -607,6 +616,7 @@ function MultiModelConfigPanel() {
     setTestResult(null);
 
     try {
+      multiModelRouter.setHybridMode(hybridMode);
       const result = await multiModelRouter.execute(selectedTask, testPrompt);
       setTestResult(result);
     } catch (err) {
@@ -616,6 +626,11 @@ function MultiModelConfigPanel() {
     } finally {
       setIsTesting(false);
     }
+  };
+
+  const handleHybridModeChange = (mode: HybridMode) => {
+    setHybridMode(mode);
+    multiModelRouter.setHybridMode(mode);
   };
 
   const taskTypes: { value: TaskType; label: string }[] = [
@@ -656,6 +671,7 @@ function MultiModelConfigPanel() {
           { key: 'local', label: '本地模型', icon: 'cpu' },
           { key: 'cloud', label: '云端模型', icon: 'cloud' },
           { key: 'rules', label: '路由规则', icon: 'git-branch' },
+          { key: 'hybrid', label: '混合协同', icon: 'layers' },
           { key: 'test', label: '协同测试', icon: 'play' },
         ].map((tab) => (
           <button
@@ -846,6 +862,226 @@ function MultiModelConfigPanel() {
             </div>
           </CardContent>
         </Card>
+      )}
+
+      {/* 混合协同 */}
+      {activeTab === 'hybrid' && (
+        <div className="space-y-6">
+          {/* 混合协同模式选择 */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <Icon name="layers" size={16} />
+                混合协同模式
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                {[
+                  { mode: 'local-first' as HybridMode, label: '本地优先', desc: '优先使用本地模型，本地不可用时切换云端', icon: 'cpu' },
+                  { mode: 'cloud-first' as HybridMode, label: '云端优先', desc: '优先使用云端模型，云端不可用时切换本地', icon: 'cloud' },
+                  { mode: 'parallel' as HybridMode, label: '并行协同', desc: '本地+云端同时调用，选择最优结果', icon: 'git-merge' },
+                ].map((item) => (
+                  <button
+                    key={item.mode}
+                    onClick={() => handleHybridModeChange(item.mode)}
+                    className={`p-4 rounded-lg border-2 text-left transition-all ${
+                      hybridMode === item.mode
+                        ? 'border-tap-orange bg-tap-orange/5'
+                        : 'border-border hover:border-tap-orange/30'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      <Icon name={item.icon as any} size={16} className={hybridMode === item.mode ? 'text-tap-orange' : ''} />
+                      <span className="font-medium">{item.label}</span>
+                      {hybridMode === item.mode && (
+                        <Badge variant="success" className="ml-auto text-xs">已启用</Badge>
+                      )}
+                    </div>
+                    <p className="text-xs text-text-muted">{item.desc}</p>
+                  </button>
+                ))}
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mt-4">
+                {[
+                  { mode: 'local-only' as HybridMode, label: '仅本地模型', desc: '完全离线，保护隐私', icon: 'lock' },
+                  { mode: 'cloud-only' as HybridMode, label: '仅云端模型', desc: '使用最强云端模型', icon: 'server' },
+                ].map((item) => (
+                  <button
+                    key={item.mode}
+                    onClick={() => handleHybridModeChange(item.mode)}
+                    className={`p-4 rounded-lg border-2 text-left transition-all ${
+                      hybridMode === item.mode
+                        ? 'border-tap-orange bg-tap-orange/5'
+                        : 'border-border hover:border-tap-orange/30'
+                    }`}
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      <Icon name={item.icon as any} size={16} className={hybridMode === item.mode ? 'text-tap-orange' : ''} />
+                      <span className="font-medium">{item.label}</span>
+                      {hybridMode === item.mode && (
+                        <Badge variant="success" className="ml-auto text-xs">已启用</Badge>
+                      )}
+                    </div>
+                    <p className="text-xs text-text-muted">{item.desc}</p>
+                  </button>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* 模型统计 */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-tap-orange/10 flex items-center justify-center">
+                    <Icon name="cpu" size={20} className="text-tap-orange" />
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold">{localModels.length}</div>
+                    <div className="text-xs text-text-muted">本地模型</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-blue-500/10 flex items-center justify-center">
+                    <Icon name="cloud" size={20} className="text-blue-500" />
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold">{cloudModels.length}</div>
+                    <div className="text-xs text-text-muted">云端模型</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-green-500/10 flex items-center justify-center">
+                    <Icon name="check-circle" size={20} className="text-green-500" />
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold">{models.filter(m => m.enabled).length}</div>
+                    <div className="text-xs text-text-muted">已启用模型</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* 调用状态 */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <Icon name="activity" size={16} />
+                当前调用状态
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {callStatus?.isCalling ? (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 text-sm">
+                    <Icon name="loading" size={14} className="animate-spin text-tap-orange" />
+                    <span>正在调用 {callStatus.taskType} 任务...</span>
+                    <Badge variant="info" className="ml-auto">{callStatus.mode}</Badge>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {callStatus.localStatus && (
+                      <div className="p-3 bg-surface-2 rounded-lg">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="default">本地</Badge>
+                          <span className="text-xs text-text-muted">{callStatus.localStatus.modelId}</span>
+                        </div>
+                        <div className="text-xs text-text-secondary">
+                          耗时: {callStatus.localStatus.latency ? `${callStatus.localStatus.latency}ms` : '进行中...'}
+                        </div>
+                        {callStatus.localStatus.content && (
+                          <div className="mt-2 text-xs text-text-muted truncate">
+                            {callStatus.localStatus.content.substring(0, 100)}...
+                          </div>
+                        )}
+                        {callStatus.localStatus.error && (
+                          <div className="mt-2 text-xs text-red-500">{callStatus.localStatus.error}</div>
+                        )}
+                      </div>
+                    )}
+                    {callStatus.cloudStatus && (
+                      <div className="p-3 bg-surface-2 rounded-lg">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Badge variant="info">云端</Badge>
+                          <span className="text-xs text-text-muted">{callStatus.cloudStatus.modelId}</span>
+                        </div>
+                        <div className="text-xs text-text-secondary">
+                          耗时: {callStatus.cloudStatus.latency ? `${callStatus.cloudStatus.latency}ms` : '进行中...'}
+                        </div>
+                        {callStatus.cloudStatus.content && (
+                          <div className="mt-2 text-xs text-text-muted truncate">
+                            {callStatus.cloudStatus.content.substring(0, 100)}...
+                          </div>
+                        )}
+                        {callStatus.cloudStatus.error && (
+                          <div className="mt-2 text-xs text-red-500">{callStatus.cloudStatus.error}</div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ) : (
+                <div className="text-sm text-text-muted flex items-center gap-2">
+                  <Icon name="inbox" size={14} />
+                  暂无进行中的调用
+                </div>
+              )}
+
+              {callStatus?.selectedModel && !callStatus?.isCalling && (
+                <div className="mt-3 p-3 bg-green-500/10 border border-green-500/30 rounded-lg">
+                  <div className="flex items-center gap-2">
+                    <Icon name="check-circle" size={14} className="text-green-500" />
+                    <span className="text-sm">已选择模型: </span>
+                    <Badge variant="success">{callStatus.selectedModel}</Badge>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* 混合协同说明 */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <Icon name="info" size={16} />
+                混合协同说明
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3 text-sm text-text-secondary">
+              <div className="p-3 bg-surface-2 rounded-lg">
+                <div className="font-medium text-text-primary mb-1">本地优先 (local-first)</div>
+                <p>适用于网络不稳定或需要保护隐私的场景。本地模型响应快、零延迟，但能力相对较弱。</p>
+              </div>
+              <div className="p-3 bg-surface-2 rounded-lg">
+                <div className="font-medium text-text-primary mb-1">云端优先 (cloud-first)</div>
+                <p>适用于追求最佳效果的场景。云端模型能力强，但依赖网络连接。</p>
+              </div>
+              <div className="p-3 bg-surface-2 rounded-lg">
+                <div className="font-medium text-text-primary mb-1">并行协同 (parallel)</div>
+                <p>同时调用本地和云端模型，根据响应质量自动选择最优结果。兼顾速度和质量，但成本加倍。</p>
+              </div>
+              <div className="p-3 bg-tap-orange/5 border border-tap-orange/20 rounded-lg">
+                <div className="flex items-center gap-2 text-tap-orange font-medium mb-1">
+                  <Icon name="lightbulb" size={14} />
+                  最佳实践
+                </div>
+                <p>日常代码补全使用"本地优先"，复杂问题自动切换云端。离线开发时自动降级为纯本地模式。</p>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
       )}
 
       {/* 协同测试 */}

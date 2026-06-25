@@ -91,6 +91,44 @@ export interface OllamaInstance {
   status: 'connected' | 'disconnected' | 'error';
 }
 
+/** 混合协同模式 */
+export type HybridMode =
+  | 'local-first'      // 本地优先，云端备选
+  | 'cloud-first'       // 云端优先，本地备选
+  | 'parallel'          // 本地+云端并行，取最优
+  | 'local-only'        // 仅使用本地模型
+  | 'cloud-only';       // 仅使用云端模型
+
+/** 混合协同状态 */
+export interface HybridCallStatus {
+  /** 是否正在调用 */
+  isCalling: boolean;
+  /** 调用的任务类型 */
+  taskType?: TaskType;
+  /** 使用的模式 */
+  mode: HybridMode;
+  /** 本地模型调用状态 */
+  localStatus?: {
+    modelId: string;
+    startedAt: number;
+    latency?: number;
+    content?: string;
+    error?: string;
+  };
+  /** 云端模型调用状态 */
+  cloudStatus?: {
+    modelId: string;
+    startedAt: number;
+    latency?: number;
+    content?: string;
+    error?: string;
+  };
+  /** 最终选择的模型 */
+  selectedModel?: string;
+  /** 最终结果 */
+  result?: string;
+}
+
 export class MultiModelRouter extends AIProviderBase {
   /** 模型实例注册表 */
   private modelRegistry = new Map<string, ModelInstance>();
@@ -100,6 +138,13 @@ export class MultiModelRouter extends AIProviderBase {
   private routingRules = new Map<TaskType, RoutingRule>();
   /** 默认 Ollama 地址 */
   private defaultOllamaUrl = 'http://localhost:11434';
+  /** 当前混合协同模式 */
+  private hybridMode: HybridMode = 'local-first';
+  /** 当前调用状态 */
+  private callStatus: HybridCallStatus = {
+    isCalling: false,
+    mode: 'local-first',
+  };
 
   constructor() {
     super();
@@ -342,68 +387,149 @@ export class MultiModelRouter extends AIProviderBase {
     });
   }
 
-  /** 初始化默认路由规则 */
+  /** 初始化默认路由规则 - 本地+云端混合协同 */
   private initDefaultRules(): void {
-    // 代码补全 - 使用本地coder模型并行调用
+    // 代码补全 - 本地coder模型 + 云端coder模型并行
     this.setRoutingRule('code-completion', {
       taskType: 'code-completion',
-      modelIds: ['ollama-coder-14b', 'ollama-codellama-13b', 'ollama-coder-7b'],
+      modelIds: [
+        'ollama-coder-14b',       // 本地 DeepSeek Coder 14B
+        'deepseek-coder-v2',       // 云端 DeepSeek Coder
+        'ollama-codellama-13b',    // 本地 CodeLlama
+        'qwen-coder',              // 云端通义千问 Coder
+      ],
       mode: 'parallel',
       parallelLimit: 2,
     });
 
-    // 代码生成 - 使用coder模型
+    // 代码生成 - 本地coder + 云端高质量模型
     this.setRoutingRule('code-generation', {
       taskType: 'code-generation',
-      modelIds: ['ollama-coder-14b', 'ollama-coder-7b'],
-      mode: 'single',
+      modelIds: [
+        'ollama-coder-14b',       // 本地优先
+        'deepseek-coder-v2',      // 云端备选
+        'qwen-coder',             // 国内云端
+        'claude-sonnet',           // 高质量云端
+      ],
+      mode: 'cascade',
+      cascadeTimeout: 8000,
     });
 
-    // 代码重构 - 使用coder模型，可能并行
+    // 代码重构 - 本地coder + 云端coder并行，取最优
     this.setRoutingRule('code-refactor', {
       taskType: 'code-refactor',
-      modelIds: ['ollama-coder-14b', 'ollama-codellama-13b'],
+      modelIds: [
+        'ollama-coder-14b',
+        'deepseek-coder-v2',
+        'ollama-codellama-13b',
+        'claude-opus',
+      ],
       mode: 'parallel',
       parallelLimit: 2,
     });
 
-    // 代码审查 - 多个模型协同
+    // 代码审查 - 本地+云端协同审查
     this.setRoutingRule('review', {
       taskType: 'review',
-      modelIds: ['ollama-codellama-13b', 'ollama-general-7b'],
+      modelIds: [
+        'ollama-codellama-13b',  // 本地 CodeLlama
+        'claude-sonnet',           // 云端 Claude
+        'ollama-general-7b',       // 本地通用
+        'deepseek-v3',             // 云端 DeepSeek
+      ],
       mode: 'parallel',
       parallelLimit: 2,
     });
 
-    // 错误诊断 - 通用模型 + coder模型协同
+    // 错误诊断 - 本地快速诊断 + 云端深度分析
     this.setRoutingRule('error-diagnosis', {
       taskType: 'error-diagnosis',
-      modelIds: ['ollama-general-7b', 'ollama-coder-14b', 'ollama-math-7b'],
+      modelIds: [
+        'ollama-general-7b',      // 本地快速响应
+        'qwen-plus',               // 国内云端
+        'ollama-coder-14b',        // 本地coder分析
+        'claude-opus',             // 云端深度分析
+        'deepseek-v3',             // DeepSeek分析
+      ],
+      mode: 'cascade',
+      cascadeTimeout: 10000,
+    });
+
+    // 对话问答 - 本地通用 + 云端深度对话
+    this.setRoutingRule('chat', {
+      taskType: 'chat',
+      modelIds: [
+        'ollama-general-7b',      // 本地快速响应
+        'qwen-plus',               // 通义千问
+        'deepseek-v3',             // DeepSeek
+        'claude-sonnet',           // Claude
+        'moonshot-v1',             // Kimi
+      ],
+      mode: 'cascade',
+      cascadeTimeout: 8000,
+    });
+
+    // 测试生成 - 本地coder + 云端coder并行
+    this.setRoutingRule('code-test', {
+      taskType: 'code-test',
+      modelIds: [
+        'ollama-coder-14b',
+        'deepseek-coder-v2',
+        'ollama-codellama-13b',
+        'qwen-coder',
+      ],
+      mode: 'parallel',
+      parallelLimit: 2,
+    });
+
+    // 翻译 - 本地通用 + 云端翻译模型
+    this.setRoutingRule('translation', {
+      taskType: 'translation',
+      modelIds: [
+        'ollama-general-7b',
+        'qwen-plus',
+        'deepseek-v3',
+        'gemini-pro',
+      ],
       mode: 'cascade',
       cascadeTimeout: 5000,
     });
 
-    // 对话问答 - 通用模型
-    this.setRoutingRule('chat', {
-      taskType: 'chat',
-      modelIds: ['ollama-general-7b'],
+    // 总结摘要 - 本地快速 + 云端深度
+    this.setRoutingRule('summary', {
+      taskType: 'summary',
+      modelIds: [
+        'ollama-general-7b',
+        'moonshot-v1',
+        'qwen-plus',
+        'deepseek-v3',
+      ],
+      mode: 'cascade',
+      cascadeTimeout: 6000,
+    });
+
+    // 代码注释 - 本地coder
+    this.setRoutingRule('code-comment', {
+      taskType: 'code-comment',
+      modelIds: [
+        'ollama-coder-7b',
+        'qwen-coder',
+        'ollama-coder-14b',
+      ],
       mode: 'single',
     });
 
-    // 测试生成 - coder模型
-    this.setRoutingRule('code-test', {
-      taskType: 'code-test',
-      modelIds: ['ollama-coder-14b', 'ollama-codellama-13b'],
-      mode: 'parallel',
-      parallelLimit: 2,
+    // 文档生成 - 本地coder
+    this.setRoutingRule('code-document', {
+      taskType: 'code-document',
+      modelIds: [
+        'ollama-coder-7b',
+        'qwen-coder',
+        'claude-sonnet',
+      ],
+      mode: 'cascade',
+      cascadeTimeout: 5000,
     });
-
-    // 其他任务默认用通用模型
-    this.setRoutingRule('chat', { taskType: 'chat', modelIds: ['ollama-general-7b'], mode: 'single' });
-    this.setRoutingRule('translation', { taskType: 'translation', modelIds: ['ollama-general-7b'], mode: 'single' });
-    this.setRoutingRule('summary', { taskType: 'summary', modelIds: ['ollama-general-7b'], mode: 'single' });
-    this.setRoutingRule('code-comment', { taskType: 'code-comment', modelIds: ['ollama-coder-7b'], mode: 'single' });
-    this.setRoutingRule('code-document', { taskType: 'code-document', modelIds: ['ollama-coder-7b'], mode: 'single' });
   }
 
   /** 注册模型 */
@@ -487,6 +613,54 @@ export class MultiModelRouter extends AIProviderBase {
     return true;
   }
 
+  /** 设置混合协同模式 */
+  setHybridMode(mode: HybridMode): void {
+    this.hybridMode = mode;
+  }
+
+  /** 获取当前混合协同模式 */
+  getHybridMode(): HybridMode {
+    return this.hybridMode;
+  }
+
+  /** 获取当前调用状态 */
+  getCallStatus(): HybridCallStatus {
+    return { ...this.callStatus };
+  }
+
+  /** 获取本地模型列表 */
+  getLocalModels(): ModelInstance[] {
+    return Array.from(this.modelRegistry.values())
+      .filter(m => m.enabled && m.provider === 'ollama');
+  }
+
+  /** 获取云端模型列表 */
+  getCloudModels(): ModelInstance[] {
+    return Array.from(this.modelRegistry.values())
+      .filter(m => m.enabled && m.provider !== 'ollama');
+  }
+
+  /** 根据混合模式过滤模型 */
+  private filterModelsByHybridMode(models: ModelInstance[]): ModelInstance[] {
+    const localModels = models.filter(m => m.provider === 'ollama');
+    const cloudModels = models.filter(m => m.provider !== 'ollama');
+
+    switch (this.hybridMode) {
+      case 'local-only':
+        return localModels;
+      case 'cloud-only':
+        return cloudModels;
+      case 'local-first':
+        return [...localModels, ...cloudModels];
+      case 'cloud-first':
+        return [...cloudModels, ...localModels];
+      case 'parallel':
+        return models;
+      default:
+        return models;
+    }
+  }
+
   /** 执行任务 - 核心方法 */
   async execute(
     taskType: TaskType,
@@ -497,54 +671,95 @@ export class MultiModelRouter extends AIProviderBase {
       maxTokens?: number;
     }
   ): Promise<AggregatedResult> {
+    // 更新调用状态
+    this.callStatus = {
+      isCalling: true,
+      taskType,
+      mode: this.hybridMode,
+    };
+
     const rule = this.routingRules.get(taskType);
     if (!rule) {
+      this.callStatus.isCalling = false;
       throw new Error(`未找到任务类型 ${taskType} 的路由规则`);
     }
 
-    const models = this.selectModels(rule);
+    let models = this.selectModels(rule);
+    // 应用混合模式过滤
+    models = this.filterModelsByHybridMode(models);
+
     if (models.length === 0) {
+      this.callStatus.isCalling = false;
       throw new Error('没有可用的模型');
     }
 
     const startTime = Date.now();
     let responses: ModelResponse[];
 
-    switch (rule.mode) {
-      case 'single':
-        responses = [await this.callSingleModel(models[0].id, prompt, options)];
-        break;
-      case 'parallel':
-        responses = await this.callParallelModels(models, prompt, options, rule.parallelLimit);
-        break;
-      case 'cascade':
-        responses = await this.callCascadeModels(models, prompt, options, rule.cascadeTimeout);
-        break;
-      default:
-        responses = [await this.callSingleModel(models[0].id, prompt, options)];
-    }
+    try {
+      switch (rule.mode) {
+        case 'single':
+          responses = [await this.callSingleModel(models[0].id, prompt, options)];
+          break;
+        case 'parallel':
+          responses = await this.callParallelModels(models, prompt, options, rule.parallelLimit);
+          break;
+        case 'cascade':
+          responses = await this.callCascadeModels(models, prompt, options, rule.cascadeTimeout);
+          break;
+        default:
+          responses = [await this.callSingleModel(models[0].id, prompt, options)];
+      }
 
-    // 过滤失败响应
-    responses = responses.filter(r => !r.error);
+      // 过滤失败响应
+      responses = responses.filter(r => !r.error);
 
-    if (responses.length === 0) {
+      if (responses.length === 0) {
+        return {
+          content: '所有模型调用失败',
+          responses,
+          strategy: rule.mode === 'single' ? 'best' : 'merge',
+          totalLatency: Date.now() - startTime,
+        };
+      }
+
+      // 聚合结果
+      const content = this.aggregateResults(responses, rule.mode);
+
+      // 更新调用状态
+      const bestResponse = responses.reduce((a, b) => (a.score ?? 0) > (b.score ?? 0) ? a : b);
+      this.callStatus.isCalling = false;
+      this.callStatus.selectedModel = bestResponse.modelId;
+      this.callStatus.result = content;
+      this.callStatus.localStatus = responses
+        .filter(r => r.modelId.startsWith('ollama'))
+        .map(r => ({
+          modelId: r.modelId,
+          startedAt: startTime,
+          latency: r.latency,
+          content: r.content,
+          error: r.error,
+        }))[0];
+      this.callStatus.cloudStatus = responses
+        .filter(r => !r.modelId.startsWith('ollama'))
+        .map(r => ({
+          modelId: r.modelId,
+          startedAt: startTime,
+          latency: r.latency,
+          content: r.content,
+          error: r.error,
+        }))[0];
+
       return {
-        content: '所有模型调用失败',
+        content,
         responses,
-        strategy: rule.mode === 'single' ? 'best' : 'merge',
+        strategy: this.getAggregationStrategy(rule.mode),
         totalLatency: Date.now() - startTime,
       };
+    } catch (err) {
+      this.callStatus.isCalling = false;
+      throw err;
     }
-
-    // 聚合结果
-    const content = this.aggregateResults(responses, rule.mode);
-
-    return {
-      content,
-      responses,
-      strategy: this.getAggregationStrategy(rule.mode),
-      totalLatency: Date.now() - startTime,
-    };
   }
 
   /** 选择模型 */
