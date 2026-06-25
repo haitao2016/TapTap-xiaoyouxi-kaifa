@@ -102,7 +102,9 @@ export const useAppStore = create<AppState>((set, get) => ({
   },
 
   createProject: (name, path, engine) => {
-    const project = projectManager.createProject({ name, path, engine });
+    const flatProject = projectManager.createProject({ name, path, engine });
+    projectManager.setCurrentProject(flatProject.id);
+    const project = projectManager.getCurrentProject();
     set({ currentProject: project, activeView: 'editor' });
   },
 

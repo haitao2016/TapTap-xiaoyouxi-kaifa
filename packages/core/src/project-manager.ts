@@ -129,7 +129,7 @@ export class ProjectManager {
     engine?: EngineType;
     description?: string;
     unityVersion?: string;
-  }): ProjectMeta {
+  }): FlatProject {
     const now = new Date().toISOString();
     const tplMeta = DEFAULT_TEMPLATES.find((t) => t.id === options.template);
     const engine: EngineType =
@@ -151,7 +151,7 @@ export class ProjectManager {
     this.projects.set(project.id, project);
     this.addRecentProject(project);
     (project as FlatProject & { __engine?: EngineType }).__engine = engine;
-    return this.toMeta(project);
+    return project;
   }
 
   /** 异步打开已有项目 */
@@ -273,11 +273,12 @@ export class ProjectManager {
   /** 导入项目（测试期望方法） */
   async importProject(data: { name: string; path: string }): Promise<ProjectMeta | null> {
     if (!data.name || !data.path) return null;
-    return this.createProject({
+    const flat = this.createProject({
       name: data.name,
       path: data.path,
       template: 'default',
     });
+    return this.toMeta(flat);
   }
 
   /** 导出项目为 JSON（测试期望方法） */

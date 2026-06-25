@@ -7,6 +7,7 @@
  */
 import { globalEventBus } from '../event-bus';
 import { randomUUID } from 'node:crypto';
+import { AIProviderBase } from './ai-provider-base';
 
 export type ChatRole = 'user' | 'assistant' | 'system';
 
@@ -36,13 +37,14 @@ export interface ChatSession {
   updatedAt: number;
 }
 
-export class AIAssistantService {
+export class AIAssistantService extends AIProviderBase {
   private sessions = new Map<string, ChatSession>();
   private activeSessionId: string | null = null;
   /** 项目文件索引（用于 @ 引用） */
   private fileIndex = new Map<string, string>();
 
   constructor() {
+    super();
     const initial: ChatSession = {
       id: randomUUID(),
       title: '新对话',
@@ -150,6 +152,10 @@ export class AIAssistantService {
     session.messages.push(reply);
     session.updatedAt = Date.now();
 
+    if (session.messages.filter(m => m.role !== 'system').length === 1) {
+      session.title = clean.slice(0, 20) + (clean.length > 20 ? '...' : '');
+    }
+
     globalEventBus.emit({ type: 'ai:message', payload: reply });
     return reply;
   }
@@ -159,18 +165,75 @@ export class AIAssistantService {
     session: ChatSession,
     refs: Reference[],
   ): Promise<ChatMessage> {
-    await new Promise((r) => setTimeout(r, 400));
-    // 实际应调用 AI 服务
+    const config = this.getConfig();
+
+    if (config.provider === 'mock') {
+      return this.mockReply(prompt, refs);
+    }
+
+    try {
+      const systemPrompt = this.buildSystemPrompt();
+      const userPrompt = this.buildUserPrompt(prompt, session, refs);
+      const content = await this.callChat({
+        systemPrompt,
+        userPrompt,
+      });
+      return {
+        id: randomUUID(),
+        role: 'assistant',
+        content,
+        timestamp: Date.now(),
+      };
+    } catch (err) {
+      console.warn('AI 对话失败，使用 mock 兜底:', err);
+      return this.mockReply(prompt, refs);
+    }
+  }
+
+  private buildSystemPrompt(): string {
+    return `你是 TapDev Studio AI 助手，一个专业的 TapTap 小游戏开发助手。
+你可以帮助用户：
+- 解答 TapTap SDK 使用问题
+- 编写和优化游戏代码
+- 调试和修复 bug
+- 解释代码和技术概念
+
+请使用简洁、专业的语言回答问题。代码示例使用 markdown 代码块格式。`;
+  }
+
+  private buildUserPrompt(
+    prompt: string,
+    session: ChatSession,
+    refs: Reference[],
+  ): string {
     const contextSnippet = refs
       .map((r) => `--- ${r.path} ---\n${this.fileIndex.get(r.path) ?? ''}`)
       .join('\n\n')
-      .slice(0, 2000);
+      .slice(0, 3000);
+
+    const recentMessages = session.messages
+      .filter(m => m.role !== 'system')
+      .slice(-10)
+      .map(m => `${m.role === 'user' ? '用户' : '助手'}: ${m.content}`)
+      .join('\n\n');
+
+    let result = '';
+    if (contextSnippet) {
+      result += `参考文件上下文:\n${contextSnippet}\n\n`;
+    }
+    if (recentMessages) {
+      result += `对话历史:\n${recentMessages}\n\n`;
+    }
+    result += `当前问题:\n${prompt}`;
+    return result;
+  }
+
+  private mockReply(prompt: string, refs: Reference[]): ChatMessage {
+    const contextSnippet = refs.length > 0 ? `\n\n参考上下文: ${refs.length} 个文件` : '';
     return {
       id: randomUUID(),
       role: 'assistant',
-      content: `已收到您的问题：「${prompt}」${
-        contextSnippet ? `\n\n参考上下文: ${refs.length} 个文件` : ''
-      }\n\n(模拟回复：实际部署会调用 AI 服务)`,
+      content: `已收到您的问题：「${prompt}」${contextSnippet}\n\n(模拟回复：实际部署会调用 AI 服务)`,
       timestamp: Date.now(),
     };
   }

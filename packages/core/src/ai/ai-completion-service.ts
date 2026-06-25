@@ -8,7 +8,7 @@
 import { globalEventBus } from '../event-bus';
 import { randomUUID } from 'node:crypto';
 
-export type AIProvider = 'openai' | 'claude' | 'ollama' | 'mock';
+export type AIProvider = 'openai' | 'claude' | 'ollama' | 'mock' | 'qwen' | 'deepseek' | 'doubao' | 'zhipu' | 'moonshot' | 'gemini';
 
 export interface AIConfig {
   provider: AIProvider;
@@ -86,6 +86,13 @@ export class AICompletionService {
       case 'claude': return [...CLAUDE_MODELS];
       case 'ollama': return [...OLLAMA_MODELS];
       case 'mock': return ['mock-fast', 'mock-quality'];
+      case 'qwen': return ['qwen-plus', 'qwen-turbo', 'qwen-max', 'qwen-coder-plus'];
+      case 'deepseek': return ['deepseek-chat', 'deepseek-coder', 'deepseek-reasoner'];
+      case 'doubao': return ['doubao-pro-32k', 'doubao-lite-32k', 'doubao-pro-128k'];
+      case 'zhipu': return ['glm-4', 'glm-4-flash', 'glm-4-air', 'glm-4-plus'];
+      case 'moonshot': return ['moonshot-v1-8k', 'moonshot-v1-32k', 'moonshot-v1-128k'];
+      case 'gemini': return ['gemini-2.0-flash', 'gemini-1.5-pro', 'gemini-1.5-flash'];
+      default: return [];
     }
   }
 
