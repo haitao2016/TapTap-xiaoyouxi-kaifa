@@ -24,3 +24,21 @@ export type {
   HybridMode,
   HybridCallStatus,
 } from './multi-model-router';
+
+export { aiReviewService, AIReviewService } from './services/ai-review-service';
+export type { ReviewIssue, ReviewResult, ReviewRequest } from './services/ai-review-service';
+
+export { aiDocGeneratorService, AIDocGeneratorService } from './services/ai-doc-generator';
+export type { DocGenerationRequest, DocGenerationResult } from './services/ai-doc-generator';
+
+export { aiTutorService, AITutorService } from './services/ai-tutor-service';
+export type { TutorLesson, TutorSession, TutorResponse } from './services/ai-tutor-service';
+
+export { teamKnowledgeBase, TeamKnowledgeBase } from './services/team-knowledge-base';
+export type { KnowledgeEntry, SharedSession, TeamCodeStandard, KnowledgeSearchResult } from './services/team-knowledge-base';
+
+export { localFineTuneService, LocalFineTuneService } from './services/local-finetune';
+export type { FineTuneDataset, FineTuneTask, FineTuneParameters, FineTuneResult } from './services/local-finetune';
+
+export { pluginMarketplace, PluginMarketplace } from './services/plugin-marketplace';
+export type { AIPlugin, PluginInstallation, AIWorkflow, WorkflowStep } from './services/plugin-marketplace';

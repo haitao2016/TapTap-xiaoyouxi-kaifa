@@ -9,6 +9,7 @@ import { DocsPage } from './pages/DocsPage';
 import { PluginsPage } from './pages/PluginsPage';
 import { SettingsPage } from './pages/SettingsPage';
 import { AIAssistantPage } from './pages/AIAssistantPage';
+import { AIFeaturesPage } from './pages/AIFeaturesPage';
 import { GitPage } from './pages/GitPage';
 import { CollabPage } from './pages/CollabPage';
 import { TapTapPage } from './pages/TapTapPage';
@@ -27,6 +28,7 @@ export function App() {
         <Route path="plugins" element={<PluginsPage />} />
         <Route path="settings" element={<SettingsPage />} />
         <Route path="ai" element={<AIAssistantPage />} />
+        <Route path="ai-features" element={<AIFeaturesPage />} />
         <Route path="git" element={<GitPage />} />
         <Route path="collab" element={<CollabPage />} />
         <Route path="taptap" element={<TapTapPage />} />
