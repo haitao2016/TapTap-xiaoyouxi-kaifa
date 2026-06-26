@@ -1,5 +1,25 @@
 import { useState } from 'react';
-import { Button, Badge, Card, CardHeader, CardTitle, CardContent, Input, Icon, Tabs, TabsList, TabsTrigger, TabsContent, Switch, Select, SelectTrigger, SelectValue, SelectContent, SelectItem, Slider } from '@tapdev/ui';
+import {
+  Button,
+  Badge,
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  Input,
+  Icon,
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+  Switch,
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+  Slider,
+} from '@tapdev/ui';
 import { useAppStore } from '../store/app-store';
 
 interface Shortcut {
@@ -60,9 +80,7 @@ export function SettingsPage() {
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border bg-surface-1 px-4 py-3">
         <div>
           <h2 className="text-lg font-semibold">设置</h2>
-          <p className="text-sm text-text-secondary">
-            自定义 TapDev Studio 的外观和行为
-          </p>
+          <p className="text-sm text-text-secondary">自定义 TapDev Studio 的外观和行为</p>
         </div>
         <div className="flex items-center gap-2">
           {saved && (
@@ -122,7 +140,9 @@ export function SettingsPage() {
                         <label className="mb-2 block text-sm text-text-muted">界面语言</label>
                         <Select
                           value={settings.language || 'zh-CN'}
-                          onValueChange={(v: string) => updateSettings({ language: v as 'zh-CN' | 'en-US' })}
+                          onValueChange={(v: string) =>
+                            updateSettings({ language: v as 'zh-CN' | 'en-US' })
+                          }
                         >
                           <SelectTrigger>
                             <SelectValue />
@@ -158,9 +178,7 @@ export function SettingsPage() {
                     <div className="flex items-center justify-between">
                       <div>
                         <div className="font-medium">自动检查更新</div>
-                        <div className="text-sm text-text-muted">
-                          启动时自动检查新版本
-                        </div>
+                        <div className="text-sm text-text-muted">启动时自动检查新版本</div>
                       </div>
                       <Switch
                         checked={settings.autoCheckUpdates ?? true}
@@ -170,9 +188,7 @@ export function SettingsPage() {
                     <div className="flex items-center justify-between">
                       <div>
                         <div className="font-medium">发送使用统计</div>
-                        <div className="text-sm text-text-muted">
-                          帮助我们改进产品（匿名）
-                        </div>
+                        <div className="text-sm text-text-muted">帮助我们改进产品（匿名）</div>
                       </div>
                       <Switch
                         checked={settings.sendTelemetry ?? false}
@@ -190,9 +206,7 @@ export function SettingsPage() {
                     <div className="flex items-center justify-between">
                       <div>
                         <div className="font-medium">自动保存</div>
-                        <div className="text-sm text-text-muted">
-                          编辑时自动保存文件
-                        </div>
+                        <div className="text-sm text-text-muted">编辑时自动保存文件</div>
                       </div>
                       <Switch
                         checked={settings.autoSave ?? true}
@@ -271,7 +285,9 @@ export function SettingsPage() {
                       <label className="mb-2 block text-sm text-text-muted">主题模式</label>
                       <Select
                         value={settings.theme || 'dark'}
-                        onValueChange={(v: string) => updateSettings({ theme: v as 'dark' | 'light' | 'system' })}
+                        onValueChange={(v: string) =>
+                          updateSettings({ theme: v as 'dark' | 'light' | 'system' })
+                        }
                       >
                         <SelectTrigger>
                           <SelectValue />
@@ -320,9 +336,7 @@ export function SettingsPage() {
                     <div className="flex items-center justify-between">
                       <div>
                         <div className="font-medium">动画效果</div>
-                        <div className="text-sm text-text-muted">
-                          启用界面过渡动画
-                        </div>
+                        <div className="text-sm text-text-muted">启用界面过渡动画</div>
                       </div>
                       <Switch
                         checked={settings.animationsEnabled ?? true}
@@ -382,7 +396,9 @@ export function SettingsPage() {
                       <label className="mb-2 block text-sm text-text-muted">制表符大小</label>
                       <Select
                         value={String(settings.editorTabSize || 4)}
-                        onValueChange={(v: string) => updateSettings({ editorTabSize: parseInt(v) })}
+                        onValueChange={(v: string) =>
+                          updateSettings({ editorTabSize: parseInt(v) })
+                        }
                       >
                         <SelectTrigger>
                           <SelectValue />
@@ -398,9 +414,7 @@ export function SettingsPage() {
                     <div className="flex items-center justify-between">
                       <div>
                         <div className="font-medium">使用空格代替 Tab</div>
-                        <div className="text-sm text-text-muted">
-                          按 Tab 键时插入空格
-                        </div>
+                        <div className="text-sm text-text-muted">按 Tab 键时插入空格</div>
                       </div>
                       <Switch
                         checked={settings.editorUseSpaces ?? true}
@@ -411,9 +425,7 @@ export function SettingsPage() {
                     <div className="flex items-center justify-between">
                       <div>
                         <div className="font-medium">显示行号</div>
-                        <div className="text-sm text-text-muted">
-                          在编辑器左侧显示行号
-                        </div>
+                        <div className="text-sm text-text-muted">在编辑器左侧显示行号</div>
                       </div>
                       <Switch
                         checked={settings.editorLineNumbers ?? true}
@@ -424,9 +436,7 @@ export function SettingsPage() {
                     <div className="flex items-center justify-between">
                       <div>
                         <div className="font-medium">显示迷你地图</div>
-                        <div className="text-sm text-text-muted">
-                          在编辑器右侧显示代码缩略图
-                        </div>
+                        <div className="text-sm text-text-muted">在编辑器右侧显示代码缩略图</div>
                       </div>
                       <Switch
                         checked={settings.editorMinimap ?? true}
@@ -444,9 +454,7 @@ export function SettingsPage() {
                     <div className="flex items-center justify-between">
                       <div>
                         <div className="font-medium">保存时自动格式化</div>
-                        <div className="text-sm text-text-muted">
-                          保存文件时自动格式化代码
-                        </div>
+                        <div className="text-sm text-text-muted">保存文件时自动格式化代码</div>
                       </div>
                       <Switch
                         checked={settings.formatOnSave ?? true}
@@ -457,9 +465,7 @@ export function SettingsPage() {
                     <div className="flex items-center justify-between">
                       <div>
                         <div className="font-medium">粘贴时格式化</div>
-                        <div className="text-sm text-text-muted">
-                          粘贴代码时自动格式化
-                        </div>
+                        <div className="text-sm text-text-muted">粘贴代码时自动格式化</div>
                       </div>
                       <Switch
                         checked={settings.formatOnPaste ?? false}
@@ -565,11 +571,7 @@ export function SettingsPage() {
                     <div>
                       <label className="mb-2 block text-sm text-text-muted">Unity 路径</label>
                       <div className="flex gap-2">
-                        <Input
-                          value={settings.unityPath || ''}
-                          placeholder="自动检测"
-                          readOnly
-                        />
+                        <Input value={settings.unityPath || ''} placeholder="自动检测" readOnly />
                         <Button variant="outline">
                           <Icon name="folder" size={14} />
                           浏览
@@ -590,9 +592,7 @@ export function SettingsPage() {
                     <div className="flex items-center justify-between">
                       <div>
                         <div className="font-medium">压缩打包</div>
-                        <div className="text-sm text-text-muted">
-                          构建完成后自动打包为 game.zip
-                        </div>
+                        <div className="text-sm text-text-muted">构建完成后自动打包为 game.zip</div>
                       </div>
                       <Switch
                         checked={settings.defaultCompress ?? true}
@@ -603,9 +603,7 @@ export function SettingsPage() {
                     <div className="flex items-center justify-between">
                       <div>
                         <div className="font-medium">WASM 分包</div>
-                        <div className="text-sm text-text-muted">
-                          WebGL 构建时启用 WASM 分包
-                        </div>
+                        <div className="text-sm text-text-muted">WebGL 构建时启用 WASM 分包</div>
                       </div>
                       <Switch
                         checked={settings.defaultWasmSplit ?? true}
@@ -616,9 +614,7 @@ export function SettingsPage() {
                     <div className="flex items-center justify-between">
                       <div>
                         <div className="font-medium">构建完成后通知</div>
-                        <div className="text-sm text-text-muted">
-                          构建完成时发送系统通知
-                        </div>
+                        <div className="text-sm text-text-muted">构建完成时发送系统通知</div>
                       </div>
                       <Switch
                         checked={settings.buildNotification ?? true}
@@ -629,13 +625,13 @@ export function SettingsPage() {
                     <div className="flex items-center justify-between">
                       <div>
                         <div className="font-medium">保留构建历史</div>
-                        <div className="text-sm text-text-muted">
-                          最多保留的构建记录数量
-                        </div>
+                        <div className="text-sm text-text-muted">最多保留的构建记录数量</div>
                       </div>
                       <Select
                         value={String(settings.maxBuildHistory || 20)}
-                        onValueChange={(v: string) => updateSettings({ maxBuildHistory: parseInt(v) })}
+                        onValueChange={(v: string) =>
+                          updateSettings({ maxBuildHistory: parseInt(v) })
+                        }
                       >
                         <SelectTrigger className="w-28">
                           <SelectValue />
@@ -688,9 +684,7 @@ export function SettingsPage() {
                     <div className="flex items-center justify-between">
                       <div>
                         <div className="font-medium">启动时自动断点</div>
-                        <div className="text-sm text-text-muted">
-                          调试启动时在第一行代码暂停
-                        </div>
+                        <div className="text-sm text-text-muted">调试启动时在第一行代码暂停</div>
                       </div>
                       <Switch
                         checked={settings.debugBreakOnStart ?? false}
@@ -701,22 +695,20 @@ export function SettingsPage() {
                     <div className="flex items-center justify-between">
                       <div>
                         <div className="font-medium">异常时中断</div>
-                        <div className="text-sm text-text-muted">
-                          遇到未捕获异常时自动暂停
-                        </div>
+                        <div className="text-sm text-text-muted">遇到未捕获异常时自动暂停</div>
                       </div>
                       <Switch
                         checked={settings.debugBreakOnException ?? true}
-                        onCheckedChange={(v: boolean) => updateSettings({ debugBreakOnException: v })}
+                        onCheckedChange={(v: boolean) =>
+                          updateSettings({ debugBreakOnException: v })
+                        }
                       />
                     </div>
 
                     <div className="flex items-center justify-between">
                       <div>
                         <div className="font-medium">显示内联变量值</div>
-                        <div className="text-sm text-text-muted">
-                          在代码中显示变量的当前值
-                        </div>
+                        <div className="text-sm text-text-muted">在代码中显示变量的当前值</div>
                       </div>
                       <Switch
                         checked={settings.debugInlineValues ?? true}
@@ -732,9 +724,7 @@ export function SettingsPage() {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div>
-                      <label className="mb-2 block text-sm text-text-muted">
-                        最大日志行数
-                      </label>
+                      <label className="mb-2 block text-sm text-text-muted">最大日志行数</label>
                       <Slider
                         value={[settings.maxLogLines || 1000]}
                         onValueChange={([v]: number[]) => updateSettings({ maxLogLines: v })}
@@ -750,9 +740,7 @@ export function SettingsPage() {
                     <div className="flex items-center justify-between">
                       <div>
                         <div className="font-medium">日志时间戳</div>
-                        <div className="text-sm text-text-muted">
-                          在日志中显示时间戳
-                        </div>
+                        <div className="text-sm text-text-muted">在日志中显示时间戳</div>
                       </div>
                       <Switch
                         checked={settings.logTimestamps ?? true}
@@ -763,9 +751,7 @@ export function SettingsPage() {
                     <div className="flex items-center justify-between">
                       <div>
                         <div className="font-medium">自动滚动</div>
-                        <div className="text-sm text-text-muted">
-                          新日志产生时自动滚动到底部
-                        </div>
+                        <div className="text-sm text-text-muted">新日志产生时自动滚动到底部</div>
                       </div>
                       <Switch
                         checked={settings.autoScrollLog ?? true}
@@ -881,9 +867,7 @@ export function SettingsPage() {
                     <CardTitle>许可证</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-sm text-text-muted">
-                      MIT License © 2024 TapDev Team
-                    </p>
+                    <p className="text-sm text-text-muted">MIT License © 2024 TapDev Team</p>
                   </CardContent>
                 </Card>
               </div>

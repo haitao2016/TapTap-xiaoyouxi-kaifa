@@ -208,11 +208,7 @@ export class DebugServer {
     ws.on('error', () => clients.delete(ws));
   }
 
-  private handleMessage(
-    msg: WSMessage,
-    role: WSClientRole,
-    ws: import('ws').WebSocket
-  ): void {
+  private handleMessage(msg: WSMessage, role: WSClientRole, ws: import('ws').WebSocket): void {
     switch (msg.type) {
       case 'ping':
         ws.send(JSON.stringify({ type: 'pong', timestamp: Date.now() } satisfies WSMessage));
@@ -304,19 +300,30 @@ export class DebugServer {
     const url = new URL(req.url ?? '/', `http://${req.headers.host}`);
 
     if (url.pathname === '/api/status') {
-      res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-      res.end(JSON.stringify({ ...this.getStatus(), sessionId: this.sessionId, status: this.status }));
+      res.writeHead(200, {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+      });
+      res.end(
+        JSON.stringify({ ...this.getStatus(), sessionId: this.sessionId, status: this.status })
+      );
       return;
     }
 
     if (url.pathname === '/api/qrcode') {
-      res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+      res.writeHead(200, {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+      });
       res.end(JSON.stringify({ dataUrl: this.qrCodeDataUrl, url: this.getStatus().url }));
       return;
     }
 
     if (url.pathname === '/api/logs') {
-      res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+      res.writeHead(200, {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+      });
       res.end(JSON.stringify(this.logs.slice(-200)));
       return;
     }

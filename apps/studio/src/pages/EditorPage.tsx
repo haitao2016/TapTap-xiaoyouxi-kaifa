@@ -61,7 +61,7 @@ export function EditorPage() {
     editor.onDidChangeCursorSelection((event: monaco.editor.ICursorSelectionChangedEvent) => {
       const selections = editor.getSelections();
       setCursorCount(selections?.length || 1);
-      
+
       const position = editor.getPosition();
       if (position) {
         setCursorPosition({ line: position.lineNumber, column: position.column });
@@ -118,33 +118,41 @@ export function EditorPage() {
     }
   }, []);
 
-  const handleSnippetSelect = useCallback((snippet: Snippet) => {
-    const activeTab = editorTabs.find((t) => t.id === activeTabId);
-    if (activeTab && editorRef.current) {
-      const editor = editorRef.current;
-      const body = snippet.body.join('\n');
-      const insertText = body.replace(/\${(\d+):([^}]*)}/g, (_, num, defaultValue) => defaultValue);
-      
-      const selection = editor.getSelection();
-      if (selection) {
-        const model = editor.getModel();
-        if (model) {
-          model.applyEdits([{
-            range: new monaco.Range(
-              selection.startLineNumber,
-              selection.startColumn,
-              selection.endLineNumber,
-              selection.endColumn
-            ),
-            text: insertText,
-          }]);
+  const handleSnippetSelect = useCallback(
+    (snippet: Snippet) => {
+      const activeTab = editorTabs.find((t) => t.id === activeTabId);
+      if (activeTab && editorRef.current) {
+        const editor = editorRef.current;
+        const body = snippet.body.join('\n');
+        const insertText = body.replace(
+          /\${(\d+):([^}]*)}/g,
+          (_, num, defaultValue) => defaultValue
+        );
+
+        const selection = editor.getSelection();
+        if (selection) {
+          const model = editor.getModel();
+          if (model) {
+            model.applyEdits([
+              {
+                range: new monaco.Range(
+                  selection.startLineNumber,
+                  selection.startColumn,
+                  selection.endLineNumber,
+                  selection.endColumn
+                ),
+                text: insertText,
+              },
+            ]);
+          }
         }
+        updateTabContent(activeTab.id, editor.getModel()?.getValue() || '');
       }
-      updateTabContent(activeTab.id, (editor.getModel()?.getValue() || ''));
-    }
-    setShowSnippets(false);
-    setSnippetQuery('');
-  }, [activeTabId, editorTabs, updateTabContent]);
+      setShowSnippets(false);
+      setSnippetQuery('');
+    },
+    [activeTabId, editorTabs, updateTabContent]
+  );
 
   useEffect(() => {
     const filtered = snippetService.searchSnippets(snippetQuery);
@@ -188,7 +196,7 @@ export function EditorPage() {
   const handleSave = () => {
     const activeTab = editorTabs.find((t) => t.id === activeTabId);
     if (!activeTab) return;
-    
+
     try {
       setError(null);
       if (activeTab.modified) {
@@ -288,10 +296,7 @@ export function EditorPage() {
                       : 'text-text-secondary hover:bg-surface-2'
                   }`}
                 >
-                  <button
-                    onClick={() => setActiveTab(tab.id)}
-                    className="flex items-center gap-1"
-                  >
+                  <button onClick={() => setActiveTab(tab.id)} className="flex items-center gap-1">
                     <Icon name="file" size={12} />
                     {tab.name}
                     {tab.modified && <span className="text-tap-orange">●</span>}
@@ -462,9 +467,7 @@ export function EditorPage() {
             </div>
             <div className="max-h-80 overflow-auto">
               {snippets.length === 0 ? (
-                <div className="p-4 text-center text-sm text-text-muted">
-                  未找到匹配的代码片段
-                </div>
+                <div className="p-4 text-center text-sm text-text-muted">未找到匹配的代码片段</div>
               ) : (
                 snippets.map((snippet) => (
                   <button
@@ -474,9 +477,7 @@ export function EditorPage() {
                   >
                     <Icon name="code" size={16} className="text-text-muted" />
                     <div className="flex-1">
-                      <div className="text-sm font-medium text-text-primary">
-                        {snippet.name}
-                      </div>
+                      <div className="text-sm font-medium text-text-primary">{snippet.name}</div>
                       <div className="text-xs text-text-muted">{snippet.description}</div>
                     </div>
                     <span className="text-xs text-tap-orange">{snippet.prefix}</span>

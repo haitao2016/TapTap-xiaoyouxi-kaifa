@@ -1,5 +1,18 @@
 import { useState, useMemo } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, Input, Icon, Tabs, TabsList, TabsTrigger, TabsContent, Badge, Button } from '@tapdev/ui';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Input,
+  Icon,
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+  Badge,
+  Button,
+} from '@tapdev/ui';
 import { useAppStore } from '../store/app-store';
 
 interface DocSection {
@@ -22,10 +35,30 @@ const DOC_SECTIONS: DocSection[] = [
     title: '快速开始',
     icon: 'rocket',
     items: [
-      { id: 'intro', title: '产品简介', description: '了解 TapDev Studio 的核心功能和定位', category: 'getting-started' },
-      { id: 'install', title: '安装与配置', description: '下载安装并完成初始配置', category: 'getting-started' },
-      { id: 'quickstart', title: '快速上手', description: '5 分钟完成第一个项目', category: 'getting-started' },
-      { id: 'faq', title: '常见问题', description: '使用过程中常见问题解答', category: 'getting-started' },
+      {
+        id: 'intro',
+        title: '产品简介',
+        description: '了解 TapDev Studio 的核心功能和定位',
+        category: 'getting-started',
+      },
+      {
+        id: 'install',
+        title: '安装与配置',
+        description: '下载安装并完成初始配置',
+        category: 'getting-started',
+      },
+      {
+        id: 'quickstart',
+        title: '快速上手',
+        description: '5 分钟完成第一个项目',
+        category: 'getting-started',
+      },
+      {
+        id: 'faq',
+        title: '常见问题',
+        description: '使用过程中常见问题解答',
+        category: 'getting-started',
+      },
     ],
   },
   {
@@ -33,9 +66,24 @@ const DOC_SECTIONS: DocSection[] = [
     title: '核心功能',
     icon: 'cpu',
     items: [
-      { id: 'project', title: '项目管理', description: '创建、导入和管理 Unity 项目', category: 'guides' },
-      { id: 'code-editor', title: '代码编辑器', description: '语法高亮、智能补全、格式化', category: 'guides' },
-      { id: 'debugger', title: '调试器', description: '断点、监视变量、调用堆栈', category: 'guides' },
+      {
+        id: 'project',
+        title: '项目管理',
+        description: '创建、导入和管理 Unity 项目',
+        category: 'guides',
+      },
+      {
+        id: 'code-editor',
+        title: '代码编辑器',
+        description: '语法高亮、智能补全、格式化',
+        category: 'guides',
+      },
+      {
+        id: 'debugger',
+        title: '调试器',
+        description: '断点、监视变量、调用堆栈',
+        category: 'guides',
+      },
       { id: 'build', title: '构建发布', description: '一键构建多平台游戏包', category: 'guides' },
       { id: 'monitor', title: '性能监控', description: '实时监控游戏运行性能', category: 'guides' },
     ],
@@ -45,10 +93,25 @@ const DOC_SECTIONS: DocSection[] = [
     title: '插件系统',
     icon: 'puzzle',
     items: [
-      { id: 'plugin-intro', title: '插件简介', description: '了解插件系统架构和能力', category: 'guides' },
-      { id: 'plugin-dev', title: '插件开发指南', description: '从零开始开发第一个插件', category: 'guides' },
+      {
+        id: 'plugin-intro',
+        title: '插件简介',
+        description: '了解插件系统架构和能力',
+        category: 'guides',
+      },
+      {
+        id: 'plugin-dev',
+        title: '插件开发指南',
+        description: '从零开始开发第一个插件',
+        category: 'guides',
+      },
       { id: 'plugin-api', title: '插件 API', description: '完整的插件 API 文档', category: 'api' },
-      { id: 'plugin-market', title: '插件市场', description: '发现和安装第三方插件', category: 'guides' },
+      {
+        id: 'plugin-market',
+        title: '插件市场',
+        description: '发现和安装第三方插件',
+        category: 'guides',
+      },
     ],
   },
   {
@@ -56,9 +119,19 @@ const DOC_SECTIONS: DocSection[] = [
     title: 'API 参考',
     icon: 'code',
     items: [
-      { id: 'core-api', title: 'Core API', description: '@tapdev/core 核心服务 API', category: 'api' },
+      {
+        id: 'core-api',
+        title: 'Core API',
+        description: '@tapdev/core 核心服务 API',
+        category: 'api',
+      },
       { id: 'ui-api', title: 'UI 组件库', description: '@tapdev/ui 组件文档', category: 'api' },
-      { id: 'types-api', title: '类型定义', description: '@tapdev/types 类型参考', category: 'api' },
+      {
+        id: 'types-api',
+        title: '类型定义',
+        description: '@tapdev/types 类型参考',
+        category: 'api',
+      },
     ],
   },
 ];
@@ -354,17 +427,17 @@ const DOC_CONTENT: Record<string, { title: string; content: string[] }> = {
       '### 基本示例',
       '',
       '```typescript',
-      'import { definePlugin } from \'@tapdev/core\';',
+      "import { definePlugin } from '@tapdev/core';",
       '',
       'export default definePlugin({',
-      '  id: \'my-plugin\',',
-      '  name: \'我的插件\',',
-      '  version: \'1.0.0\',',
+      "  id: 'my-plugin',",
+      "  name: '我的插件',",
+      "  version: '1.0.0',",
       '  activate(ctx) {',
       '    ctx.sidebar.register({',
-      '      id: \'my-page\',',
-      '      title: \'我的页面\',',
-      '      icon: \'star\',',
+      "      id: 'my-page',",
+      "      title: '我的页面',",
+      "      icon: 'star',",
       '      component: MyPage,',
       '    });',
       '  },',
@@ -439,16 +512,16 @@ const DOC_CONTENT: Record<string, { title: string; content: string[] }> = {
       '项目管理服务，负责项目的创建、导入、配置管理。',
       '',
       '```typescript',
-      'import { projectManager } from \'@tapdev/core\';',
+      "import { projectManager } from '@tapdev/core';",
       '',
       '// 获取所有项目',
       'const projects = projectManager.getAllProjects();',
       '',
       '// 创建新项目',
       'const project = await projectManager.createProject({',
-      '  name: \'MyGame\',',
-      '  template: \'2d\',',
-      '  path: \'/path/to/project\',',
+      "  name: 'MyGame',",
+      "  template: '2d',",
+      "  path: '/path/to/project',",
       '});',
       '```',
       '',
@@ -457,12 +530,12 @@ const DOC_CONTENT: Record<string, { title: string; content: string[] }> = {
       '构建服务，负责 Unity 构建的调度和管理。',
       '',
       '```typescript',
-      'import { buildService } from \'@tapdev/core\';',
+      "import { buildService } from '@tapdev/core';",
       '',
       '// 开始构建',
       'const task = buildService.startBuild({',
-      '  platform: \'webgl\',',
-      '  version: \'1.0.0\',',
+      "  platform: 'webgl',",
+      "  version: '1.0.0',",
       '});',
       '',
       '// 获取构建状态',
@@ -570,8 +643,7 @@ export function DocsPage() {
       const query = searchQuery.toLowerCase();
       items = items.filter(
         (item) =>
-          item.title.toLowerCase().includes(query) ||
-          item.description.toLowerCase().includes(query)
+          item.title.toLowerCase().includes(query) || item.description.toLowerCase().includes(query)
       );
     }
 
@@ -686,9 +758,7 @@ export function DocsPage() {
             </Tabs>
 
             {searchQuery && (
-              <div className="text-sm text-text-muted">
-                找到 {filteredItems.length} 个相关结果
-              </div>
+              <div className="text-sm text-text-muted">找到 {filteredItems.length} 个相关结果</div>
             )}
 
             {searchQuery ? (
@@ -707,7 +777,11 @@ export function DocsPage() {
                       className="w-full text-left rounded-lg border border-border p-4 hover:border-tap-orange hover:bg-surface-2 transition-all"
                     >
                       <div className="flex items-start gap-3">
-                        <Icon name={item.sectionIcon} size={20} className="mt-0.5 text-tap-orange shrink-0" />
+                        <Icon
+                          name={item.sectionIcon}
+                          size={20}
+                          className="mt-0.5 text-tap-orange shrink-0"
+                        />
                         <div className="min-w-0 flex-1">
                           <div className="font-medium text-text-primary">{item.title}</div>
                           <div className="mt-1 text-sm text-text-muted line-clamp-2">
@@ -774,9 +848,7 @@ export function DocsPage() {
                     </div>
                   </div>
                 </div>
-                <Button variant="secondary">
-                  加入社区
-                </Button>
+                <Button variant="secondary">加入社区</Button>
               </CardContent>
             </Card>
           </div>

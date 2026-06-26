@@ -1,4 +1,19 @@
-import { Button, Badge, Progress, Card, CardHeader, CardTitle, CardContent, Input, Checkbox, Icon, Tabs, TabsList, TabsTrigger, TabsContent } from '@tapdev/ui';
+import {
+  Button,
+  Badge,
+  Progress,
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  Input,
+  Checkbox,
+  Icon,
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+} from '@tapdev/ui';
 import { useAppStore } from '../store/app-store';
 import { getNativeBridge, buildService } from '@tapdev/core';
 import { isNativeAvailable } from '../lib/native-bridge';
@@ -167,7 +182,9 @@ export function BuildPage() {
             <TabsTrigger value="history">
               构建历史
               {buildTasks.length > 0 && (
-                <Badge variant="default" className="ml-1">{buildTasks.length}</Badge>
+                <Badge variant="default" className="ml-1">
+                  {buildTasks.length}
+                </Badge>
               )}
             </TabsTrigger>
             <TabsTrigger value="compare">构建对比</TabsTrigger>
@@ -180,9 +197,7 @@ export function BuildPage() {
                   <CardContent className="flex items-start gap-3 py-3">
                     <Icon name="alert" size={18} className="shrink-0 text-yellow-400" />
                     <div>
-                      <p className="text-sm text-yellow-400">
-                        Web 模式仅支持模拟构建
-                      </p>
+                      <p className="text-sm text-yellow-400">Web 模式仅支持模拟构建</p>
                       <p className="mt-1 text-xs text-text-muted">
                         真实 Unity 构建请使用 Electron 桌面端：pnpm dev:desktop
                       </p>
@@ -201,7 +216,8 @@ export function BuildPage() {
                   </CardHeader>
                   <CardContent className="space-y-3">
                     {PLATFORMS.map((platform) => {
-                      const disabled = !native && (platform.id === 'android' || platform.id === 'ios');
+                      const disabled =
+                        !native && (platform.id === 'android' || platform.id === 'ios');
                       return (
                         <label
                           key={platform.id}
@@ -386,7 +402,9 @@ export function BuildPage() {
                       {lastBuildResult.buildNumber && (
                         <div className="rounded-lg bg-surface-2 p-3">
                           <div className="text-xs text-text-muted">构建编号</div>
-                          <div className="mt-1 font-mono text-xs">{lastBuildResult.buildNumber}</div>
+                          <div className="mt-1 font-mono text-xs">
+                            {lastBuildResult.buildNumber}
+                          </div>
                         </div>
                       )}
                       {lastBuildResult.buildHash && (
@@ -408,7 +426,9 @@ export function BuildPage() {
                               key={f}
                               className="flex items-center justify-between rounded bg-surface-2 px-3 py-2"
                             >
-                              <span className="font-mono text-xs text-tap-orange truncate">{f}</span>
+                              <span className="font-mono text-xs text-tap-orange truncate">
+                                {f}
+                              </span>
                               <Icon name="download" size={12} className="text-text-muted" />
                             </li>
                           ))}
@@ -485,10 +505,10 @@ export function BuildPage() {
                               task.status === 'success'
                                 ? 'success'
                                 : task.status === 'failed'
-                                ? 'error'
-                                : task.status === 'running'
-                                ? 'info'
-                                : 'default'
+                                  ? 'error'
+                                  : task.status === 'running'
+                                    ? 'info'
+                                    : 'default'
                             }
                           >
                             {task.status === 'running' && (
@@ -497,19 +517,17 @@ export function BuildPage() {
                             {task.status === 'success'
                               ? '成功'
                               : task.status === 'failed'
-                              ? '失败'
-                              : task.status === 'running'
-                              ? '构建中'
-                              : task.status === 'cancelled'
-                              ? '已取消'
-                              : '待处理'}
+                                ? '失败'
+                                : task.status === 'running'
+                                  ? '构建中'
+                                  : task.status === 'cancelled'
+                                    ? '已取消'
+                                    : '待处理'}
                           </Badge>
                           <div className="min-w-0">
                             <div className="font-medium">v{task.config.version}</div>
                             <div className="text-xs text-text-muted">
-                              {task.startedAt
-                                ? new Date(task.startedAt).toLocaleString()
-                                : '--'}
+                              {task.startedAt ? new Date(task.startedAt).toLocaleString() : '--'}
                             </div>
                           </div>
                         </div>
@@ -545,9 +563,7 @@ export function BuildPage() {
                   <CardTitle>构建对比</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <p className="text-sm text-text-muted">
-                    选择两个构建进行对比，查看差异
-                  </p>
+                  <p className="text-sm text-text-muted">选择两个构建进行对比，查看差异</p>
                   <div className="flex flex-wrap gap-2">
                     {buildTasks.slice(0, 10).map((task) => (
                       <button
@@ -561,9 +577,7 @@ export function BuildPage() {
                       >
                         <div className="font-medium">v{task.config.version}</div>
                         <div className="text-xs text-text-muted">
-                          {task.startedAt
-                            ? new Date(task.startedAt).toLocaleDateString()
-                            : '--'}
+                          {task.startedAt ? new Date(task.startedAt).toLocaleDateString() : '--'}
                         </div>
                       </button>
                     ))}
@@ -588,8 +602,8 @@ export function BuildPage() {
                               task.status === 'success'
                                 ? 'success'
                                 : task.status === 'failed'
-                                ? 'error'
-                                : 'default'
+                                  ? 'error'
+                                  : 'default'
                             }
                           >
                             {task.status}
@@ -598,9 +612,7 @@ export function BuildPage() {
                         <div className="flex justify-between">
                           <span className="text-text-muted">耗时</span>
                           <span>
-                            {task.result?.duration
-                              ? formatDuration(task.result.duration)
-                              : '--'}
+                            {task.result?.duration ? formatDuration(task.result.duration) : '--'}
                           </span>
                         </div>
                         <div className="flex justify-between">
@@ -618,9 +630,7 @@ export function BuildPage() {
                         {task.result?.buildNumber && (
                           <div className="flex justify-between">
                             <span className="text-text-muted">构建编号</span>
-                            <span className="font-mono text-xs">
-                              {task.result.buildNumber}
-                            </span>
+                            <span className="font-mono text-xs">{task.result.buildNumber}</span>
                           </div>
                         )}
                       </CardContent>

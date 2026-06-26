@@ -1,4 +1,16 @@
-import { Button, Badge, Tabs, TabsList, TabsTrigger, TabsContent, Icon, Card, CardHeader, CardTitle, CardContent } from '@tapdev/ui';
+import {
+  Button,
+  Badge,
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+  Icon,
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+} from '@tapdev/ui';
 import { useAppStore } from '../store/app-store';
 import { debugService, callStackService } from '@tapdev/core';
 import { useEffect, useState, useRef } from 'react';
@@ -65,7 +77,7 @@ export function DebugPage() {
       const newLogs = debugService.getLogs();
       setLogs(newLogs);
       setCallStack(callStackService.getFrames());
-      
+
       if (autoScroll && logContainerRef.current) {
         logContainerRef.current.scrollTop = logContainerRef.current.scrollHeight;
       }
@@ -202,9 +214,7 @@ export function DebugPage() {
                   }`}
                 >
                   {level === 'all' ? '全部' : level.toUpperCase()}
-                  <span className="ml-1 text-text-muted">
-                    {logLevelCounts[level]}
-                  </span>
+                  <span className="ml-1 text-text-muted">{logLevelCounts[level]}</span>
                 </button>
               ))}
             </div>
@@ -248,9 +258,7 @@ export function DebugPage() {
                 </div>
               </div>
             ) : (
-              filteredLogs.map((log) => (
-                <LogLine key={log.id} log={log} />
-              ))
+              filteredLogs.map((log) => <LogLine key={log.id} log={log} />)
             )}
           </div>
         </div>
@@ -500,7 +508,7 @@ function ServerStatusCard({
   return (
     <Card>
       <CardHeader>
-      <CardTitle className="text-sm">服务器状态</CardTitle>
+        <CardTitle className="text-sm">服务器状态</CardTitle>
       </CardHeader>
       <CardContent className="space-y-2 text-sm">
         <div className="flex justify-between">
@@ -552,9 +560,7 @@ function QRCodeCard({
                 <QRPlaceholder url={url} />
               )}
             </div>
-            <p className="text-center text-xs text-text-muted">
-              使用 TapTap App 扫描二维码
-            </p>
+            <p className="text-center text-xs text-text-muted">使用 TapTap App 扫描二维码</p>
             <Badge variant={gameConnected ? 'success' : 'default'}>
               {gameConnected ? '游戏已连接' : '等待连接...'}
             </Badge>

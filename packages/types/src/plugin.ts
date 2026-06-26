@@ -58,7 +58,11 @@ export interface PluginAction {
 export interface PluginContext {
   project?: ProjectMeta;
   emit: (event: string, data?: unknown) => void;
-  registerCommand: (id: string, handler: () => void | Promise<void>, config?: CommandConfig) => void;
+  registerCommand: (
+    id: string,
+    handler: () => void | Promise<void>,
+    config?: CommandConfig
+  ) => void;
   registerPanel: (id: string, config: PanelConfig) => void;
   registerAction: (action: PluginAction) => void;
   showNotification: (message: string, type?: 'info' | 'success' | 'warning' | 'error') => void;
