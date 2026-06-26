@@ -1,7 +1,7 @@
 // 游戏设计文档（GDD）协作
 // 文档在线协作编辑、版本历史、模板
 
-import { globalEventBus } from '../core/event-bus';
+import { globalEventBus } from '../event-bus';
 
 // 文档块
 export interface DocBlock {

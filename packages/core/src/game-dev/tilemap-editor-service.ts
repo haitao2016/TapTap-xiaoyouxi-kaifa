@@ -1,7 +1,7 @@
 // 瓦片地图关卡编辑器
 // 专业 2D 瓦片地图编辑器，支持图块集、自动拼接、多层
 
-import { globalEventBus } from '../core/event-bus';
+import { globalEventBus } from '../event-bus';
 
 // 图块集
 export interface Tileset {

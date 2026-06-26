@@ -31,7 +31,7 @@ export type PointsReason =
   | 'spend_download'
   | 'spend_other';
 
-export interface PointsRecord {
+export interface DeveloperPointsRecord {
   id: string;
   userId: string;
   type: 'earn' | 'spend';
@@ -191,7 +191,7 @@ export interface LeaderboardPeriod {
 export class DeveloperIncentivesService {
   private currentUserId = 'user-001';
   private profiles = new Map<string, DeveloperProfile>();
-  private pointsRecords = new Map<string, PointsRecord[]>();
+  private pointsRecords = new Map<string, DeveloperPointsRecord[]>();
   private contributions = new Map<string, Contribution[]>();
   private featuredItems: FeaturedItem[] = [];
   private certification = new Map<string, DeveloperCertification>();
@@ -254,7 +254,7 @@ export class DeveloperIncentivesService {
   getPointsHistory(
     page = 1,
     pageSize = 20
-  ): { records: PointsRecord[]; total: number; totalPages: number } {
+  ): { records: DeveloperPointsRecord[]; total: number; totalPages: number } {
     const records = this.pointsRecords.get(this.currentUserId) || [];
     const total = records.length;
     const totalPages = Math.ceil(total / pageSize);
@@ -517,7 +517,7 @@ export class DeveloperIncentivesService {
     description: string,
     relatedId?: string
   ): void {
-    const record: PointsRecord = {
+    const record: DeveloperPointsRecord = {
       id: randomUUID(),
       userId,
       type: 'earn',
@@ -856,7 +856,7 @@ export class DeveloperIncentivesService {
     const now = Date.now();
     const day = 24 * 60 * 60 * 1000;
 
-    const records: PointsRecord[] = [
+    const records: DeveloperPointsRecord[] = [
       {
         id: 'pt-001',
         userId: this.currentUserId,

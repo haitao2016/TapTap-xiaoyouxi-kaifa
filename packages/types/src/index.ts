@@ -13,3 +13,5 @@ export * from './collab';
 export * from './audio';
 export * from './perf';
 export * from './analytics';
+export * from './settings';
+export * from './event';

@@ -222,6 +222,7 @@ export class DeviceDebugService {
       resolution: { width: 1080, height: 2340 },
       pixelRatio: 3,
       totalMemory: 8 * 1024 * 1024 * 1024,
+      cpuCores: 8,
       status: 'connecting',
       deviceId: code,
       manufacturer: 'Unknown',

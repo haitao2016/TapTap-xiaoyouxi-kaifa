@@ -79,7 +79,7 @@ export interface ExportOptions {
   includeMetadata?: boolean;
 }
 
-export interface CompressionOptions {
+export interface AtlasCompressionOptions {
   enabled: boolean;
   quality: number;
   format: 'png' | 'jpg' | 'webp';
@@ -93,7 +93,7 @@ export class SpriteAtlasService {
       name: string;
       sprites: Map<string, SpriteItem>;
       packingOptions: AtlasPackingOptions;
-      compressionOptions: CompressionOptions;
+      compressionOptions: AtlasCompressionOptions;
       packedData?: SpriteAtlasData;
       atlasImage?: string;
       createdAt: number;
@@ -380,11 +380,11 @@ export class SpriteAtlasService {
     });
   }
 
-  getCompressionOptions(atlasId: string): CompressionOptions | undefined {
+  getCompressionOptions(atlasId: string): AtlasCompressionOptions | undefined {
     return this.atlases.get(atlasId)?.compressionOptions;
   }
 
-  setCompressionOptions(atlasId: string, options: Partial<CompressionOptions>): void {
+  setCompressionOptions(atlasId: string, options: Partial<AtlasCompressionOptions>): void {
     const atlas = this.atlases.get(atlasId);
     if (!atlas) {
       throw new Error(`图集不存在: ${atlasId}`);

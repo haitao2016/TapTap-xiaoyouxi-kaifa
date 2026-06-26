@@ -1,7 +1,7 @@
 // 插件 SDK 2.0 与开放平台
 // 强大的扩展能力、开放市场、开发者收入分成
 
-import { globalEventBus } from '../core/event-bus';
+import { globalEventBus } from '../event-bus';
 
 // 扩展点
 export type ExtensionPoint =

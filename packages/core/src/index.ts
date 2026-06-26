@@ -130,8 +130,8 @@ export type {
   LevelInfo,
   CreateTemplateProjectOptions,
   CreatedTemplateProject,
-  TemplateSearchOptions,
-  TemplateSearchResult,
+  GameTemplateSearchOptions,
+  GameTemplateSearchResult,
 } from './game-templates-service';
 
 export {
@@ -141,7 +141,7 @@ export {
 export type {
   ContributionType,
   PointsReason,
-  PointsRecord,
+  DeveloperPointsRecord,
   DeveloperLevel,
   DeveloperProfile,
   DeveloperBadge,
@@ -339,7 +339,7 @@ export type {
   AtlasInfo,
   ExportFormat,
   ExportOptions as AtlasExportOptions,
-  CompressionOptions,
+  AtlasCompressionOptions,
 } from './sprite-atlas-service';
 
 export { ParticleEditorService, particleEditorService } from './particle-editor-service';

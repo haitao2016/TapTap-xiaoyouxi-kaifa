@@ -1,7 +1,7 @@
 // 游戏音频混音器
 // 音轨管理、音量调节、淡入淡出、空间音效、音频事件
 
-import { globalEventBus } from '../core/event-bus';
+import { globalEventBus } from '../event-bus';
 
 // 音轨类别
 export type AudioTrackCategory = 'bgm' | 'sfx' | 'voice' | 'ambient';

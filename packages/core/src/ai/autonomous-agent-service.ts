@@ -1,8 +1,8 @@
 // 自主编码 Agent 核心框架
 // 基于大模型的编程代理，支持需求理解、任务规划、代码生成、自动测试与修复
 
-import { globalEventBus } from '../core/event-bus';
-import { aiCodeGenService } from '../ai/ai-codegen-service';
+import { globalEventBus } from '../event-bus';
+import { aiCodeGenService, CodeLanguage } from '../ai/ai-codegen-service';
 import { aiErrorDiagnosis } from '../ai/ai-error-diagnosis';
 
 // 任务步骤
@@ -165,10 +165,13 @@ class AutonomousAgentService {
         { name: 'language', type: 'string', required: false, description: '编程语言' },
       ],
       execute: async (args) => {
-        const result = await aiCodeGenService.generate(args.description, {
-          language: args.language || 'typescript',
+        const result = await aiCodeGenService.generateCode({
+          id: `agent-gen-${Date.now()}`,
+          action: 'generate',
+          prompt: args.description,
+          language: (args.language as CodeLanguage) || 'typescript',
         });
-        return { success: result.success, code: result.code };
+        return { success: true, code: result.code };
       },
     });
 
@@ -180,10 +183,10 @@ class AutonomousAgentService {
         { name: 'code', type: 'string', required: false, description: '相关代码' },
       ],
       execute: async (args) => {
-        const result = await aiErrorDiagnosis.analyze({
+        const result = await aiErrorDiagnosis.diagnose({
           message: args.errorMessage,
           stack: '',
-          code: args.code || '',
+          codeSnippet: args.code || '',
         });
         return { success: true, diagnosis: result };
       },
@@ -240,7 +243,8 @@ class AutonomousAgentService {
 
       // 3. 逐步执行
       for (const step of task.steps) {
-        if (task.status === 'cancelled' || task.status === 'paused') break;
+        const currentStatus = task.status as AgentTask['status'];
+        if (currentStatus === 'cancelled' || currentStatus === 'paused') break;
         await this.executeStep(task, step);
         if (step.status === 'failed' && step.type !== 'fix') {
           // 尝试自动修复

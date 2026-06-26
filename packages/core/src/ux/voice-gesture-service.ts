@@ -1,7 +1,7 @@
 // 语音与手势交互
 // 语音命令控制、触屏手势操作、AI 语音助手
 
-import { globalEventBus } from '../core/event-bus';
+import { globalEventBus } from '../event-bus';
 
 // 手势类型
 export type GestureType =
@@ -246,9 +246,10 @@ class VoiceGestureService {
       if (match) {
         const params: any = {};
         if (cmd.parameters && typeof cmd.pattern !== 'string') {
+          const regExpMatch = match as RegExpMatchArray;
           for (let i = 0; i < cmd.parameters.length; i++) {
             const paramName = cmd.parameters[i].name;
-            const value = match[i + 1];
+            const value = regExpMatch[i + 1];
             if (value) {
               params[paramName] = cmd.parameters[i].type === 'number' ? parseInt(value) : value;
             }

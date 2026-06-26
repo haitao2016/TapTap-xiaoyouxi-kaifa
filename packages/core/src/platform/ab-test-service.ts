@@ -15,7 +15,7 @@ import { randomUUID } from 'node:crypto';
 
 export type ExperimentStatus = 'draft' | 'running' | 'paused' | 'completed' | 'archived';
 export type VariableType = 'number' | 'string' | 'boolean' | 'json';
-export type MetricType = 'conversion' | 'mean' | 'retention';
+export type ExperimentMetricType = 'conversion' | 'mean' | 'retention';
 export type MetricRole = 'primary' | 'secondary' | 'guardrail';
 export type ConfidenceLevel = '90%' | '95%' | '99%';
 export type ExperimentConclusion = 'positive' | 'negative' | 'neutral' | 'inconclusive';
@@ -39,7 +39,7 @@ export interface ExperimentVariable {
 export interface ExperimentMetric {
   id: string;
   name: string;
-  type: MetricType;
+  type: ExperimentMetricType;
   role: MetricRole;
   description: string;
   eventName?: string;
@@ -69,14 +69,11 @@ export interface VariantResult {
 
 export interface ExperimentResult {
   experimentId: string;
-  metrics: Record<
-    string,
-    {
-      primary: VariantResult[];
-      secondary: VariantResult[];
-      guardrail: VariantResult[];
-    }
-  >;
+  metrics: {
+    primary: VariantResult[];
+    secondary: VariantResult[];
+    guardrail: VariantResult[];
+  };
   conclusion: ExperimentConclusion;
   recommendation: string;
   startDate: number;
@@ -344,7 +341,7 @@ export class ABTestService {
     description: string;
     createdBy: string;
     trafficPercentage: number;
-    variants: Omit<ExperimentVariant>[];
+    variants: Omit<ExperimentVariant, 'id'>[];
     metrics: Omit<ExperimentMetric, 'id'>[];
     tags?: string[];
     exclusionGroup?: string;
@@ -541,12 +538,12 @@ export class ABTestService {
 
     const primaryResults = metrics.primary;
     const bestVariant = primaryResults.reduce(
-      (best, curr) => (curr.uplift > best.uplift ? curr : best),
-      primaryResults[0]
+      (best: VariantResult, curr: VariantResult) => (curr.uplift > best.uplift ? curr : best),
+      primaryResults[0]!
     );
     const worstVariant = primaryResults.reduce(
-      (worst, curr) => (curr.uplift < worst.uplift ? curr : worst),
-      primaryResults[0]
+      (worst: VariantResult, curr: VariantResult) => (curr.uplift < worst.uplift ? curr : worst),
+      primaryResults[0]!
     );
 
     let conclusion: ExperimentConclusion = 'inconclusive';

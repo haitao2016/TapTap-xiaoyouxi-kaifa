@@ -1,7 +1,7 @@
 // 游戏 AI 行为训练（ML Agent）
 // 强化学习训练游戏 AI 角色，支持 PPO/DQN
 
-import { globalEventBus } from '../core/event-bus';
+import { globalEventBus } from '../event-bus';
 
 // 训练算法
 export type TrainingAlgorithm = 'PPO' | 'DQN' | 'A2C' | 'REINFORCE' | 'SAC';

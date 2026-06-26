@@ -30,7 +30,7 @@ export { sdkManagerService, SDKManagerService } from './sdk-manager-service';
 export type {
   SDKRelease,
   SDKInstalled,
-  Announcement,
+  SDKAnnouncement,
   SDKDownloadProgress,
   DependencyCheckResult,
   CompatReport,
@@ -79,7 +79,7 @@ export { abTestService, ABTestService } from './ab-test-service';
 export type {
   ExperimentStatus,
   VariableType,
-  MetricType,
+  ExperimentMetricType,
   MetricRole,
   ConfidenceLevel,
   ExperimentConclusion,

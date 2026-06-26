@@ -1,7 +1,7 @@
 // 设计资源版本管理
 // PSD/AI/Figma 等设计文件的版本管理
 
-import { globalEventBus } from '../core/event-bus';
+import { globalEventBus } from '../event-bus';
 
 // 设计资源类型
 export type DesignFormat = 'psd' | 'ai' | 'figma' | 'sketch' | 'xd' | 'svg' | 'pdf';

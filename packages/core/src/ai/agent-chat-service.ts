@@ -1,7 +1,7 @@
 // Agent 对话界面与工作流
 // 多轮对话、任务进度可视化、步骤确认、修改预览
 
-import { globalEventBus } from '../core/event-bus';
+import { globalEventBus } from '../event-bus';
 import { autonomousAgentService, AgentTask, AgentStep } from './autonomous-agent-service';
 
 // 对话消息

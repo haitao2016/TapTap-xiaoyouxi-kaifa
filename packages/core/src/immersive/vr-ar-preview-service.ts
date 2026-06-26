@@ -1,7 +1,17 @@
 // VR/AR 预览模式
 // 基于 WebXR 的沉浸式开发体验
 
-import { globalEventBus } from '../core/event-bus';
+import { globalEventBus } from '../event-bus';
+
+// 扩展标准 Navigator 接口以支持 WebXR
+declare global {
+  interface Navigator {
+    xr?: {
+      isSessionSupported(mode: string): Promise<boolean>;
+      requestSession(mode: string, options?: unknown): Promise<XRSession>;
+    };
+  }
+}
 
 // XR 模式
 export type XRMode = 'none' | 'vr' | 'ar';

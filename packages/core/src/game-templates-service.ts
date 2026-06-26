@@ -119,7 +119,7 @@ export interface CreatedTemplateProject {
   fileCount: number;
 }
 
-export interface TemplateSearchOptions {
+export interface GameTemplateSearchOptions {
   query?: string;
   type?: GameTemplateType;
   sortBy?: 'downloads' | 'rating' | 'created' | 'updated' | 'name';
@@ -131,7 +131,7 @@ export interface TemplateSearchOptions {
   tags?: string[];
 }
 
-export interface TemplateSearchResult {
+export interface GameTemplateSearchResult {
   templates: GameTemplate[];
   total: number;
   page: number;
@@ -146,7 +146,7 @@ export class GameTemplatesService {
     this.loadTemplates();
   }
 
-  getTemplates(options?: TemplateSearchOptions): TemplateSearchResult {
+  getTemplates(options?: GameTemplateSearchOptions): GameTemplateSearchResult {
     let result = [...this.templates];
 
     if (options?.query) {
