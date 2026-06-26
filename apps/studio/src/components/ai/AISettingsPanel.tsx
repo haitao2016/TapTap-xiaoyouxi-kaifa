@@ -155,11 +155,7 @@ export const AISettingsPanel: React.FC<AISettingsPanelProps> = ({
         );
 
       default:
-        return (
-          <div className="text-gray-500 text-sm">
-            Mock 模式使用内置模拟数据，无需配置。
-          </div>
-        );
+        return <div className="text-gray-500 text-sm">Mock 模式使用内置模拟数据，无需配置。</div>;
     }
   };
 

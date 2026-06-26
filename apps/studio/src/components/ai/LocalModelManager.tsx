@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { localModelService, LOCAL_MODEL_EVENTS } from '../../core/src/ai/local-model-service';
+import { localModelService, LOCAL_MODEL_EVENTS } from '@tapdev/core';
 import type { GGUFModelInfo, RecommendedModel, ModelLoadProgress } from '@tapdev/types';
 
 interface LocalModelManagerProps {
@@ -16,7 +16,9 @@ export const LocalModelManager: React.FC<LocalModelManagerProps> = ({ onModelLoa
   const [recommendedModels, setRecommendedModels] = useState<RecommendedModel[]>([]);
   const [currentModel, setCurrentModel] = useState<GGUFModelInfo | null>(null);
   const [loadingProgress, setLoadingProgress] = useState<ModelLoadProgress | null>(null);
-  const [webgpuStatus, setWebgpuStatus] = useState<{ available: boolean; tier: string } | null>(null);
+  const [webgpuStatus, setWebgpuStatus] = useState<{ available: boolean; tier: string } | null>(
+    null
+  );
   const [showLocalUpload, setShowLocalUpload] = useState(false);
 
   useEffect(() => {
@@ -26,9 +28,11 @@ export const LocalModelManager: React.FC<LocalModelManagerProps> = ({ onModelLoa
     setCurrentModel(localModelService.getCurrentModel());
 
     // 检查 WebGPU 状态
-    localModelService.checkWebGPUAvailability().then((status) => {
-      setWebgpuStatus(status);
-    });
+    localModelService
+      .checkWebGPUAvailability()
+      .then((status: { available: boolean; tier: string }) => {
+        setWebgpuStatus(status);
+      });
 
     // 监听事件
     const handleProgress = (payload: any) => {
@@ -61,14 +65,14 @@ export const LocalModelManager: React.FC<LocalModelManagerProps> = ({ onModelLoa
   const handleLoadModel = async (modelId: string) => {
     try {
       await localModelService.loadModel(modelId, {
-        onProgress: (progress) => {
+        onProgress: (progress: ModelLoadProgress) => {
           setLoadingProgress(progress);
         },
         onComplete: () => {
           setCurrentModel(localModelService.getCurrentModel());
           setLoadingProgress(null);
         },
-        onError: (error) => {
+        onError: (error: Error) => {
           console.error('模型加载失败:', error);
           setLoadingProgress(null);
         },
@@ -222,12 +226,7 @@ export const LocalModelManager: React.FC<LocalModelManagerProps> = ({ onModelLoa
           <h3 className="text-lg font-medium">本地文件</h3>
           <label className="px-3 py-1 text-sm bg-gray-100 dark:bg-gray-700 rounded cursor-pointer hover:bg-gray-200 dark:hover:bg-gray-600">
             上传 .gguf 文件
-            <input
-              type="file"
-              accept=".gguf"
-              onChange={handleFileUpload}
-              className="hidden"
-            />
+            <input type="file" accept=".gguf" onChange={handleFileUpload} className="hidden" />
           </label>
         </div>
       </div>

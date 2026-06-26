@@ -1156,14 +1156,16 @@ ${recentLines}
     const completionText = lines[0]?.trim() || '';
 
     if (completionText.length > 0) {
-      return [{
-        id: `gguf-${randomUUID().slice(0, 8)}`,
-        text: completionText,
-        displayText: completionText.slice(0, 50) + (completionText.length > 50 ? '...' : ''),
-        type: 'snippet',
-        confidence: 0.85,
-        detail: 'GGUF 本地模型生成',
-      }];
+      return [
+        {
+          id: `gguf-${randomUUID().slice(0, 8)}`,
+          text: completionText,
+          displayText: completionText.slice(0, 50) + (completionText.length > 50 ? '...' : ''),
+          type: 'snippet',
+          confidence: 0.85,
+          detail: 'GGUF 本地模型生成',
+        },
+      ];
     }
 
     return this.callFallbackCompletion(req);

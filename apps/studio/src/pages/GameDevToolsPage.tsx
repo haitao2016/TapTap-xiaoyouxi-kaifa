@@ -1,5 +1,18 @@
 import { useState, useRef, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, Button, Icon, Input, Tabs, TabsList, TabsTrigger, TabsContent, Badge } from '@tapdev/ui';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Button,
+  Icon,
+  Input,
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+  Badge,
+} from '@tapdev/ui';
 
 export function GameDevToolsPage() {
   const [activeTab, setActiveTab] = useState('behavior-tree');
@@ -71,11 +84,23 @@ function BehaviorTreePanel() {
   };
 
   const nodeTypes = [
-    { type: 'selector', label: '选择器', color: 'bg-yellow-500/20 text-yellow-500 border-yellow-500/30' },
+    {
+      type: 'selector',
+      label: '选择器',
+      color: 'bg-yellow-500/20 text-yellow-500 border-yellow-500/30',
+    },
     { type: 'sequence', label: '序列', color: 'bg-blue-500/20 text-blue-500 border-blue-500/30' },
     { type: 'action', label: '动作', color: 'bg-green-500/20 text-green-500 border-green-500/30' },
-    { type: 'condition', label: '条件', color: 'bg-purple-500/20 text-purple-500 border-purple-500/30' },
-    { type: 'decorator', label: '装饰器', color: 'bg-pink-500/20 text-pink-500 border-pink-500/30' },
+    {
+      type: 'condition',
+      label: '条件',
+      color: 'bg-purple-500/20 text-purple-500 border-purple-500/30',
+    },
+    {
+      type: 'decorator',
+      label: '装饰器',
+      color: 'bg-pink-500/20 text-pink-500 border-pink-500/30',
+    },
   ];
 
   const rootNode: TreeNode = { id: 'root', name: '根节点', type: 'selector' };
@@ -134,8 +159,14 @@ function BehaviorTreePanel() {
             <Badge variant="default">运行中</Badge>
           </div>
           <div className="flex gap-2">
-            <Button size="sm" variant="secondary"><Icon name="play" size={14} />运行</Button>
-            <Button size="sm" variant="secondary"><Icon name="save" size={14} />保存</Button>
+            <Button size="sm" variant="secondary">
+              <Icon name="play" size={14} />
+              运行
+            </Button>
+            <Button size="sm" variant="secondary">
+              <Icon name="save" size={14} />
+              保存
+            </Button>
           </div>
         </div>
 
@@ -156,9 +187,33 @@ function BehaviorTreePanel() {
                 ))}
               </div>
               <svg className="absolute inset-0 w-full h-full pointer-events-none">
-                <line x1="50%" y1="48" x2="30%" y2="96" stroke="#6b7280" strokeOpacity="0.3" strokeWidth="2" />
-                <line x1="50%" y1="48" x2="50%" y2="96" stroke="#6b7280" strokeOpacity="0.3" strokeWidth="2" />
-                <line x1="50%" y1="48" x2="70%" y2="96" stroke="#6b7280" strokeOpacity="0.3" strokeWidth="2" />
+                <line
+                  x1="50%"
+                  y1="48"
+                  x2="30%"
+                  y2="96"
+                  stroke="#6b7280"
+                  strokeOpacity="0.3"
+                  strokeWidth="2"
+                />
+                <line
+                  x1="50%"
+                  y1="48"
+                  x2="50%"
+                  y2="96"
+                  stroke="#6b7280"
+                  strokeOpacity="0.3"
+                  strokeWidth="2"
+                />
+                <line
+                  x1="50%"
+                  y1="48"
+                  x2="70%"
+                  y2="96"
+                  stroke="#6b7280"
+                  strokeOpacity="0.3"
+                  strokeWidth="2"
+                />
               </svg>
             </div>
           </div>
@@ -253,9 +308,18 @@ function AnimationPanel() {
         <div className="p-3 border-t border-border">
           <div className="text-xs font-medium text-text-muted mb-2">参数</div>
           <div className="space-y-1 text-sm">
-            <div className="flex justify-between"><span className="text-text-secondary">speed</span><Badge variant="info">float</Badge></div>
-            <div className="flex justify-between"><span className="text-text-secondary">isGrounded</span><Badge variant="warning">bool</Badge></div>
-            <div className="flex justify-between"><span className="text-text-secondary">attack</span><Badge variant="success">trigger</Badge></div>
+            <div className="flex justify-between">
+              <span className="text-text-secondary">speed</span>
+              <Badge variant="info">float</Badge>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-text-secondary">isGrounded</span>
+              <Badge variant="warning">bool</Badge>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-text-secondary">attack</span>
+              <Badge variant="success">trigger</Badge>
+            </div>
           </div>
         </div>
       </div>
@@ -264,8 +328,14 @@ function AnimationPanel() {
         <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-surface-0">
           <span className="text-sm font-medium text-text-primary">{selected?.name}</span>
           <div className="flex gap-2">
-            <Button size="sm" variant="secondary"><Icon name="play" size={14} />预览</Button>
-            <Button size="sm" variant="secondary"><Icon name="save" size={14} />保存</Button>
+            <Button size="sm" variant="secondary">
+              <Icon name="play" size={14} />
+              预览
+            </Button>
+            <Button size="sm" variant="secondary">
+              <Icon name="save" size={14} />
+              保存
+            </Button>
           </div>
         </div>
 
@@ -282,14 +352,55 @@ function AnimationPanel() {
             ))}
             <svg className="absolute inset-0 w-full h-full pointer-events-none">
               <defs>
-                <marker id="anim-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+                <marker
+                  id="anim-arrow"
+                  markerWidth="8"
+                  markerHeight="6"
+                  refX="7"
+                  refY="3"
+                  orient="auto"
+                >
                   <polygon points="0 0, 8 3, 0 6" fill="#22c55e" fillOpacity="0.5" />
                 </marker>
               </defs>
-              <line x1="88" y1="78" x2="180" y2="78" stroke="#22c55e" strokeOpacity="0.4" strokeWidth="2" markerEnd="url(#anim-arrow)" />
-              <line x1="228" y1="78" x2="320" y2="78" stroke="#22c55e" strokeOpacity="0.4" strokeWidth="2" markerEnd="url(#anim-arrow)" />
-              <path d="M 208 96 Q 208 140 208 160" stroke="#22c55e" strokeOpacity="0.4" strokeWidth="2" fill="none" markerEnd="url(#anim-arrow)" />
-              <line x1="248" y1="178" x2="320" y2="178" stroke="#22c55e" strokeOpacity="0.4" strokeWidth="2" markerEnd="url(#anim-arrow)" />
+              <line
+                x1="88"
+                y1="78"
+                x2="180"
+                y2="78"
+                stroke="#22c55e"
+                strokeOpacity="0.4"
+                strokeWidth="2"
+                markerEnd="url(#anim-arrow)"
+              />
+              <line
+                x1="228"
+                y1="78"
+                x2="320"
+                y2="78"
+                stroke="#22c55e"
+                strokeOpacity="0.4"
+                strokeWidth="2"
+                markerEnd="url(#anim-arrow)"
+              />
+              <path
+                d="M 208 96 Q 208 140 208 160"
+                stroke="#22c55e"
+                strokeOpacity="0.4"
+                strokeWidth="2"
+                fill="none"
+                markerEnd="url(#anim-arrow)"
+              />
+              <line
+                x1="248"
+                y1="178"
+                x2="320"
+                y2="178"
+                stroke="#22c55e"
+                strokeOpacity="0.4"
+                strokeWidth="2"
+                markerEnd="url(#anim-arrow)"
+              />
             </svg>
           </div>
         </div>
@@ -312,7 +423,10 @@ function TileMapPanel() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const tw = 32, th = 32, w = 25, h = 18;
+    const tw = 32,
+      th = 32,
+      w = 25,
+      h = 18;
     canvas.width = w * tw;
     canvas.height = h * th;
 
@@ -360,11 +474,23 @@ function TileMapPanel() {
       <div className="flex-1 flex flex-col">
         <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-surface-0">
           <div className="flex gap-2">
-            <Button size="sm" variant="secondary"><Icon name="brush" size={14} />画笔</Button>
-            <Button size="sm" variant="secondary"><Icon name="eraser" size={14} />橡皮</Button>
-            <Button size="sm" variant="secondary"><Icon name="grid" size={14} />网格</Button>
+            <Button size="sm" variant="secondary">
+              <Icon name="brush" size={14} />
+              画笔
+            </Button>
+            <Button size="sm" variant="secondary">
+              <Icon name="eraser" size={14} />
+              橡皮
+            </Button>
+            <Button size="sm" variant="secondary">
+              <Icon name="grid" size={14} />
+              网格
+            </Button>
           </div>
-          <Button size="sm" variant="secondary"><Icon name="save" size={14} />保存</Button>
+          <Button size="sm" variant="secondary">
+            <Icon name="save" size={14} />
+            保存
+          </Button>
         </div>
 
         <div className="flex-1 overflow-auto p-4 bg-[#0a0a14] flex items-center justify-center">
@@ -373,7 +499,11 @@ function TileMapPanel() {
             className="border border-border rounded cursor-crosshair"
             onClick={(e) => {
               const rect = e.currentTarget.getBoundingClientRect();
-              console.log('Tile:', Math.floor((e.clientX - rect.left) / 32), Math.floor((e.clientY - rect.top) / 32));
+              console.log(
+                'Tile:',
+                Math.floor((e.clientX - rect.left) / 32),
+                Math.floor((e.clientY - rect.top) / 32)
+              );
             }}
           />
         </div>
@@ -417,12 +547,14 @@ function ShaderPanel() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const w = canvas.width, h = canvas.height;
+    const w = canvas.width,
+      h = canvas.height;
     const t = Date.now() / 1000;
 
     for (let y = 0; y < h; y++) {
       for (let x = 0; x < w; x++) {
-        const u = x / w, v = y / h;
+        const u = x / w,
+          v = y / h;
         const r = Math.floor((Math.sin(u * 8 + t) * 0.5 + 0.5) * 200 + 55);
         const g = Math.floor((Math.cos(v * 6 + t * 0.7) * 0.5 + 0.5) * 180 + 75);
         const b = Math.floor((Math.sin((u + v) * 5 + t * 0.5) * 0.5 + 0.5) * 220 + 35);
@@ -450,16 +582,26 @@ function ShaderPanel() {
         </div>
         <div className="p-3 border-b border-border">
           <div className="text-xs font-medium text-text-muted mb-2">实时预览</div>
-          <canvas ref={previewCanvasRef} width={176} height={176} className="w-full aspect-square rounded-lg border border-border" />
+          <canvas
+            ref={previewCanvasRef}
+            width={176}
+            height={176}
+            className="w-full aspect-square rounded-lg border border-border"
+          />
         </div>
         <div className="flex-1 overflow-y-auto p-3">
           <div className="text-xs font-medium text-text-muted mb-2">节点库</div>
           <div className="space-y-1 text-sm">
-            {['输入节点', '输出节点', '数学运算', '函数', '纹理采样', '颜色操作', 'UV 操作'].map((cat) => (
-              <div key={cat} className="px-2 py-1.5 rounded bg-surface-1 text-text-secondary hover:bg-surface-2 cursor-pointer">
-                {cat}
-              </div>
-            ))}
+            {['输入节点', '输出节点', '数学运算', '函数', '纹理采样', '颜色操作', 'UV 操作'].map(
+              (cat) => (
+                <div
+                  key={cat}
+                  className="px-2 py-1.5 rounded bg-surface-1 text-text-secondary hover:bg-surface-2 cursor-pointer"
+                >
+                  {cat}
+                </div>
+              )
+            )}
           </div>
         </div>
       </div>
@@ -470,8 +612,14 @@ function ShaderPanel() {
             <Badge variant="success">已编译</Badge>
           </div>
           <div className="flex gap-2">
-            <Button size="sm" variant="secondary"><Icon name="play" size={14} />编译</Button>
-            <Button size="sm" variant="secondary"><Icon name="save" size={14} />保存</Button>
+            <Button size="sm" variant="secondary">
+              <Icon name="play" size={14} />
+              编译
+            </Button>
+            <Button size="sm" variant="secondary">
+              <Icon name="save" size={14} />
+              保存
+            </Button>
           </div>
         </div>
 
@@ -483,21 +631,65 @@ function ShaderPanel() {
                 className="absolute px-3 py-2 rounded-lg border border-surface-3 bg-surface-1 text-xs font-medium text-text-primary cursor-move hover:border-green-500/50 transition-colors min-w-[80px]"
                 style={{ left: node.x, top: node.y }}
               >
-                <div className="text-[10px] text-text-muted uppercase tracking-wide">{node.type}</div>
+                <div className="text-[10px] text-text-muted uppercase tracking-wide">
+                  {node.type}
+                </div>
                 <div className="text-sm">{node.name}</div>
               </div>
             ))}
             <svg className="absolute inset-0 w-full h-full pointer-events-none">
               <defs>
-                <marker id="sh-arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+                <marker
+                  id="sh-arrow"
+                  markerWidth="8"
+                  markerHeight="6"
+                  refX="7"
+                  refY="3"
+                  orient="auto"
+                >
                   <polygon points="0 0, 8 3, 0 6" fill="#22c55e" fillOpacity="0.5" />
                 </marker>
               </defs>
-              <path d="M 76 48 Q 103 48 130 45" stroke="#22c55e" strokeOpacity="0.4" strokeWidth="2" fill="none" markerEnd="url(#sh-arrow)" />
-              <path d="M 76 138 Q 103 138 130 135" stroke="#22c55e" strokeOpacity="0.4" strokeWidth="2" fill="none" markerEnd="url(#sh-arrow)" />
-              <path d="M 186 55 Q 213 70 240 85" stroke="#22c55e" strokeOpacity="0.4" strokeWidth="2" fill="none" markerEnd="url(#sh-arrow)" />
-              <path d="M 186 135 Q 213 110 240 95" stroke="#22c55e" strokeOpacity="0.4" strokeWidth="2" fill="none" markerEnd="url(#sh-arrow)" />
-              <path d="M 296 93 Q 323 93 350 93" stroke="#22c55e" strokeOpacity="0.4" strokeWidth="2" fill="none" markerEnd="url(#sh-arrow)" />
+              <path
+                d="M 76 48 Q 103 48 130 45"
+                stroke="#22c55e"
+                strokeOpacity="0.4"
+                strokeWidth="2"
+                fill="none"
+                markerEnd="url(#sh-arrow)"
+              />
+              <path
+                d="M 76 138 Q 103 138 130 135"
+                stroke="#22c55e"
+                strokeOpacity="0.4"
+                strokeWidth="2"
+                fill="none"
+                markerEnd="url(#sh-arrow)"
+              />
+              <path
+                d="M 186 55 Q 213 70 240 85"
+                stroke="#22c55e"
+                strokeOpacity="0.4"
+                strokeWidth="2"
+                fill="none"
+                markerEnd="url(#sh-arrow)"
+              />
+              <path
+                d="M 186 135 Q 213 110 240 95"
+                stroke="#22c55e"
+                strokeOpacity="0.4"
+                strokeWidth="2"
+                fill="none"
+                markerEnd="url(#sh-arrow)"
+              />
+              <path
+                d="M 296 93 Q 323 93 350 93"
+                stroke="#22c55e"
+                strokeOpacity="0.4"
+                strokeWidth="2"
+                fill="none"
+                markerEnd="url(#sh-arrow)"
+              />
             </svg>
           </div>
         </div>

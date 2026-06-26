@@ -8,7 +8,14 @@ export type ModelRuntime = 'webgpu' | 'wasm' | 'native';
 export type ModelSource = 'huggingface' | 'local' | 'mlc';
 
 // 模型状态
-export type ModelStatus = 'idle' | 'downloading' | 'downloaded' | 'loading' | 'ready' | 'error' | 'unloading';
+export type ModelStatus =
+  | 'idle'
+  | 'downloading'
+  | 'downloaded'
+  | 'loading'
+  | 'ready'
+  | 'error'
+  | 'unloading';
 
 // 模型提供商
 export type GGUFProvider = 'webllm' | 'transformers' | 'nollama';

@@ -31,8 +31,7 @@ class ElectronLLMBackend {
    * 检查是否在 Electron 环境中
    */
   isElectronEnvironment(): boolean {
-    return typeof window !== 'undefined' &&
-           typeof (window as any).electron !== 'undefined';
+    return typeof window !== 'undefined' && typeof (window as any).electron !== 'undefined';
   }
 
   /**

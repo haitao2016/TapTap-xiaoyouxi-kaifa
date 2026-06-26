@@ -2,9 +2,26 @@
 export type AIProvider = 'openai' | 'claude' | 'ollama' | 'mock' | 'local';
 export type CompletionTrigger = 'auto' | 'manual' | 'on-type';
 export type ChatRole = 'user' | 'assistant' | 'system' | 'tool';
-export type ReferenceType = 'file' | 'function' | 'class' | 'symbol' | 'error' | 'snippet' | 'selection';
+export type ReferenceType =
+  | 'file'
+  | 'function'
+  | 'class'
+  | 'symbol'
+  | 'error'
+  | 'snippet'
+  | 'selection';
 export type ChatStatus = 'idle' | 'thinking' | 'streaming' | 'error';
-export type CodeLanguage = 'typescript' | 'javascript' | 'python' | 'java' | 'csharp' | 'cpp' | 'go' | 'rust' | 'lua' | 'other';
+export type CodeLanguage =
+  | 'typescript'
+  | 'javascript'
+  | 'python'
+  | 'java'
+  | 'csharp'
+  | 'cpp'
+  | 'go'
+  | 'rust'
+  | 'lua'
+  | 'other';
 export type ErrorSeverity = 'error' | 'warning' | 'info';
 export type ErrorCategory = 'syntax' | 'runtime' | 'logic' | 'performance' | 'security' | 'type';
 

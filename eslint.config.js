@@ -67,6 +67,9 @@ export default [
         global: 'readonly',
         crypto: 'readonly',
         WebAssembly: 'readonly',
+        alert: 'readonly',
+        confirm: 'readonly',
+        prompt: 'readonly',
       },
     },
     plugins: {
@@ -76,6 +79,7 @@ export default [
     rules: {
       'prettier/prettier': 'error',
       'no-unused-vars': 'off',
+      'no-redeclare': 'off',
       '@typescript-eslint/no-unused-vars': 'off',
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/explicit-function-return-type': 'warn',

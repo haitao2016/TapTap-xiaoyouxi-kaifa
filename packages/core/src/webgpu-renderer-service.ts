@@ -1,7 +1,7 @@
 /**
  * WebGPU 渲染引擎服务
  * 提供高性能的 WebGPU 渲染能力，用于游戏预览和可视化编辑器
- * 
+ *
  * 注意：此服务为 WebGPU API 的轻量封装，实际使用时需要浏览器支持 WebGPU
  */
 
@@ -265,7 +265,12 @@ export class WebGPURendererService {
   /**
    * 编译着色器模块
    */
-  async compileShader(id: string, name: string, code: string, type: 'vertex' | 'fragment' | 'compute'): Promise<ShaderModule> {
+  async compileShader(
+    id: string,
+    name: string,
+    code: string,
+    type: 'vertex' | 'fragment' | 'compute'
+  ): Promise<ShaderModule> {
     if (!this.capabilities.device) {
       return { id, name, code, type, compiled: false, error: 'Device not available' };
     }
@@ -279,13 +284,18 @@ export class WebGPURendererService {
     };
 
     try {
-      const shaderModule: WebGPUShaderModule = this.capabilities.device.createShaderModule({ code });
+      const shaderModule: WebGPUShaderModule = this.capabilities.device.createShaderModule({
+        code,
+      });
       const compInfo = await shaderModule.getCompilationInfo();
 
       if (compInfo.messages && compInfo.messages.length > 0) {
         const errors = compInfo.messages
           .filter((msg: { type: string; message: string; lineNum: number }) => msg.type === 'error')
-          .map((msg: { type: string; message: string; lineNum: number }) => `${msg.message} (at line ${msg.lineNum})`)
+          .map(
+            (msg: { type: string; message: string; lineNum: number }) =>
+              `${msg.message} (at line ${msg.lineNum})`
+          )
           .join('\n');
 
         if (errors) {
@@ -323,7 +333,13 @@ export class WebGPURendererService {
   /**
    * 创建缓冲区
    */
-  createBuffer(id: string, label: string, data: Float32Array | Uint16Array | Uint32Array, usage: WebGPUBufferUsageFlags, type: BufferData['type']): BufferData | null {
+  createBuffer(
+    id: string,
+    label: string,
+    data: Float32Array | Uint16Array | Uint32Array,
+    usage: WebGPUBufferUsageFlags,
+    type: BufferData['type']
+  ): BufferData | null {
     if (!this.capabilities.device) {
       return null;
     }
@@ -407,7 +423,16 @@ export class WebGPURendererService {
   /**
    * 创建纹理
    */
-  createTexture(id: string, label: string, width: number, height: number, format: WebGPUTextureFormat = 'rgba8unorm', usage: WebGPUTextureUsageFlags = 0x04 | 0x10, mipLevelCount = 1, sampleCount = 1): TextureData | null {
+  createTexture(
+    id: string,
+    label: string,
+    width: number,
+    height: number,
+    format: WebGPUTextureFormat = 'rgba8unorm',
+    usage: WebGPUTextureUsageFlags = 0x04 | 0x10,
+    mipLevelCount = 1,
+    sampleCount = 1
+  ): TextureData | null {
     if (!this.capabilities.device) {
       return null;
     }
@@ -530,7 +555,10 @@ export class WebGPURendererService {
    */
   private updateStats(): void {
     this.stats.textures = this.textures.size;
-    this.stats.bufferSize = Array.from(this.buffers.values()).reduce((sum, buf) => sum + buf.data.byteLength, 0);
+    this.stats.bufferSize = Array.from(this.buffers.values()).reduce(
+      (sum, buf) => sum + buf.data.byteLength,
+      0
+    );
   }
 
   /**

@@ -16,6 +16,16 @@ import type {
   RecommendedModel,
 } from '@tapdev/types';
 
+declare global {
+  interface Navigator {
+    gpu?: {
+      requestAdapter(): Promise<any>;
+    };
+  }
+
+  var GPU: any;
+}
+
 export const LOCAL_MODEL_EVENTS = {
   MODEL_STATUS_CHANGED: 'localModel:statusChanged',
   LOAD_PROGRESS: 'localModel:loadProgress',
@@ -30,7 +40,8 @@ const RECOMMENDED_MODELS: RecommendedModel[] = [
     id: 'qwen2.5-coder-7b-q4',
     name: 'Qwen2.5-Coder-7B (Q4)',
     provider: 'webllm',
-    modelUrl: 'https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct-GGUF/resolve/main/qwen2.5-coder-7b-instruct-q4_k_m.gguf',
+    modelUrl:
+      'https://huggingface.co/Qwen/Qwen2.5-Coder-7B-Instruct-GGUF/resolve/main/qwen2.5-coder-7b-instruct-q4_k_m.gguf',
     description: '阿里巴巴开源的强大代码模型，支持代码补全、生成、解释',
     size: '~4.4GB',
     quantization: 'Q4_K_M',
@@ -41,7 +52,8 @@ const RECOMMENDED_MODELS: RecommendedModel[] = [
     id: 'codellama-13b-q4',
     name: 'CodeLlama-13B (Q4)',
     provider: 'webllm',
-    modelUrl: 'https://huggingface.co/TheBloke/CodeLlama-13B-Instruct-GGUF/resolve/main/codellama-13b-instruct.Q4_K_M.gguf',
+    modelUrl:
+      'https://huggingface.co/TheBloke/CodeLlama-13B-Instruct-GGUF/resolve/main/codellama-13b-instruct.Q4_K_M.gguf',
     description: 'Meta 开源的代码专用模型，擅长代码补全和修复',
     size: '~7.5GB',
     quantization: 'Q4_K_M',
@@ -52,7 +64,8 @@ const RECOMMENDED_MODELS: RecommendedModel[] = [
     id: 'deepseek-coder-6.7b-q4',
     name: 'DeepSeek-Coder-6.7B (Q4)',
     provider: 'webllm',
-    modelUrl: 'https://huggingface.co/DeepSeek/DeepSeek-Coder-V2-Lite-Instruct-GGUF/resolve/main/deepseek-coder-6.7b-instruct-q4_k_m.gguf',
+    modelUrl:
+      'https://huggingface.co/DeepSeek/DeepSeek-Coder-V2-Lite-Instruct-GGUF/resolve/main/deepseek-coder-6.7b-instruct-q4_k_m.gguf',
     description: '深度求索开源的代码模型，性能优异',
     size: '~4.1GB',
     quantization: 'Q4_K_M',
@@ -64,7 +77,8 @@ const RECOMMENDED_MODELS: RecommendedModel[] = [
     id: 'qwen2.5-7b-q4',
     name: 'Qwen2.5-7B (Q4)',
     provider: 'webllm',
-    modelUrl: 'https://huggingface.co/Qwen/Qwen2.5-7B-Instruct-GGUF/resolve/main/qwen2.5-7b-instruct-q4_k_m.gguf',
+    modelUrl:
+      'https://huggingface.co/Qwen/Qwen2.5-7B-Instruct-GGUF/resolve/main/qwen2.5-7b-instruct-q4_k_m.gguf',
     description: '通用对话模型，支持问答、创作、分析',
     size: '~4.4GB',
     quantization: 'Q4_K_M',
@@ -75,7 +89,8 @@ const RECOMMENDED_MODELS: RecommendedModel[] = [
     id: 'phi-3-mini-q4',
     name: 'Phi-3-Mini (Q4)',
     provider: 'webllm',
-    modelUrl: 'https://huggingface.co/microsoft/Phi-3-mini-4k-instruct-GGUF/resolve/main/phi-3-mini-4k-instruct-q4_k_m.gguf',
+    modelUrl:
+      'https://huggingface.co/microsoft/Phi-3-mini-4k-instruct-GGUF/resolve/main/phi-3-mini-4k-instruct-q4_k_m.gguf',
     description: '微软 Phi-3 小型模型，体积小但能力强劲',
     size: '~2.7GB',
     quantization: 'Q4_K_M',
@@ -172,7 +187,7 @@ class LocalModelService {
       }
 
       const info = await adapter.requestAdapterInfo();
-      const supportsChrome = 'requestAdapterInfo' in GPU;
+      const supportsChrome = typeof GPU !== 'undefined' && 'requestAdapterInfo' in GPU;
 
       // 评估 GPU 能力
       let tier: 'perfect' | 'good' | 'fallback' | 'unsupported' = 'good';
@@ -195,10 +210,7 @@ class LocalModelService {
   /**
    * 加载模型 (使用 WebLLM)
    */
-  async loadModel(
-    modelId: string,
-    options?: ModelLoadOptions
-  ): Promise<boolean> {
+  async loadModel(modelId: string, options?: ModelLoadOptions): Promise<boolean> {
     if (this.isLoading) {
       throw new Error('模型正在加载中，请稍候');
     }
@@ -213,7 +225,7 @@ class LocalModelService {
 
     try {
       // 动态导入 WebLLM
-      const { MLEngine } = await import('@mlc-ai/web-llm');
+      const { MLCEngine } = await import('@mlc-ai/web-llm');
 
       options?.onProgress?.({
         stage: 'downloading',
@@ -224,21 +236,28 @@ class LocalModelService {
       });
 
       // 创建引擎
-      this.webllmEngine = new MLEngine(modelInfo.modelUrl, {
-        initProgressCallback: (progress: ModelLoadProgress) => {
-          const status = progress.stage === 'ready' ? 'ready' : 'downloading';
-          this.updateModelStatus(modelId, status);
-          options?.onProgress?.(progress);
+      const engine = new MLCEngine();
+      engine.setInitProgressCallback((progress: any) => {
+        const status = progress.stage === 'ready' ? 'ready' : 'downloading';
+        this.updateModelStatus(modelId, status);
+        options?.onProgress?.({
+          stage: status as any,
+          progress: progress.progress || 0,
+          loaded: Math.floor(modelInfo.size * ((progress.progress || 0) / 100)),
+          total: modelInfo.size,
+          message: progress.text || '',
+        });
 
-          globalEventBus.emit({
-            type: LOCAL_MODEL_EVENTS.LOAD_PROGRESS,
-            payload: { modelId, progress },
-          });
-        },
+        globalEventBus.emit({
+          type: LOCAL_MODEL_EVENTS.LOAD_PROGRESS,
+          payload: { modelId, progress },
+        });
       });
 
-      // 等待模型加载完成
-      await this.webllmEngine.reload();
+      this.webllmEngine = engine;
+
+      // 加载模型
+      await engine.reload(modelInfo.modelUrl);
 
       this.currentModel = modelInfo;
       this.updateModelStatus(modelId, 'ready');
@@ -292,20 +311,22 @@ class LocalModelService {
     }
 
     try {
-      const response = await this.webllmEngine.completion(request.prompt, {
+      const response = await this.webllmEngine.completions.create({
+        model: this.currentModel?.modelUrl || '',
+        prompt: request.prompt,
         temperature: request.temperature ?? 0.7,
         max_tokens: request.maxTokens ?? 256,
         stream: false,
       });
 
       return {
-        text: response.value || response.text || '',
+        text: response.choices?.[0]?.text || '',
         usage: {
           promptTokens: response.usage?.prompt_tokens || 0,
           completionTokens: response.usage?.completion_tokens || 0,
-          totalTokens: (response.usage?.prompt_tokens || 0) + (response.usage?.completion_tokens || 0),
+          totalTokens: response.usage?.total_tokens || 0,
         },
-        finishReason: 'stop',
+        finishReason: response.choices?.[0]?.finish_reason || 'stop',
       };
     } catch (error) {
       return {
@@ -323,14 +344,16 @@ class LocalModelService {
       throw new Error('模型未加载');
     }
 
-    const stream = await this.webllmEngine.completion(request.prompt, {
+    const stream = await this.webllmEngine.completions.create({
+      model: this.currentModel?.modelUrl || '',
+      prompt: request.prompt,
       temperature: request.temperature ?? 0.7,
       max_tokens: request.maxTokens ?? 256,
       stream: true,
     });
 
-    for await (const chunk of stream) {
-      yield chunk.value || chunk;
+    for await (const chunk of stream as any) {
+      yield chunk.choices?.[0]?.text || '';
     }
   }
 
