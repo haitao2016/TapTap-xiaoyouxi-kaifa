@@ -19,6 +19,14 @@ export default {
     '!packages/**/*.d.ts',
   ],
   coverageDirectory: 'coverage',
+  coverageThreshold: {
+    global: {
+      statements: 30,
+      branches: 20,
+      functions: 30,
+      lines: 30,
+    },
+  },
   verbose: true,
   injectGlobals: true,
 };

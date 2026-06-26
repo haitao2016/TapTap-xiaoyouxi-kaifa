@@ -114,14 +114,15 @@ class TileMapEditorService {
       properties: {},
     };
 
+    this.maps.set(map.id, map);
+    this.activeMapId = map.id;
+
     // 默认创建两个层：背景层和地形层
     this.addLayer(map.id, 'Background');
     this.addLayer(map.id, 'Ground');
     this.addLayer(map.id, 'Objects');
     this.addObjectLayer(map.id, 'Entities');
 
-    this.maps.set(map.id, map);
-    this.activeMapId = map.id;
     this.notify('map:created', map);
     return map;
   }

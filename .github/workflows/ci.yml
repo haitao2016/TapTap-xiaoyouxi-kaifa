@@ -68,7 +68,12 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Test
-        run: pnpm test
+        run: pnpm test -- --coverage
+
+      - name: Check coverage threshold
+        run: |
+          echo "Coverage report generated"
+          cat coverage/coverage-summary.json 2>/dev/null || echo "No coverage summary file"
 
       - name: Upload coverage
         uses: actions/upload-artifact@v4
