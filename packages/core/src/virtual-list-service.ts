@@ -212,4 +212,13 @@ export class VirtualListService {
   }
 }
 
-export const virtualListService = new (VirtualListService as any)();
+export const virtualListService = {
+  instance: null as VirtualListService | null,
+  init(options: VirtualListOptions) {
+    this.instance = new VirtualListService(options);
+    return this.instance;
+  },
+  getInstance() {
+    return this.instance;
+  },
+};

@@ -8,6 +8,7 @@
  */
 import { globalEventBus } from '../event-bus';
 import { spawn } from 'child_process';
+import fs from 'node:fs';
 import { randomUUID } from '../utils/crypto-utils';
 
 export interface GitStatus {
@@ -473,9 +474,8 @@ export class GitService {
    * 解析冲突区域
    */
   async parseConflicts(filePath: string): Promise<MergeConflictRegion[]> {
-    const fs = await import('fs/promises');
     try {
-      const content = await fs.readFile(filePath, 'utf-8');
+      const content = await (fs as any).promises.readFile(filePath, 'utf-8');
       return this.parseConflictMarkers(content, filePath);
     } catch {
       return [];
@@ -491,8 +491,7 @@ export class GitService {
     strategy: 'ours' | 'theirs' | 'manual',
     manualContent?: string
   ): Promise<boolean> {
-    const fs = await import('fs/promises');
-    let content = await fs.readFile(filePath, 'utf-8');
+    let content = await (fs as any).promises.readFile(filePath, 'utf-8');
     for (const region of regions) {
       const blockRegex = new RegExp(
         `<<<<<<< HEAD\\n([\\s\\S]*?)=======\\n([\\s\\S]*?)>>>>>>> [^\\n]*\\n?`,
@@ -506,7 +505,7 @@ export class GitService {
             : (manualContent ?? region.ours);
       content = content.replace(blockRegex, replacement);
     }
-    await fs.writeFile(filePath, content, 'utf-8');
+    await (fs as any).promises.writeFile(filePath, content, 'utf-8');
     await this.exec(['add', filePath]);
     globalEventBus.emit({ type: 'git:conflict-resolved', payload: { filePath, strategy } });
     return true;
