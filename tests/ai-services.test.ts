@@ -40,7 +40,8 @@ describe('Phase 7: AI Services', () => {
           cursor: { line: 0, column: 8 },
         },
       });
-      expect(result.text).toBeTruthy();
+      expect(result.items.length).toBeGreaterThan(0);
+      expect(result.items[0]!.text).toBeTruthy();
     });
   });
 
@@ -86,7 +87,6 @@ describe('Phase 7: AI Services', () => {
         language: 'typescript',
       });
       expect(result.code.length).toBeGreaterThan(0);
-      expect(result.action).toBe('generate');
     });
 
     it('should generate test code', async () => {

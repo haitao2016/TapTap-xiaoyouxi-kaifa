@@ -98,7 +98,7 @@ export interface RealtimeMetric {
 }
 
 const METRIC_LABELS: Record<MetricType, string> = {
-  dau: '日活跃用户',
+  dau: '日活',
   mau: '月活跃用户',
   new_users: '新增用户',
   retention_d1: '次日留存率',

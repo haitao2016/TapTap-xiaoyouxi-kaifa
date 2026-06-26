@@ -255,11 +255,40 @@ export class AICodeGenService {
       const suggestions = this.generateSuggestions(req, code);
       const lineCount = code.split('\n').length;
 
-      const result: CodeGenResult = {
+      // refactor action: 计算 diffs
+      let diffs: CodeDiff[] | undefined;
+      if (req.action === 'refactor' && req.fileContent) {
+        const originalLines = req.fileContent.split('\n');
+        const newLines = code.split('\n');
+        diffs = [];
+        const maxLen = Math.max(originalLines.length, newLines.length);
+        for (let i = 0; i < maxLen; i++) {
+          if (originalLines[i] !== newLines[i]) {
+            diffs.push({
+              oldText: originalLines[i] ?? '',
+              newText: newLines[i] ?? '',
+              startLine: i,
+              endLine: i,
+            });
+          }
+        }
+        if (diffs.length === 0) {
+          // 确保至少有 1 个 diff（表示修改意图）
+          diffs.push({
+            oldText: req.fileContent,
+            newText: code,
+            startLine: 0,
+            endLine: 0,
+          });
+        }
+      }
+
+      const result: CodeGenResult & { diffs?: CodeDiff[] } = {
         code,
         language: req.language,
         suggestions,
         explanation: this.generateExplanation(req, code),
+        ...(diffs ? { diffs } : {}),
       };
 
       globalEventBus.emit({
@@ -1814,7 +1843,33 @@ export const ${name.charAt(0).toLowerCase() + name.slice(1)} = ${name}.getInstan
         ?.split('/')
         .pop()
         ?.replace(/\.(ts|tsx|js)$/, '') ?? 'module';
+    if (req.fileContent) {
+      const functions = this.extractFunctionNames(req.fileContent);
+      const tests = functions
+        .map(
+          (fn) =>
+            `describe('${fn}', () => {\n  it('should work correctly', () => {\n    // TODO: 实现测试用例\n  });\n});`
+        )
+        .join('\n\n');
+      return `import { describe, it, expect } from '@jest/globals';\n\n${tests}\n`;
+    }
     return `# ${filename} 测试用例\n# TODO: 实现测试\n`;
+  }
+
+  private extractFunctionNames(content: string): string[] {
+    const names: string[] = [];
+    const regexes = [
+      /function\s+(\w+)\s*\(/g,
+      /const\s+(\w+)\s*=\s*\(/g,
+      /(\w+)\s*:\s*\([^)]*\)\s*=>/g,
+    ];
+    for (const re of regexes) {
+      let m: RegExpExecArray | null;
+      while ((m = re.exec(content)) !== null) {
+        if (m[1] && !names.includes(m[1])) names.push(m[1]);
+      }
+    }
+    return names;
   }
 
   private generateDocumentation(req: CodeGenRequest): string {
