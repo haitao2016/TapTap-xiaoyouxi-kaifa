@@ -4,11 +4,30 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: '版本号 (如 v0.2.0)'
+        required: false
 
 jobs:
-  release-desktop:
-    name: Release Desktop App
-    runs-on: ubuntu-latest
+  build-desktop:
+    name: Build Desktop App (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            platform: win
+            artifact: TapDev-Studio-*.exe
+          - os: macos-latest
+            platform: mac
+            artifact: TapDev-Studio-*.dmg
+          - os: ubuntu-latest
+            platform: linux
+            artifact: TapDev-Studio-*.AppImage
+
     steps:
       - uses: actions/checkout@v4
 
@@ -25,38 +44,47 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Build Desktop App
-        run: pnpm --filter @tapdev/desktop build
+        run: pnpm --filter @tapdev/desktop dist:${{ matrix.platform }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CSC_LINK: ${{ secrets.CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
+          WIN_CSC_LINK: ${{ secrets.WIN_CSC_LINK }}
+          WIN_CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
 
-      - name: Upload Windows Installer
-        uses: actions/upload-release-asset@v1
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: apps/desktop/release/*.exe
-          asset_name: TapDev-Studio-${{ github.ref_name }}-win.exe
-          asset_content_type: application/octet-stream
+          name: tapdev-studio-${{ matrix.platform }}
+          path: apps/desktop/release/${{ matrix.artifact }}
+          if-no-files-found: error
 
-      - name: Upload macOS DMG
-        if: matrix.os == 'macos-latest'
-        uses: actions/upload-release-asset@v1
+  create-release:
+    name: Create Release
+    needs: build-desktop
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: apps/desktop/release/*.dmg
-          asset_name: TapDev-Studio-${{ github.ref_name }}-mac.dmg
-          asset_content_type: application/x-apple-diskimage
+          files: |
+            tapdev-studio-win/*.exe
+            tapdev-studio-mac/*.dmg
+            tapdev-studio-linux/*.AppImage
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload Linux AppImage
-        if: matrix.os == 'ubuntu-latest'
-        uses: actions/upload-release-asset@v1
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: apps/desktop/release/*.AppImage
-          asset_name: TapDev-Studio-${{ github.ref_name }}-linux.AppImage
-          asset_content_type: application/vnd.appimage
-
-  release-web:
-    name: Release Web App
+  build-web:
+    name: Build Web App
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -77,6 +105,7 @@ jobs:
         run: pnpm --filter @tapdev/studio build
 
       - name: Deploy to GitHub Pages
+        if: startsWith(github.ref, 'refs/tags/v')
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
