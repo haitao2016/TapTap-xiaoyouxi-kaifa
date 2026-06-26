@@ -9,3 +9,7 @@ export * from './server';
 export * from './snippet';
 export * from './ai';
 export * from './game-dev';
+export * from './collab';
+export * from './audio';
+export * from './perf';
+export * from './analytics';
