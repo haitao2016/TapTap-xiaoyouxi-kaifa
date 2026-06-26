@@ -4,7 +4,6 @@ export interface WebVitals {
   lcp: number;
   fid: number;
   cls: number;
-  fid: number;
   inp: number;
   ttfcp: number;
 }
@@ -174,17 +173,18 @@ export class PerformanceService {
     if (typeof window !== 'undefined' && 'PerformanceObserver' in window) {
       const observer = new PerformanceObserver((entryList) => {
         for (const entry of entryList.getEntries()) {
+          const entryAny = entry as any;
           switch (entry.entryType) {
             case 'largest-contentful-paint':
               (window as any)._lcpValue = entry.startTime;
               break;
             case 'first-input':
-              (window as any)._fidValue = entry.processingStart - entry.startTime;
+              (window as any)._fidValue = entryAny.processingStart - entry.startTime;
               break;
             case 'layout-shift':
-              if (!entry.hadRecentInput) {
+              if (!entryAny.hadRecentInput) {
                 const currentCls = (window as any)._clsValue || 0;
-                (window as any)._clsValue = currentCls + entry.value;
+                (window as any)._clsValue = currentCls + entryAny.value;
               }
               break;
             case 'interaction':
