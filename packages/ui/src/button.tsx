@@ -2,7 +2,7 @@ import { cn } from './utils';
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'ghost' | 'danger';
+  variant?: 'primary' | 'secondary' | 'ghost' | 'danger' | 'outline';
   size?: 'sm' | 'md' | 'lg';
   children: ReactNode;
 }
@@ -12,6 +12,7 @@ const variants = {
   secondary: 'bg-surface-2 hover:bg-surface-3 text-text-primary border border-border',
   ghost: 'hover:bg-surface-2 text-text-secondary hover:text-text-primary',
   danger: 'bg-red-600 hover:bg-red-500 text-white',
+  outline: 'border border-border hover:bg-surface-2 text-text-primary bg-transparent',
 };
 
 const sizes = {
