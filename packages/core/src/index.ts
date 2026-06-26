@@ -1,3 +1,5 @@
+/// <reference path="./types/webgpu.d.ts" />
+
 export { EventBus, globalEventBus } from './event-bus';
 export { ProjectManager, projectManager } from './project-manager';
 export { DebugService, debugService, setNativeBridge, getNativeBridge } from './debug-service';
@@ -360,6 +362,18 @@ export type {
   ParticlePreset,
   ParticleInstance,
 } from './particle-editor-service';
+
+// v3.1 新增 - WebGPU 渲染引擎
+export { WebGPURendererService, webgpuRendererService } from './webgpu-renderer-service';
+export type {
+  WebGPUCapabilities,
+  RenderTarget,
+  ShaderModule,
+  PipelineConfig,
+  BufferData,
+  TextureData,
+  RenderStats,
+} from './webgpu-renderer-service';
 
 // 官方插件
 export * from './plugins';
