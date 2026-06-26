@@ -4,8 +4,16 @@ export type { StartupStage, StartupMetric, StartupReport } from './startup-monit
 export { memoryMonitor, MemoryMonitor } from './memory-monitor';
 export type { MemorySample, PerformanceBudget } from './memory-monitor';
 
-export { i18n, I18nService } from './i18n-service';
-export type { Locale, TranslationKey, Translations, I18nConfig } from './i18n-service';
+export { i18n, i18nService, I18nService } from './i18n-service';
+export type {
+  Locale,
+  TranslationKey,
+  Translations,
+  I18nConfig,
+  TranslationDict,
+  NamespaceTranslations,
+  Gender,
+} from './i18n-service';
 
 export { releasePipeline, ReleasePipeline } from './release-pipeline';
 export type { Platform, BuildJob, Release, ConventionalCommit } from './release-pipeline';

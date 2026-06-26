@@ -8,7 +8,6 @@ import {
   startUnityBuild,
   cancelUnityBuild,
 } from './native-service';
-import { initAutoUpdater, checkForUpdatesOnStartup } from './auto-updater';
 import type { BuildConfig } from '@tapdev/types';
 
 const isDev = !app.isPackaged;
@@ -38,11 +37,7 @@ function createWindow(): void {
     mainWindow.loadFile(path.join(__dirname, '../studio-dist/index.html'));
   }
 
-  mainWindow.once('ready-to-show', () => {
-    mainWindow?.show();
-    initAutoUpdater(mainWindow!);
-    checkForUpdatesOnStartup();
-  });
+  mainWindow.once('ready-to-show', () => mainWindow?.show());
   mainWindow.on('closed', () => {
     mainWindow = null;
   });

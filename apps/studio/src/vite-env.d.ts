@@ -45,43 +45,6 @@ declare global {
         onGameConnected: (cb: () => void) => () => void;
         onGameDisconnected: (cb: () => void) => () => void;
       };
-      updater?: {
-        check: () => Promise<{ success: boolean; message?: string }>;
-        download: () => Promise<{ success: boolean; message?: string }>;
-        install: () => Promise<{ success: boolean; message?: string }>;
-        getCurrentVersion: () => Promise<string>;
-        getStatus: () => Promise<{
-          isUpdating: boolean;
-          updateDownloaded: boolean;
-          currentVersion: string;
-        }>;
-        onChecking: (cb: () => void) => () => void;
-        onAvailable: (
-          cb: (info: {
-            version: string;
-            releaseDate: string;
-            releaseNotes: unknown;
-            files: unknown[];
-          }) => void
-        ) => () => void;
-        onNotAvailable: (cb: (info: { version: string }) => void) => () => void;
-        onDownloadProgress: (
-          cb: (progress: {
-            bytesPerSecond: number;
-            percent: number;
-            total: number;
-            transferred: number;
-          }) => void
-        ) => () => void;
-        onDownloaded: (
-          cb: (info: {
-            version: string;
-            releaseDate: string;
-            releaseNotes: unknown;
-          }) => void
-        ) => () => void;
-        onError: (cb: (error: { message: string; stack?: string }) => void) => () => void;
-      };
     };
   }
 }
