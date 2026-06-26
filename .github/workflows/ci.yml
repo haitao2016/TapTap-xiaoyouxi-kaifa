@@ -15,7 +15,7 @@ jobs:
 
       - uses: pnpm/action-setup@v4
         with:
-          version: 9
+          version: 9.15.0
 
       - uses: actions/setup-node@v4
         with:
@@ -36,7 +36,7 @@ jobs:
 
       - uses: pnpm/action-setup@v4
         with:
-          version: 9
+          version: 9.15.0
 
       - uses: actions/setup-node@v4
         with:
@@ -57,7 +57,7 @@ jobs:
 
       - uses: pnpm/action-setup@v4
         with:
-          version: 9
+          version: 9.15.0
 
       - uses: actions/setup-node@v4
         with:
@@ -67,17 +67,22 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Test
-        run: pnpm test -- --coverage
+      - name: Test with coverage
+        run: pnpm test:coverage
 
       - name: Check coverage threshold
+        if: always()
         run: |
-          echo "Coverage report generated"
-          cat coverage/coverage-summary.json 2>/dev/null || echo "No coverage summary file"
+          if [ -f coverage/coverage-summary.json ]; then
+            echo "Coverage report generated"
+            cat coverage/coverage-summary.json
+          else
+            echo "No coverage summary file found"
+          fi
 
       - name: Upload coverage
+        if: always() && hashFiles('coverage/lcov.info') != ''
         uses: actions/upload-artifact@v4
-        if: always()
         with:
           name: coverage
           path: coverage/
@@ -91,7 +96,7 @@ jobs:
 
       - uses: pnpm/action-setup@v4
         with:
-          version: 9
+          version: 9.15.0
 
       - uses: actions/setup-node@v4
         with:
@@ -105,6 +110,7 @@ jobs:
         run: pnpm build
 
       - name: Upload build artifacts
+        if: always() && hashFiles('apps/studio/dist/**') != ''
         uses: actions/upload-artifact@v4
         with:
           name: build
@@ -123,7 +129,7 @@ jobs:
 
       - uses: pnpm/action-setup@v4
         with:
-          version: 9
+          version: 9.15.0
 
       - uses: actions/setup-node@v4
         with:
@@ -140,7 +146,7 @@ jobs:
         run: pnpm test:e2e
 
       - name: Upload E2E report
-        if: always()
+        if: always() && hashFiles('playwright-report/**') != ''
         uses: actions/upload-artifact@v4
         with:
           name: e2e-report
@@ -155,7 +161,7 @@ jobs:
 
       - uses: pnpm/action-setup@v4
         with:
-          version: 9
+          version: 9.15.0
 
       - uses: actions/setup-node@v4
         with:
