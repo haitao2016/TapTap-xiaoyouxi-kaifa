@@ -29,7 +29,7 @@ export type {
   CodeLanguage,
   CodeGenTemplate,
   CodeGenRequest,
-  CodeDiff,
+  CodeLineDiff,
   CodeGenResult,
   CodeGenSuggestion,
 } from './ai-codegen-service';
