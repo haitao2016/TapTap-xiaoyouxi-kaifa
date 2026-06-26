@@ -1310,7 +1310,7 @@ export class DataEditorService {
             skillId: 'skill_heal',
             skillName: '治疗术',
             skillType: 'support',
-            damage: -150,
+            damage: 150,
             cooldown: 8,
             cost: 40,
             range: 4,
