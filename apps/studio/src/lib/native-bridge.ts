@@ -1,8 +1,4 @@
-import {
-  setNativeBridge,
-  getNativeBridge,
-  type NativeBridge,
-} from '@tapdev/core';
+import { setNativeBridge, getNativeBridge, type NativeBridge } from '@tapdev/core';
 
 function createElectronBridge(): NativeBridge | null {
   const api = window.electronAPI?.native;

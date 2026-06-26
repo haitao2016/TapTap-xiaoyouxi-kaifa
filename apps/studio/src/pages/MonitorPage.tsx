@@ -1,8 +1,25 @@
-import { Button, Badge, Card, CardHeader, CardTitle, CardContent, Icon, Tabs, TabsList, TabsTrigger, TabsContent } from '@tapdev/ui';
+import {
+  Button,
+  Badge,
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  Icon,
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+} from '@tapdev/ui';
 import { useAppStore } from '../store/app-store';
 import { monitorService } from '@tapdev/core';
 import { useEffect, useState } from 'react';
-import type { PerformanceMetrics, NetworkRequestInfo, MonitorStats, MonitorAlert } from '@tapdev/types';
+import type {
+  PerformanceMetrics,
+  NetworkRequestInfo,
+  MonitorStats,
+  MonitorAlert,
+} from '@tapdev/types';
 
 export function MonitorPage() {
   const { isMonitoring, monitorAlerts, startMonitor, stopMonitor, resolveAlert } = useAppStore();
@@ -55,9 +72,7 @@ export function MonitorPage() {
   };
 
   const avgFps = monitorService.getAverageFps();
-  const memoryPercent = metrics
-    ? ((metrics.memory / metrics.memoryLimit) * 100).toFixed(1)
-    : '0';
+  const memoryPercent = metrics ? ((metrics.memory / metrics.memoryLimit) * 100).toFixed(1) : '0';
 
   const formatTime = (ms: number) => {
     const seconds = Math.floor(ms / 1000);
@@ -99,7 +114,9 @@ export function MonitorPage() {
         </div>
         <div className="flex items-center gap-2">
           <Badge variant={isMonitoring ? 'success' : 'default'} className="hidden sm:inline-flex">
-            <span className={`mr-1 h-1.5 w-1.5 rounded-full ${isMonitoring ? 'bg-green-400 animate-pulse' : 'bg-text-muted'}`} />
+            <span
+              className={`mr-1 h-1.5 w-1.5 rounded-full ${isMonitoring ? 'bg-green-400 animate-pulse' : 'bg-text-muted'}`}
+            />
             {isMonitoring ? '监控中' : '未启动'}
           </Badge>
           {!isMonitoring ? (
@@ -152,14 +169,22 @@ export function MonitorPage() {
             label="FPS"
             value={metrics?.fps ?? '--'}
             sub={`平均: ${avgFps.toFixed(0)}`}
-            status={metrics && metrics.fps < 30 ? 'warning' : metrics && metrics.fps < 50 ? 'info' : 'ok'}
+            status={
+              metrics && metrics.fps < 30 ? 'warning' : metrics && metrics.fps < 50 ? 'info' : 'ok'
+            }
             icon="activity"
           />
           <MetricCard
             label="内存"
             value={metrics ? `${(metrics.memory / 1024 / 1024).toFixed(0)} MB` : '--'}
             sub={`使用率: ${memoryPercent}%`}
-            status={parseFloat(memoryPercent) > 85 ? 'critical' : parseFloat(memoryPercent) > 70 ? 'warning' : 'ok'}
+            status={
+              parseFloat(memoryPercent) > 85
+                ? 'critical'
+                : parseFloat(memoryPercent) > 70
+                  ? 'warning'
+                  : 'ok'
+            }
             icon="hard-drive"
           />
           <MetricCard
@@ -167,7 +192,13 @@ export function MonitorPage() {
             value={metrics?.cpuUsage ?? '--'}
             unit="%"
             sub="处理器使用率"
-            status={metrics && metrics.cpuUsage && metrics.cpuUsage > 90 ? 'critical' : metrics && metrics.cpuUsage && metrics.cpuUsage > 70 ? 'warning' : 'ok'}
+            status={
+              metrics && metrics.cpuUsage && metrics.cpuUsage > 90
+                ? 'critical'
+                : metrics && metrics.cpuUsage && metrics.cpuUsage > 70
+                  ? 'warning'
+                  : 'ok'
+            }
             icon="cpu"
           />
           <MetricCard
@@ -187,7 +218,9 @@ export function MonitorPage() {
             value={metrics?.networkLatency ?? '--'}
             unit="ms"
             sub="网络延迟"
-            status={metrics && metrics.networkLatency && metrics.networkLatency > 2000 ? 'warning' : 'ok'}
+            status={
+              metrics && metrics.networkLatency && metrics.networkLatency > 2000 ? 'warning' : 'ok'
+            }
             icon="wifi"
           />
         </div>
@@ -261,9 +294,7 @@ export function MonitorPage() {
                     <Icon name="globe" size={16} className="text-tap-orange" />
                     网络请求
                   </div>
-                  <Badge variant="default">
-                    {networkRequests.length}
-                  </Badge>
+                  <Badge variant="default">{networkRequests.length}</Badge>
                 </CardTitle>
               </CardHeader>
               <CardContent className="p-0">
@@ -294,8 +325,8 @@ export function MonitorPage() {
                               req.status >= 400
                                 ? 'error'
                                 : req.status >= 300
-                                ? 'warning'
-                                : 'success'
+                                  ? 'warning'
+                                  : 'success'
                             }
                             className="text-xs"
                           >
@@ -306,7 +337,9 @@ export function MonitorPage() {
                           <span className="font-mono text-xs">{req.method}</span>
                         </div>
                         <div className="col-span-5 truncate text-text-secondary">{req.url}</div>
-                        <div className="col-span-2 text-right font-mono text-xs">{req.duration}ms</div>
+                        <div className="col-span-2 text-right font-mono text-xs">
+                          {req.duration}ms
+                        </div>
                         <div className="col-span-2 text-right font-mono text-xs text-text-muted">
                           {formatSize(req.size)}
                         </div>
@@ -360,46 +393,51 @@ export function MonitorPage() {
                 ) : (
                   <div className="max-h-[500px] overflow-y-auto">
                     <ul className="divide-y divide-border">
-                      {filteredAlerts.slice().reverse().map((alert) => (
-                        <li
-                          key={alert.id}
-                          className={`px-4 py-3 ${alert.resolved ? 'opacity-60' : ''}`}
-                        >
-                          <div className="flex items-start justify-between gap-4">
-                            <div className="flex items-start gap-3 min-w-0">
-                              <Badge
-                                variant={
-                                  alert.severity === 'critical'
-                                    ? 'error'
-                                    : alert.severity === 'warning'
-                                    ? 'warning'
-                                    : 'info'
-                                }
-                                className="shrink-0"
-                              >
-                                {alert.type}
-                              </Badge>
-                              <div className="min-w-0">
-                                <p className={alert.resolved ? 'line-through text-text-muted' : ''}>
-                                  {alert.message}
-                                </p>
-                                <p className="mt-1 text-xs text-text-muted">
-                                  {new Date(alert.timestamp).toLocaleString()}
-                                </p>
+                      {filteredAlerts
+                        .slice()
+                        .reverse()
+                        .map((alert) => (
+                          <li
+                            key={alert.id}
+                            className={`px-4 py-3 ${alert.resolved ? 'opacity-60' : ''}`}
+                          >
+                            <div className="flex items-start justify-between gap-4">
+                              <div className="flex items-start gap-3 min-w-0">
+                                <Badge
+                                  variant={
+                                    alert.severity === 'critical'
+                                      ? 'error'
+                                      : alert.severity === 'warning'
+                                        ? 'warning'
+                                        : 'info'
+                                  }
+                                  className="shrink-0"
+                                >
+                                  {alert.type}
+                                </Badge>
+                                <div className="min-w-0">
+                                  <p
+                                    className={alert.resolved ? 'line-through text-text-muted' : ''}
+                                  >
+                                    {alert.message}
+                                  </p>
+                                  <p className="mt-1 text-xs text-text-muted">
+                                    {new Date(alert.timestamp).toLocaleString()}
+                                  </p>
+                                </div>
                               </div>
+                              {!alert.resolved && (
+                                <Button
+                                  size="sm"
+                                  variant="ghost"
+                                  onClick={() => resolveAlert(alert.id)}
+                                >
+                                  忽略
+                                </Button>
+                              )}
                             </div>
-                            {!alert.resolved && (
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => resolveAlert(alert.id)}
-                              >
-                                忽略
-                              </Button>
-                            )}
-                          </div>
-                        </li>
-                      ))}
+                          </li>
+                        ))}
                     </ul>
                   </div>
                 )}
@@ -452,9 +490,7 @@ function MetricCard({
     <div className={`rounded-xl border ${borderColors[status]} ${bgColors[status]} p-4`}>
       <div className="flex items-start justify-between">
         <div className="text-xs text-text-muted">{label}</div>
-        {icon && (
-          <Icon name={icon} size={16} className={iconColors[status]} />
-        )}
+        {icon && <Icon name={icon} size={16} className={iconColors[status]} />}
       </div>
       <div className="mt-1 flex items-baseline gap-1">
         <span className="text-2xl font-bold">{value}</span>
@@ -496,12 +532,38 @@ function FPSChart({ data }: { data: PerformanceMetrics[] }) {
 
   return (
     <svg viewBox="0 0 100 100" className="h-32 w-full" preserveAspectRatio="none">
-      <line x1="0" y1="57" x2="100" y2="57" stroke="#2e2e38" strokeWidth="0.3" strokeDasharray="2" />
-      <line x1="0" y1="28" x2="100" y2="28" stroke="#2e2e38" strokeWidth="0.2" strokeDasharray="1" />
+      <line
+        x1="0"
+        y1="57"
+        x2="100"
+        y2="57"
+        stroke="#2e2e38"
+        strokeWidth="0.3"
+        strokeDasharray="2"
+      />
+      <line
+        x1="0"
+        y1="28"
+        x2="100"
+        y2="28"
+        stroke="#2e2e38"
+        strokeWidth="0.2"
+        strokeDasharray="1"
+      />
       <polyline fill="none" stroke="#ff6b00" strokeWidth="0.8" points={points} />
-      <polyline fill="none" stroke="#6b6b7b" strokeWidth="0.5" strokeDasharray="2" points={avgPoints} />
-      <text x="2" y="55" fill="#6b6b7b" fontSize="4">30</text>
-      <text x="2" y="26" fill="#6b6b7b" fontSize="4">60</text>
+      <polyline
+        fill="none"
+        stroke="#6b6b7b"
+        strokeWidth="0.5"
+        strokeDasharray="2"
+        points={avgPoints}
+      />
+      <text x="2" y="55" fill="#6b6b7b" fontSize="4">
+        30
+      </text>
+      <text x="2" y="26" fill="#6b6b7b" fontSize="4">
+        60
+      </text>
     </svg>
   );
 }
@@ -531,10 +593,20 @@ function MemoryChart({ data }: { data: PerformanceMetrics[] }) {
 
   return (
     <svg viewBox="0 0 100 100" className="h-32 w-full" preserveAspectRatio="none">
-      <line x1="0" y1="15" x2="100" y2="15" stroke="#2e2e38" strokeWidth="0.3" strokeDasharray="2" />
+      <line
+        x1="0"
+        y1="15"
+        x2="100"
+        y2="15"
+        stroke="#2e2e38"
+        strokeWidth="0.3"
+        strokeDasharray="2"
+      />
       <polygon fill="rgba(99, 102, 241, 0.1)" points={areaPoints} />
       <polyline fill="none" stroke="#6366f1" strokeWidth="0.8" points={points} />
-      <text x="2" y="13" fill="#6b6b7b" fontSize="4">85%</text>
+      <text x="2" y="13" fill="#6b6b7b" fontSize="4">
+        85%
+      </text>
     </svg>
   );
 }
@@ -563,10 +635,20 @@ function CPUChart({ data }: { data: PerformanceMetrics[] }) {
 
   return (
     <svg viewBox="0 0 100 100" className="h-32 w-full" preserveAspectRatio="none">
-      <line x1="0" y1="30" x2="100" y2="30" stroke="#2e2e38" strokeWidth="0.3" strokeDasharray="2" />
+      <line
+        x1="0"
+        y1="30"
+        x2="100"
+        y2="30"
+        stroke="#2e2e38"
+        strokeWidth="0.3"
+        strokeDasharray="2"
+      />
       <polygon fill="rgba(34, 197, 94, 0.1)" points={areaPoints} />
       <polyline fill="none" stroke="#22c55e" strokeWidth="0.8" points={points} />
-      <text x="2" y="28" fill="#6b6b7b" fontSize="4">70%</text>
+      <text x="2" y="28" fill="#6b6b7b" fontSize="4">
+        70%
+      </text>
     </svg>
   );
 }
@@ -595,9 +677,19 @@ function LatencyChart({ data }: { data: PerformanceMetrics[] }) {
 
   return (
     <svg viewBox="0 0 100 100" className="h-32 w-full" preserveAspectRatio="none">
-      <line x1="0" y1="33" x2="100" y2="33" stroke="#2e2e38" strokeWidth="0.3" strokeDasharray="2" />
+      <line
+        x1="0"
+        y1="33"
+        x2="100"
+        y2="33"
+        stroke="#2e2e38"
+        strokeWidth="0.3"
+        strokeDasharray="2"
+      />
       <polyline fill="none" stroke="#a855f7" strokeWidth="0.8" points={points} />
-      <text x="2" y="31" fill="#6b6b7b" fontSize="4">2s</text>
+      <text x="2" y="31" fill="#6b6b7b" fontSize="4">
+        2s
+      </text>
     </svg>
   );
 }

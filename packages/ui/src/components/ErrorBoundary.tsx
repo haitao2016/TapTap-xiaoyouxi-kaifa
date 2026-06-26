@@ -67,33 +67,21 @@ export class ErrorBoundary extends Component<Props, State> {
 
             <h1 style={styles.title}>出错了</h1>
 
-            <p style={styles.message}>
-              {error?.message || '发生了一个未知错误'}
-            </p>
+            <p style={styles.message}>{error?.message || '发生了一个未知错误'}</p>
 
             {process.env.NODE_ENV === 'development' && error?.stack && (
               <details style={styles.details}>
                 <summary style={styles.summary}>查看错误详情</summary>
-                <pre style={styles.pre}>
-                  {error.stack}
-                </pre>
+                <pre style={styles.pre}>{error.stack}</pre>
               </details>
             )}
 
             <div style={styles.buttonContainer}>
-              <button
-                style={styles.primaryButton}
-                onClick={this.handleReload}
-                type="button"
-              >
+              <button style={styles.primaryButton} onClick={this.handleReload} type="button">
                 重新加载
               </button>
 
-              <button
-                style={styles.secondaryButton}
-                onClick={this.handleGoHome}
-                type="button"
-              >
+              <button style={styles.secondaryButton} onClick={this.handleGoHome} type="button">
                 返回首页
               </button>
             </div>
@@ -117,7 +105,10 @@ interface SimpleErrorBoundaryState {
   error?: Error;
 }
 
-export class SimpleErrorBoundary extends Component<SimpleErrorBoundaryProps, SimpleErrorBoundaryState> {
+export class SimpleErrorBoundary extends Component<
+  SimpleErrorBoundaryProps,
+  SimpleErrorBoundaryState
+> {
   constructor(props: SimpleErrorBoundaryProps) {
     super(props);
     this.state = { hasError: false };
@@ -144,14 +135,8 @@ export class SimpleErrorBoundary extends Component<SimpleErrorBoundaryProps, Sim
               <span style={styles.errorIcon}>!</span>
             </div>
             <h1 style={styles.title}>组件加载失败</h1>
-            <p style={styles.message}>
-              {this.state.error?.message || '未知错误'}
-            </p>
-            <button
-              style={styles.primaryButton}
-              onClick={this.handleRetry}
-              type="button"
-            >
+            <p style={styles.message}>{this.state.error?.message || '未知错误'}</p>
+            <button style={styles.primaryButton} onClick={this.handleRetry} type="button">
               重试
             </button>
           </div>

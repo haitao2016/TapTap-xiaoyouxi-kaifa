@@ -1,5 +1,19 @@
 import { useEffect, useState, useMemo } from 'react';
-import { Button, Badge, Card, CardHeader, CardTitle, CardContent, Input, Icon, Tabs, TabsList, TabsTrigger, TabsContent, Switch } from '@tapdev/ui';
+import {
+  Button,
+  Badge,
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  Input,
+  Icon,
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+  Switch,
+} from '@tapdev/ui';
 import { useAppStore } from '../store/app-store';
 import { pluginManager } from '@tapdev/core';
 import type { PluginInfo } from '@tapdev/types';
@@ -338,9 +352,7 @@ export function PluginsPage() {
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border bg-surface-1 px-4 py-3">
         <div>
           <h2 className="text-lg font-semibold">插件管理</h2>
-          <p className="text-sm text-text-secondary">
-            管理和扩展 TapDev Studio 的功能
-          </p>
+          <p className="text-sm text-text-secondary">管理和扩展 TapDev Studio 的功能</p>
         </div>
         <div className="flex items-center gap-2">
           <Badge variant="success" className="hidden sm:inline-flex">
@@ -364,7 +376,9 @@ export function PluginsPage() {
               <TabsTrigger value="installed">
                 已安装
                 {installedPlugins.length > 0 && (
-                  <Badge variant="default" className="ml-1">{installedPlugins.length}</Badge>
+                  <Badge variant="default" className="ml-1">
+                    {installedPlugins.length}
+                  </Badge>
                 )}
               </TabsTrigger>
             </TabsList>
@@ -406,7 +420,11 @@ export function PluginsPage() {
 
               {loading && plugins.length === 0 ? (
                 <div className="py-12 text-center">
-                  <Icon name="loader" size={32} className="mx-auto mb-3 animate-spin text-text-muted" />
+                  <Icon
+                    name="loader"
+                    size={32}
+                    className="mx-auto mb-3 animate-spin text-text-muted"
+                  />
                   <p className="text-text-secondary">加载插件中...</p>
                 </div>
               ) : filteredMarketPlugins.length === 0 ? (
@@ -485,7 +503,11 @@ export function PluginsPage() {
             <div className="p-4">
               {loading && plugins.length === 0 ? (
                 <div className="py-12 text-center">
-                  <Icon name="loader" size={32} className="mx-auto mb-3 animate-spin text-text-muted" />
+                  <Icon
+                    name="loader"
+                    size={32}
+                    className="mx-auto mb-3 animate-spin text-text-muted"
+                  />
                   <p className="text-text-secondary">加载插件中...</p>
                 </div>
               ) : installedPlugins.length === 0 ? (
@@ -493,10 +515,7 @@ export function PluginsPage() {
                   <Icon name="puzzle" size={40} className="mx-auto mb-3 text-text-muted" />
                   <p className="text-text-secondary">暂无已安装的插件</p>
                   <p className="mt-1 text-xs text-text-muted">前往插件市场发现更多功能</p>
-                  <Button
-                    className="mt-4"
-                    onClick={() => setActiveTab('market')}
-                  >
+                  <Button className="mt-4" onClick={() => setActiveTab('market')}>
                     浏览插件市场
                   </Button>
                 </div>

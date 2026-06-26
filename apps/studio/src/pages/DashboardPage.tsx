@@ -19,7 +19,8 @@ interface DashboardStats {
 }
 
 export function DashboardPage() {
-  const { currentProject, openProject, createProject, startDebug, startBuild, settings } = useAppStore();
+  const { currentProject, openProject, createProject, startDebug, startBuild, settings } =
+    useAppStore();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -58,9 +59,21 @@ export function DashboardPage() {
       setRecentBuilds(allBuilds.slice(0, 5));
 
       const mockRecentFiles: RecentFile[] = [
-        { path: 'Assets/Scripts/GameManager.cs', name: 'GameManager.cs', lastOpened: Date.now() - 300000 },
-        { path: 'Assets/Scripts/PlayerController.cs', name: 'PlayerController.cs', lastOpened: Date.now() - 600000 },
-        { path: 'tapdev.config.json', name: 'tapdev.config.json', lastOpened: Date.now() - 1800000 },
+        {
+          path: 'Assets/Scripts/GameManager.cs',
+          name: 'GameManager.cs',
+          lastOpened: Date.now() - 300000,
+        },
+        {
+          path: 'Assets/Scripts/PlayerController.cs',
+          name: 'PlayerController.cs',
+          lastOpened: Date.now() - 600000,
+        },
+        {
+          path: 'tapdev.config.json',
+          name: 'tapdev.config.json',
+          lastOpened: Date.now() - 1800000,
+        },
         { path: 'Assets/Scenes/Main.unity', name: 'Main.unity', lastOpened: Date.now() - 3600000 },
       ];
       setRecentFiles(mockRecentFiles);
@@ -158,7 +171,9 @@ export function DashboardPage() {
           icon="build"
           trend={`${stats.successBuilds > 0 ? Math.round((stats.successBuilds / Math.max(stats.totalBuilds, 1)) * 100) : 0}%`}
           trendLabel="成功率"
-          trendPositive={stats.successBuilds > 0 && (stats.successBuilds / Math.max(stats.totalBuilds, 1)) >= 0.8}
+          trendPositive={
+            stats.successBuilds > 0 && stats.successBuilds / Math.max(stats.totalBuilds, 1) >= 0.8
+          }
         />
         <StatCard
           label="活跃插件"
@@ -225,7 +240,11 @@ export function DashboardPage() {
               <InfoItem label="路径" value={currentProject.path} />
               <InfoItem
                 label="上次打开"
-                value={currentProject.lastOpenedAt ? new Date(currentProject.lastOpenedAt).toLocaleString() : '--'}
+                value={
+                  currentProject.lastOpenedAt
+                    ? new Date(currentProject.lastOpenedAt).toLocaleString()
+                    : '--'
+                }
               />
             </div>
             <div className="mt-4 flex flex-wrap gap-2">
@@ -316,19 +335,17 @@ export function DashboardPage() {
                           build.status === 'success'
                             ? 'success'
                             : build.status === 'failed'
-                            ? 'error'
-                            : build.status === 'running'
-                            ? 'info'
-                            : 'default'
+                              ? 'error'
+                              : build.status === 'running'
+                                ? 'info'
+                                : 'default'
                         }
                         className="shrink-0"
                       >
                         {build.status}
                       </Badge>
                       <div className="min-w-0 flex-1">
-                        <div className="truncate text-sm font-medium">
-                          v{build.config.version}
-                        </div>
+                        <div className="truncate text-sm font-medium">v{build.config.version}</div>
                         <div className="truncate text-xs text-text-muted">
                           {build.startedAt ? new Date(build.startedAt).toLocaleString() : '--'}
                         </div>
@@ -369,7 +386,9 @@ export function DashboardPage() {
                     <Icon name="folder" size={20} className="text-tap-orange" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="truncate text-sm font-medium">{project.name || project.path}</div>
+                    <div className="truncate text-sm font-medium">
+                      {project.name || project.path}
+                    </div>
                     <div className="truncate text-xs text-text-muted">{project.path}</div>
                   </div>
                 </button>
@@ -480,15 +499,7 @@ function InfoItem({ label, value }: { label: string; value: string }) {
   );
 }
 
-function FeatureCard({
-  title,
-  icon,
-  items,
-}: {
-  title: string;
-  icon: string;
-  items: string[];
-}) {
+function FeatureCard({ title, icon, items }: { title: string; icon: string; items: string[] }) {
   return (
     <Card>
       <CardHeader>

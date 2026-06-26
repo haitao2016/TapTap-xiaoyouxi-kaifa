@@ -85,10 +85,7 @@ export function Slider({
       onMouseDown={handleMouseDown}
     >
       <div className="relative h-2 w-full grow overflow-hidden rounded-full bg-surface-3">
-        <div
-          className="absolute h-full bg-tap-orange"
-          style={{ width: `${percent}%` }}
-        />
+        <div className="absolute h-full bg-tap-orange" style={{ width: `${percent}%` }} />
       </div>
       <div
         className="absolute h-5 w-5 rounded-full border-2 border-tap-orange bg-white shadow-md transition-transform hover:scale-110 focus:outline-none focus:ring-2 focus:ring-tap-orange focus:ring-offset-2"
