@@ -1,5 +1,5 @@
 import { globalEventBus } from './event-bus';
-import { randomUUID, createHash } from 'node:crypto';
+import { randomUUID, generateHash } from './utils/crypto-utils';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
@@ -173,7 +173,7 @@ export class CloudSyncService {
   }
 
   private computeHash(content: string): string {
-    return createHash('sha256').update(content).digest('hex');
+    return generateHash('sha256').update(content).digest('hex');
   }
 
   addSyncItem(type: string, data: any): string {

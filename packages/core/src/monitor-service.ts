@@ -6,7 +6,7 @@ import type {
   NetworkRequestInfo,
 } from '@tapdev/types';
 import { globalEventBus } from './event-bus';
-import { randomUUID } from 'node:crypto';
+import { randomUUID } from './utils/crypto-utils';
 
 const DEFAULT_THRESHOLDS: MonitorThresholds = {
   fps: 30,

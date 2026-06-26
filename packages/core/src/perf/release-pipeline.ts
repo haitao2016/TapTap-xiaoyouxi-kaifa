@@ -6,7 +6,7 @@
  * - 桌面端自动更新
  */
 import { globalEventBus } from '../event-bus';
-import { randomUUID } from 'node:crypto';
+import { randomUUID } from '../utils/crypto-utils';
 
 export type Platform = 'windows' | 'macos' | 'linux' | 'android' | 'ios' | 'web';
 

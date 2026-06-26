@@ -8,7 +8,7 @@ import type {
 } from '@tapdev/types';
 import { globalEventBus } from './event-bus';
 import { debugWebSocketClient } from './debug-client';
-import { randomUUID } from 'node:crypto';
+import { randomUUID } from './utils/crypto-utils';
 
 export interface StartDebugOptions {
   projectId: string;

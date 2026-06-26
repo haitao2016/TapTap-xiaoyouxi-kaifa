@@ -7,7 +7,7 @@
  * - 项目共享
  */
 import { globalEventBus } from '../event-bus';
-import { randomUUID } from 'node:crypto';
+import { randomUUID } from '../utils/crypto-utils';
 
 export type TeamRole = 'owner' | 'admin' | 'developer' | 'viewer';
 
