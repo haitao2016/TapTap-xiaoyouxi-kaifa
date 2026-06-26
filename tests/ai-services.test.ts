@@ -79,7 +79,7 @@ describe('Phase 7: AI Services', () => {
 
   describe('AICodeGenService', () => {
     it('should generate code from description', async () => {
-      const result = await aiCodeGenService.generate({
+      const result = await aiCodeGenService.generateCode({
         id: 'g1',
         action: 'generate',
         prompt: 'Create a function that returns hello world',
@@ -90,7 +90,7 @@ describe('Phase 7: AI Services', () => {
     });
 
     it('should generate test code', async () => {
-      const result = await aiCodeGenService.generate({
+      const result = await aiCodeGenService.generateCode({
         id: 'g2',
         action: 'test',
         prompt: '',
@@ -102,7 +102,7 @@ describe('Phase 7: AI Services', () => {
     });
 
     it('should produce diffs for refactor', async () => {
-      const result = await aiCodeGenService.generate({
+      const result = await aiCodeGenService.generateCode({
         id: 'g3',
         action: 'refactor',
         prompt: 'Use arrow functions',
