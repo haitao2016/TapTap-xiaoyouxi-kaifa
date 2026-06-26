@@ -26,7 +26,12 @@ export function exec(_command: string, _options: any, callback?: Function): any 
   return { on: () => {}, kill: () => {} };
 }
 
-export function execFile(_file: string, _args?: string[], _options?: any, callback?: Function): any {
+export function execFile(
+  _file: string,
+  _args?: string[],
+  _options?: any,
+  callback?: Function
+): any {
   if (typeof _options === 'function') {
     callback = _options;
   }

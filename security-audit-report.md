@@ -1,14 +1,14 @@
 # 安全审计报告
 
-生成时间: 2026-06-24T07:47:55.243Z
+生成时间: 2026-06-26T08:56:26.938Z
 项目: TapDev Studio v0.2.0
 
 ## 依赖统计
 
-- 总依赖数: 3
+- 总依赖数: 12
 - 内部包 (@tapdev): 0
 - Capacitor 插件: 0
-- 类型定义: 1
+- 类型定义: 3
 
 ## 依赖清单
 
@@ -28,12 +28,22 @@
 无
 
 ### 其他依赖
+- @playwright/test
+- eslint
+- eslint-config-prettier
+- eslint-plugin-prettier
 - jest
+- playwright
+- prettier
 - ts-jest
+- typescript
 
 ## 高风险检查
 
-✅ 未发现高风险代码模式
+⚠️  发现 3 处潜在风险:
+- /packages/core/src/debug-service.ts: 动态代码执行
+- /packages/core/src/plugin-sandbox.ts: 动态代码执行
+- /packages/core/src/watch-service.ts: 动态代码执行
 
 ## 建议
 

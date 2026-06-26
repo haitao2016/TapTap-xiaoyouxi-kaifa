@@ -1,5 +1,18 @@
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, Button, Icon, Input, Tabs, TabsList, TabsTrigger, TabsContent, Badge } from '@tapdev/ui';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Button,
+  Icon,
+  Input,
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+  Badge,
+} from '@tapdev/ui';
 import { teamService, cloudSyncService, collabService } from '@tapdev/core';
 import type { Team, TeamMember } from '@tapdev/core';
 
@@ -177,9 +190,7 @@ function TeamPanel() {
                       <div className="text-sm font-medium text-text-primary truncate">
                         {member.name || member.email}
                       </div>
-                      <div className="text-xs text-text-muted truncate">
-                        {member.email}
-                      </div>
+                      <div className="text-xs text-text-muted truncate">{member.email}</div>
                     </div>
                     <span className={`text-xs px-2 py-1 rounded ${roleColors[member.role] || ''}`}>
                       {roleLabels[member.role] || member.role}
@@ -201,15 +212,18 @@ function TeamPanel() {
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
-                {teamService.getPermissions().slice(0, 8).map((perm) => (
-                  <div key={perm.id} className="flex items-center justify-between py-2">
-                    <div>
-                      <div className="text-sm text-text-primary">{perm.name}</div>
-                      <div className="text-xs text-text-muted">{perm.description}</div>
+                {teamService
+                  .getPermissions()
+                  .slice(0, 8)
+                  .map((perm) => (
+                    <div key={perm.id} className="flex items-center justify-between py-2">
+                      <div>
+                        <div className="text-sm text-text-primary">{perm.name}</div>
+                        <div className="text-xs text-text-muted">{perm.description}</div>
+                      </div>
+                      <Badge variant="info">{perm.category}</Badge>
                     </div>
-                    <Badge variant="info">{perm.category}</Badge>
-                  </div>
-                ))}
+                  ))}
               </div>
             </CardContent>
           </Card>
@@ -275,8 +289,14 @@ function CloudSyncPanel() {
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-4 p-4 bg-surface-0 rounded-xl">
-              <div className={`w-12 h-12 rounded-full bg-surface-2 flex items-center justify-center ${status.color}`}>
-                <Icon name={status.icon} size={24} className={syncStatus === 'syncing' ? 'animate-spin' : ''} />
+              <div
+                className={`w-12 h-12 rounded-full bg-surface-2 flex items-center justify-center ${status.color}`}
+              >
+                <Icon
+                  name={status.icon}
+                  size={24}
+                  className={syncStatus === 'syncing' ? 'animate-spin' : ''}
+                />
               </div>
               <div className="flex-1">
                 <div className="text-lg font-semibold text-text-primary">{status.label}</div>
@@ -306,7 +326,10 @@ function CloudSyncPanel() {
               <span className="text-sm font-medium text-text-primary">2.3 GB / 10 GB</span>
             </div>
             <div className="w-full h-3 bg-surface-2 rounded-full overflow-hidden">
-              <div className="h-full bg-gradient-to-r from-purple-500 to-tap-orange rounded-full" style={{ width: '23%' }} />
+              <div
+                className="h-full bg-gradient-to-r from-purple-500 to-tap-orange rounded-full"
+                style={{ width: '23%' }}
+              />
             </div>
             <div className="grid grid-cols-4 gap-2 mt-4">
               <div className="text-center p-2 bg-surface-0 rounded-lg">
@@ -379,13 +402,24 @@ function CloudSyncPanel() {
                 { file: 'Packages/manifest.json', time: '1 小时前', action: '冲突合并' },
                 { file: 'Assets/Art/player.png', time: '2 小时前', action: '上传' },
               ].map((item, i) => (
-                <div key={i} className="flex items-center justify-between py-2 border-b border-border last:border-0">
+                <div
+                  key={i}
+                  className="flex items-center justify-between py-2 border-b border-border last:border-0"
+                >
                   <div className="flex items-center gap-3">
                     <Icon name="file" size={16} className="text-text-muted" />
                     <span className="text-sm text-text-primary">{item.file}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Badge variant={item.action === '上传' ? 'success' : item.action === '下载' ? 'info' : 'warning'}>
+                    <Badge
+                      variant={
+                        item.action === '上传'
+                          ? 'success'
+                          : item.action === '下载'
+                            ? 'info'
+                            : 'warning'
+                      }
+                    >
                       {item.action}
                     </Badge>
                     <span className="text-xs text-text-muted">{item.time}</span>
@@ -450,7 +484,9 @@ function CollabPanel() {
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-3 p-4 bg-surface-0 rounded-xl mb-4">
-              <div className={`w-3 h-3 rounded-full ${isCollabActive ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`} />
+              <div
+                className={`w-3 h-3 rounded-full ${isCollabActive ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`}
+              />
               <span className="text-sm text-text-primary">
                 {isCollabActive ? '协作已开启，其他人可以实时编辑' : '协作未开启'}
               </span>

@@ -1,5 +1,18 @@
 import { useState, useRef, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle, Button, Icon, Input, Tabs, TabsList, TabsTrigger, TabsContent, Badge } from '@tapdev/ui';
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  Button,
+  Icon,
+  Input,
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+  Badge,
+} from '@tapdev/ui';
 import { aiAssistantService, aiCodeGenService, codeReviewService } from '@tapdev/core';
 import type { ChatMessage, ChatSession } from '@tapdev/core';
 import type { CodeGenAction, CodeGenResult, CodeLanguage } from '@tapdev/core';
@@ -190,9 +203,7 @@ function ChatPanel() {
               </div>
             </div>
           ) : (
-            messages.map((msg) => (
-              <ChatMessageBubble key={msg.id} message={msg} />
-            ))
+            messages.map((msg) => <ChatMessageBubble key={msg.id} message={msg} />)
           )}
           <div ref={messagesEndRef} />
         </div>
@@ -202,7 +213,9 @@ function ChatPanel() {
             <Input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), sendMessage())}
+              onKeyDown={(e) =>
+                e.key === 'Enter' && !e.shiftKey && (e.preventDefault(), sendMessage())
+              }
               placeholder="输入你的问题..."
               className="flex-1"
             />
@@ -231,7 +244,11 @@ function ChatMessageBubble({ message }: { message: ChatMessage }) {
           isUser ? 'bg-tap-orange/20' : 'bg-surface-2'
         }`}
       >
-        <Icon name={isUser ? 'user' : 'sparkles'} size={16} className={isUser ? 'text-tap-orange' : 'text-text-secondary'} />
+        <Icon
+          name={isUser ? 'user' : 'sparkles'}
+          size={16}
+          className={isUser ? 'text-tap-orange' : 'text-text-secondary'}
+        />
       </div>
       <div
         className={`max-w-[75%] px-4 py-3 rounded-2xl ${
@@ -263,7 +280,15 @@ function CodeGenPanel() {
     { value: 'document', label: '文档', icon: 'book' },
   ];
 
-  const languages: CodeLanguage[] = ['typescript', 'javascript', 'csharp', 'lua', 'python', 'html', 'css'];
+  const languages: CodeLanguage[] = [
+    'typescript',
+    'javascript',
+    'csharp',
+    'lua',
+    'python',
+    'html',
+    'css',
+  ];
 
   const generate = async () => {
     if (!prompt.trim() || isLoading) return;
@@ -400,7 +425,9 @@ function CodeGenPanel() {
                     {result.suggestions.map((s, i) => (
                       <div key={i} className="p-3 bg-surface-2 rounded-lg">
                         <div className="text-sm font-medium text-text-primary flex items-center gap-2">
-                          <Badge variant={s.severity === 'warning' ? 'warning' : 'info'}>{s.severity}</Badge>
+                          <Badge variant={s.severity === 'warning' ? 'warning' : 'info'}>
+                            {s.severity}
+                          </Badge>
                           {s.title}
                         </div>
                         <p className="text-sm text-text-secondary mt-1">{s.description}</p>
@@ -515,7 +542,9 @@ function processUserData(user) {
                   </CardHeader>
                   <CardContent>
                     <div className="flex items-center gap-4">
-                      <div className="text-4xl font-bold text-tap-orange">{result.summary?.score ?? 85}</div>
+                      <div className="text-4xl font-bold text-tap-orange">
+                        {result.summary?.score ?? 85}
+                      </div>
                       <div>
                         <div className="text-sm text-text-primary">代码质量</div>
                         <div className="text-xs text-text-muted">满分 100</div>
@@ -523,19 +552,27 @@ function processUserData(user) {
                     </div>
                     <div className="grid grid-cols-4 gap-2 mt-4">
                       <div className="text-center p-2 bg-surface-2 rounded-lg">
-                        <div className="text-lg font-semibold text-text-primary">{result.summary?.total ?? 0}</div>
+                        <div className="text-lg font-semibold text-text-primary">
+                          {result.summary?.total ?? 0}
+                        </div>
                         <div className="text-xs text-text-muted">总问题</div>
                       </div>
                       <div className="text-center p-2 bg-red-50 dark:bg-red-900/20 rounded-lg">
-                        <div className="text-lg font-semibold text-red-500">{result.summary?.errors ?? 0}</div>
+                        <div className="text-lg font-semibold text-red-500">
+                          {result.summary?.errors ?? 0}
+                        </div>
                         <div className="text-xs text-text-muted">错误</div>
                       </div>
                       <div className="text-center p-2 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
-                        <div className="text-lg font-semibold text-yellow-600">{result.summary?.warnings ?? 0}</div>
+                        <div className="text-lg font-semibold text-yellow-600">
+                          {result.summary?.warnings ?? 0}
+                        </div>
                         <div className="text-xs text-text-muted">警告</div>
                       </div>
                       <div className="text-center p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-                        <div className="text-lg font-semibold text-blue-500">{result.summary?.info ?? 0}</div>
+                        <div className="text-lg font-semibold text-blue-500">
+                          {result.summary?.info ?? 0}
+                        </div>
                         <div className="text-xs text-text-muted">建议</div>
                       </div>
                     </div>
@@ -556,11 +593,22 @@ function processUserData(user) {
                                   : 'bg-blue-100 text-blue-600'
                             }`}
                           >
-                            <Icon name={issue.severity === 'error' ? 'alert-circle' : issue.severity === 'warning' ? 'alert-triangle' : 'info'} size={16} />
+                            <Icon
+                              name={
+                                issue.severity === 'error'
+                                  ? 'alert-circle'
+                                  : issue.severity === 'warning'
+                                    ? 'alert-triangle'
+                                    : 'info'
+                              }
+                              size={16}
+                            />
                           </div>
                           <div className="flex-1">
                             <div className="flex items-center gap-2">
-                              <span className="text-sm font-medium text-text-primary">{issue.ruleName}</span>
+                              <span className="text-sm font-medium text-text-primary">
+                                {issue.ruleName}
+                              </span>
                               <Badge variant="default">{issue.category}</Badge>
                             </div>
                             <p className="text-sm text-text-secondary mt-1">{issue.message}</p>
@@ -576,7 +624,9 @@ function processUserData(user) {
                               </div>
                             )}
                             {issue.startLine && (
-                              <div className="text-xs text-text-muted mt-2">第 {issue.startLine} - {issue.endLine} 行</div>
+                              <div className="text-xs text-text-muted mt-2">
+                                第 {issue.startLine} - {issue.endLine} 行
+                              </div>
                             )}
                           </div>
                         </div>
@@ -587,7 +637,11 @@ function processUserData(user) {
                   <Card>
                     <CardContent>
                       <div className="text-center py-8">
-                        <Icon name="check-circle" size={48} className="mx-auto mb-3 text-green-500" />
+                        <Icon
+                          name="check-circle"
+                          size={48}
+                          className="mx-auto mb-3 text-green-500"
+                        />
                         <div className="text-sm font-medium text-text-primary">代码质量良好</div>
                         <div className="text-xs text-text-muted mt-1">未发现明显问题</div>
                       </div>
@@ -604,19 +658,27 @@ function processUserData(user) {
                       <div className="grid grid-cols-2 gap-3">
                         <div className="p-3 bg-surface-2 rounded-lg">
                           <div className="text-xs text-text-muted">代码行数</div>
-                          <div className="text-lg font-semibold text-text-primary">{result.metrics.linesOfCode}</div>
+                          <div className="text-lg font-semibold text-text-primary">
+                            {result.metrics.linesOfCode}
+                          </div>
                         </div>
                         <div className="p-3 bg-surface-2 rounded-lg">
                           <div className="text-xs text-text-muted">圈复杂度</div>
-                          <div className="text-lg font-semibold text-text-primary">{result.metrics.cyclomaticComplexity}</div>
+                          <div className="text-lg font-semibold text-text-primary">
+                            {result.metrics.cyclomaticComplexity}
+                          </div>
                         </div>
                         <div className="p-3 bg-surface-2 rounded-lg">
                           <div className="text-xs text-text-muted">可维护性指数</div>
-                          <div className="text-lg font-semibold text-text-primary">{result.metrics.maintainabilityIndex}</div>
+                          <div className="text-lg font-semibold text-text-primary">
+                            {result.metrics.maintainabilityIndex}
+                          </div>
                         </div>
                         <div className="p-3 bg-surface-2 rounded-lg">
                           <div className="text-xs text-text-muted">重复行数</div>
-                          <div className="text-lg font-semibold text-text-primary">{result.metrics.duplicateLines}</div>
+                          <div className="text-lg font-semibold text-text-primary">
+                            {result.metrics.duplicateLines}
+                          </div>
                         </div>
                       </div>
                     </CardContent>

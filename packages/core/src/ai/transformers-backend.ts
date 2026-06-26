@@ -29,9 +29,10 @@ export class TransformersBackend {
 
       return {
         supported: true,
-        wasmSimd: typeof WebAssembly !== 'undefined' &&
-                 'SIMD' in WebAssembly &&
-                 typeof WebAssembly.SIMD !== 'undefined',
+        wasmSimd:
+          typeof WebAssembly !== 'undefined' &&
+          'SIMD' in (WebAssembly as any) &&
+          typeof (WebAssembly as any).SIMD !== 'undefined',
         threads: navigator.hardwareConcurrency || 4,
       };
     } catch {
@@ -46,15 +47,14 @@ export class TransformersBackend {
   /**
    * 加载模型 (Transformers.js)
    */
-  async loadModel(
-    modelInfo: GGUFModelInfo,
-    options?: ModelLoadOptions
-  ): Promise<boolean> {
+  async loadModel(modelInfo: GGUFModelInfo, options?: ModelLoadOptions): Promise<boolean> {
     try {
       const { pipeline, env } = await import('@huggingface/transformers');
 
       // 配置 WASM 后端
-      env.backends.onnx.wasm.numThreads = navigator.hardwareConcurrency || 4;
+      if (env.backends?.onnx?.wasm) {
+        env.backends.onnx.wasm.numThreads = navigator.hardwareConcurrency || 4;
+      }
 
       options?.onProgress?.({
         stage: 'loading',

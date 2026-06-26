@@ -193,6 +193,47 @@ export function accessSync(path: string, _mode?: number): void {
   }
 }
 
+// === File descriptor API ===
+
+const fdMap = new Map<number, string>();
+let nextFd = 100;
+
+export function openSync(path: string, _flags?: string, _mode?: number): number {
+  const normalized = normalizePath(path);
+  if (!memoryFs.has(normalized)) {
+    memoryFs.set(normalized, '');
+  }
+  const fd = nextFd++;
+  fdMap.set(fd, normalized);
+  return fd;
+}
+
+export function readSync(
+  fd: number,
+  buffer: Buffer,
+  offset: number,
+  length: number,
+  position: number | null
+): number {
+  const path = fdMap.get(fd);
+  if (!path) {
+    const err = new Error('EBADF: bad file descriptor') as any;
+    err.code = 'EBADF';
+    throw err;
+  }
+  const content = memoryFs.get(path);
+  if (!content) return 0;
+  const buf = Buffer.isBuffer(content) ? content : Buffer.from(content);
+  const start = position ?? 0;
+  const bytesRead = Math.min(length, buf.length - start);
+  buf.copy(buffer, offset, start, start + bytesRead);
+  return bytesRead;
+}
+
+export function closeSync(fd: number): void {
+  fdMap.delete(fd);
+}
+
 // === Stream API ===
 
 export function createReadStream(path: string, _options?: any): any {
@@ -306,4 +347,7 @@ export default {
   accessSync,
   unlinkSync,
   rmdirSync,
+  openSync,
+  readSync,
+  closeSync,
 };

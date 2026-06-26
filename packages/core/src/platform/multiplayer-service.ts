@@ -1037,7 +1037,9 @@ export class MultiplayerService {
   }
 
   listGameModeCategories(): string[] {
-    const categories = new Set(Array.from(this.templates.values()).map((t: GameModeTemplate) => t.category));
+    const categories = new Set(
+      Array.from(this.templates.values()).map((t: GameModeTemplate) => t.category)
+    );
     return Array.from(categories) as string[];
   }
 }

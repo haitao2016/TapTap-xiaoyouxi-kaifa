@@ -10,19 +10,177 @@ export {};
 // GPU-related types
 declare type GPUAddressMode = 'clamp-to-edge' | 'repeat' | 'mirror-repeat';
 declare type GPUFilterMode = 'nearest' | 'linear';
-declare type GPUCompareFunction = 'never' | 'less' | 'equal' | 'less-equal' | 'greater' | 'not-equal' | 'greater-equal' | 'always';
-declare type GPUPrimitiveTopology = 'point-list' | 'line-list' | 'line-strip' | 'triangle-list' | 'triangle-strip';
+declare type GPUCompareFunction =
+  | 'never'
+  | 'less'
+  | 'equal'
+  | 'less-equal'
+  | 'greater'
+  | 'not-equal'
+  | 'greater-equal'
+  | 'always';
+declare type GPUPrimitiveTopology =
+  | 'point-list'
+  | 'line-list'
+  | 'line-strip'
+  | 'triangle-list'
+  | 'triangle-strip';
 declare type GPUCullMode = 'none' | 'front' | 'back';
 declare type GPUFrontFace = 'ccw' | 'cw';
 declare type GPUIndexFormat = 'uint16' | 'uint32';
-declare type GPUVertexFormat = 'uint8x2' | 'uint8x4' | 'sint8x2' | 'sint8x4' | 'unorm8x2' | 'unorm8x4' | 'snorm8x2' | 'snorm8x4' | 'uint16x2' | 'uint16x4' | 'sint16x2' | 'sint16x4' | 'unorm16x2' | 'unorm16x4' | 'snorm16x2' | 'snorm16x4' | 'float16x2' | 'float16x4' | 'float32' | 'float32x2' | 'float32x3' | 'float32x4' | 'uint32' | 'uint32x2' | 'uint32x3' | 'uint32x4' | 'sint32' | 'sint32x2' | 'sint32x3' | 'sint32x4';
-declare type GPUTextureFormat = 'r8unorm' | 'r8snorm' | 'r8uint' | 'r8sint' | 'r16uint' | 'r16sint' | 'r16float' | 'rg8unorm' | 'rg8snorm' | 'rg8uint' | 'rg8sint' | 'rgba8unorm' | 'rgba8unorm-srgb' | 'rgba8snorm' | 'rgba8uint' | 'rgba8sint' | 'bgra8unorm' | 'bgra8unorm-srgb' | 'pcmfloat16x2' | 'pcmfloat16x4' | 'pcmfloat32' | 'pcmfloat32x2' | 'pcmfloat32x3' | 'pcmfloat32x4' | 'pcmuint16' | 'pcmuint16x2' | 'pcmuint16x3' | 'pcmuint16x4' | 'pcmuint32' | 'pcmuint32x2' | 'pcmuint32x3' | 'pcmuint32x4' | 'pcmusint16' | 'pcmusint16x2' | 'pcmusint16x3' | 'pcmusint16x4' | 'depth32float' | 'depth24plus' | 'depth24plus-stencil8' | 'depth32float-stencil8' | 'bc1-rgbaunorm' | 'bc1-rgbaunorm-srgb' | 'bc2-rgbaunorm' | 'bc2-rgbaunorm-srgb' | 'bc3-rgbaunorm' | 'bc3-rgbaunorm-srgb' | 'bc4-runorm' | 'bc4-rsnorm' | 'bc5-runorm' | 'bc5-rsnorm' | 'bc6h-rgbunorm' | 'bc6h-rgbfloat' | 'bc7-rgbaunorm' | 'bc7-rgbaunorm-srgb' | 'etc2-rgb8unorm' | 'etc2-rgb8unorm-srgb' | 'etc2-rgb8a1unorm' | 'etc2-rgba8unorm' | 'eac-r11unorm' | 'eac-r11snorm' | 'eac-rg11unorm' | 'eac-rg11snorm' | 'astc-4x4-unorm' | 'astc-4x4-unorm-srgb' | 'astc-5x4-unorm' | 'astc-5x4-unorm-srgb' | 'astc-5x5-unorm' | 'astc-5x5-unorm-srgb' | 'astc-6x5-unorm' | 'astc-6x5-unorm-srgb' | 'astc-6x6-unorm' | 'astc-6x6-unorm-srgb' | 'astc-8x5-unorm' | 'astc-8x5-unorm-srgb' | 'astc-8x6-unorm' | 'astc-8x6-unorm-srgb' | 'astc-8x8-unorm' | 'astc-8x8-unorm-srgb' | 'astc-10x5-unorm' | 'astc-10x5-unorm-srgb' | 'astc-10x6-unorm' | 'astc-10x6-unorm-srgb' | 'astc-10x8-unorm' | 'astc-10x8-unorm-srgb' | 'astc-10x10-unorm' | 'astc-10x10-unorm-srgb' | 'astc-12x10-unorm' | 'astc-12x10-unorm-srgb' | 'astc-12x12-unorm' | 'astc-12x12-unorm-srgb';
+declare type GPUVertexFormat =
+  | 'uint8x2'
+  | 'uint8x4'
+  | 'sint8x2'
+  | 'sint8x4'
+  | 'unorm8x2'
+  | 'unorm8x4'
+  | 'snorm8x2'
+  | 'snorm8x4'
+  | 'uint16x2'
+  | 'uint16x4'
+  | 'sint16x2'
+  | 'sint16x4'
+  | 'unorm16x2'
+  | 'unorm16x4'
+  | 'snorm16x2'
+  | 'snorm16x4'
+  | 'float16x2'
+  | 'float16x4'
+  | 'float32'
+  | 'float32x2'
+  | 'float32x3'
+  | 'float32x4'
+  | 'uint32'
+  | 'uint32x2'
+  | 'uint32x3'
+  | 'uint32x4'
+  | 'sint32'
+  | 'sint32x2'
+  | 'sint32x3'
+  | 'sint32x4';
+declare type GPUTextureFormat =
+  | 'r8unorm'
+  | 'r8snorm'
+  | 'r8uint'
+  | 'r8sint'
+  | 'r16uint'
+  | 'r16sint'
+  | 'r16float'
+  | 'rg8unorm'
+  | 'rg8snorm'
+  | 'rg8uint'
+  | 'rg8sint'
+  | 'rgba8unorm'
+  | 'rgba8unorm-srgb'
+  | 'rgba8snorm'
+  | 'rgba8uint'
+  | 'rgba8sint'
+  | 'bgra8unorm'
+  | 'bgra8unorm-srgb'
+  | 'pcmfloat16x2'
+  | 'pcmfloat16x4'
+  | 'pcmfloat32'
+  | 'pcmfloat32x2'
+  | 'pcmfloat32x3'
+  | 'pcmfloat32x4'
+  | 'pcmuint16'
+  | 'pcmuint16x2'
+  | 'pcmuint16x3'
+  | 'pcmuint16x4'
+  | 'pcmuint32'
+  | 'pcmuint32x2'
+  | 'pcmuint32x3'
+  | 'pcmuint32x4'
+  | 'pcmusint16'
+  | 'pcmusint16x2'
+  | 'pcmusint16x3'
+  | 'pcmusint16x4'
+  | 'depth32float'
+  | 'depth24plus'
+  | 'depth24plus-stencil8'
+  | 'depth32float-stencil8'
+  | 'bc1-rgbaunorm'
+  | 'bc1-rgbaunorm-srgb'
+  | 'bc2-rgbaunorm'
+  | 'bc2-rgbaunorm-srgb'
+  | 'bc3-rgbaunorm'
+  | 'bc3-rgbaunorm-srgb'
+  | 'bc4-runorm'
+  | 'bc4-rsnorm'
+  | 'bc5-runorm'
+  | 'bc5-rsnorm'
+  | 'bc6h-rgbunorm'
+  | 'bc6h-rgbfloat'
+  | 'bc7-rgbaunorm'
+  | 'bc7-rgbaunorm-srgb'
+  | 'etc2-rgb8unorm'
+  | 'etc2-rgb8unorm-srgb'
+  | 'etc2-rgb8a1unorm'
+  | 'etc2-rgba8unorm'
+  | 'eac-r11unorm'
+  | 'eac-r11snorm'
+  | 'eac-rg11unorm'
+  | 'eac-rg11snorm'
+  | 'astc-4x4-unorm'
+  | 'astc-4x4-unorm-srgb'
+  | 'astc-5x4-unorm'
+  | 'astc-5x4-unorm-srgb'
+  | 'astc-5x5-unorm'
+  | 'astc-5x5-unorm-srgb'
+  | 'astc-6x5-unorm'
+  | 'astc-6x5-unorm-srgb'
+  | 'astc-6x6-unorm'
+  | 'astc-6x6-unorm-srgb'
+  | 'astc-8x5-unorm'
+  | 'astc-8x5-unorm-srgb'
+  | 'astc-8x6-unorm'
+  | 'astc-8x6-unorm-srgb'
+  | 'astc-8x8-unorm'
+  | 'astc-8x8-unorm-srgb'
+  | 'astc-10x5-unorm'
+  | 'astc-10x5-unorm-srgb'
+  | 'astc-10x6-unorm'
+  | 'astc-10x6-unorm-srgb'
+  | 'astc-10x8-unorm'
+  | 'astc-10x8-unorm-srgb'
+  | 'astc-10x10-unorm'
+  | 'astc-10x10-unorm-srgb'
+  | 'astc-12x10-unorm'
+  | 'astc-12x10-unorm-srgb'
+  | 'astc-12x12-unorm'
+  | 'astc-12x12-unorm-srgb';
 declare type GPUTextureViewDimension = '1d' | '2d' | '2d-array' | 'cube' | 'cube-array' | '3d';
 declare type GPUTextureDimension = '1d' | '2d' | '3d';
-declare type GPUBlendFactor = 'zero' | 'one' | 'src' | 'one-minus-src' | 'src-alpha' | 'one-minus-src-alpha' | 'dst' | 'one-minus-dst' | 'dst-alpha' | 'one-minus-dst-alpha' | 'src-alpha-saturated' | 'blend' | 'one-minus-blend' | 'src1' | 'one-minus-src1' | 'src1-alpha' | 'one-minus-src1-alpha';
+declare type GPUBlendFactor =
+  | 'zero'
+  | 'one'
+  | 'src'
+  | 'one-minus-src'
+  | 'src-alpha'
+  | 'one-minus-src-alpha'
+  | 'dst'
+  | 'one-minus-dst'
+  | 'dst-alpha'
+  | 'one-minus-dst-alpha'
+  | 'src-alpha-saturated'
+  | 'blend'
+  | 'one-minus-blend'
+  | 'src1'
+  | 'one-minus-src1'
+  | 'src1-alpha'
+  | 'one-minus-src1-alpha';
 declare type GPUBlendOperation = 'add' | 'subtract' | 'reverse-subtract' | 'min' | 'max';
 declare type GPUColorWriteFlags = number;
-declare type GPUStencilOperation = 'keep' | 'zero' | 'replace' | 'invert' | 'increment-clamp' | 'decrement-clamp' | 'increment-wrap' | 'decrement-wrap';
+declare type GPUStencilOperation =
+  | 'keep'
+  | 'zero'
+  | 'replace'
+  | 'invert'
+  | 'increment-clamp'
+  | 'decrement-clamp'
+  | 'increment-wrap'
+  | 'decrement-wrap';
 declare type GPUInputStepMode = 'vertex' | 'instance';
 declare type GPULoadOp = 'load' | 'clear';
 declare type GPUStoreOp = 'store' | 'discard';
@@ -433,12 +591,41 @@ declare interface GPUCommandEncoder {}
 
 declare interface GPUQueue {
   submit(commandBuffers: GPUCommandBuffer[]): void;
-  writeBuffer(buffer: GPUBuffer, bufferOffset: number, data: ArrayBuffer | ArrayBufferView, dataOffset?: number, size?: number): void;
-  writeTexture(destination: GPUImageCopyTexture, data: ArrayBuffer | ArrayBufferView, dataLayout: GPUImageDataLayout, size: GPUExtent3D): void;
-  copyBufferToBuffer(source: GPUBuffer, sourceOffset: number, destination: GPUBuffer, destinationOffset: number, size: number): void;
-  copyBufferToTexture(source: GPUImageCopyBuffer, destination: GPUImageCopyTexture, copySize: GPUExtent3D): void;
-  copyTextureToBuffer(source: GPUImageCopyTexture, destination: GPUImageCopyBuffer, copySize: GPUExtent3D): void;
-  copyTextureToTexture(source: GPUImageCopyTexture, destination: GPUImageCopyTexture, copySize: GPUExtent3D): void;
+  writeBuffer(
+    buffer: GPUBuffer,
+    bufferOffset: number,
+    data: ArrayBuffer | ArrayBufferView,
+    dataOffset?: number,
+    size?: number
+  ): void;
+  writeTexture(
+    destination: GPUImageCopyTexture,
+    data: ArrayBuffer | ArrayBufferView,
+    dataLayout: GPUImageDataLayout,
+    size: GPUExtent3D
+  ): void;
+  copyBufferToBuffer(
+    source: GPUBuffer,
+    sourceOffset: number,
+    destination: GPUBuffer,
+    destinationOffset: number,
+    size: number
+  ): void;
+  copyBufferToTexture(
+    source: GPUImageCopyBuffer,
+    destination: GPUImageCopyTexture,
+    copySize: GPUExtent3D
+  ): void;
+  copyTextureToBuffer(
+    source: GPUImageCopyTexture,
+    destination: GPUImageCopyBuffer,
+    copySize: GPUExtent3D
+  ): void;
+  copyTextureToTexture(
+    source: GPUImageCopyTexture,
+    destination: GPUImageCopyTexture,
+    copySize: GPUExtent3D
+  ): void;
   signal(queue: GPUQueue, signalValue: number): void;
   onSubmittedWorkDone(): Promise<void>;
 }
@@ -559,7 +746,7 @@ declare interface GPUQuerySetDescriptor extends GPUObjectDescriptorBase {
 declare interface GPUBindGroup {}
 
 declare interface GPUEventTypeMap {
-  'uncapturederror': GPUUncapturedErrorEvent;
+  uncapturederror: GPUUncapturedErrorEvent;
 }
 
 // Navigator WebGPU extension
