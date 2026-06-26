@@ -1,5 +1,6 @@
 import { globalEventBus } from '../event-bus';
 import { randomUUID } from '../utils/crypto-utils';
+import { localModelService } from './local-model-service';
 
 export type AIProvider = 'openai' | 'claude' | 'ollama' | 'mock' | 'local';
 
@@ -1099,8 +1100,79 @@ export class AICompletionService {
   }
 
   private async callLocalEngine(req: CompletionRequest): Promise<CompletionItem[]> {
-    await new Promise((r) => setTimeout(r, 50));
+    // 检查本地模型是否已加载
+    if (!localModelService.isModelLoaded()) {
+      // 如果模型未加载，回退到简单的补全
+      return this.callFallbackCompletion(req);
+    }
 
+    try {
+      // 构建提示词
+      const prompt = this.buildCompletionPrompt(req);
+
+      // 调用本地模型
+      const result = await localModelService.inference({
+        prompt,
+        modelId: localModelService.getCurrentModel()?.id || '',
+        maxTokens: 128,
+        temperature: 0.3,
+      });
+
+      // 解析模型输出为补全项
+      return this.parseModelOutput(result.text, req);
+    } catch (error) {
+      console.warn('Local model inference failed:', error);
+      return this.callFallbackCompletion(req);
+    }
+  }
+
+  /**
+   * 构建补全提示词
+   */
+  private buildCompletionPrompt(req: CompletionRequest): string {
+    const { prefix, suffix, language } = req.context;
+
+    // 构建简洁的提示词
+    const contextLines = this.config.maxContextLines ?? 10;
+    const lines = prefix.split('\n');
+    const recentLines = lines.slice(-contextLines).join('\n');
+
+    return `// ${language} code completion
+// Context:
+${recentLines}
+[COMPLETION]`;
+  }
+
+  /**
+   * 解析模型输出
+   */
+  private parseModelOutput(output: string, req: CompletionRequest): CompletionItem[] {
+    if (!output || output.trim().length === 0) {
+      return this.callFallbackCompletion(req);
+    }
+
+    // 提取可能的补全文本
+    const lines = output.split('\n');
+    const completionText = lines[0]?.trim() || '';
+
+    if (completionText.length > 0) {
+      return [{
+        id: `gguf-${randomUUID().slice(0, 8)}`,
+        text: completionText,
+        displayText: completionText.slice(0, 50) + (completionText.length > 50 ? '...' : ''),
+        type: 'snippet',
+        confidence: 0.85,
+        detail: 'GGUF 本地模型生成',
+      }];
+    }
+
+    return this.callFallbackCompletion(req);
+  }
+
+  /**
+   * 回退补全（模型未加载时）
+   */
+  private callFallbackCompletion(req: CompletionRequest): CompletionItem[] {
     const { prefix, language } = req.context;
     const line = this.getCurrentLine(req.context);
     const items: CompletionItem[] = [];

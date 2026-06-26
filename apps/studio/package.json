@@ -11,6 +11,8 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@huggingface/transformers": "^3.0.0",
+    "@mlc-ai/web-llm": "^0.2.46",
     "@monaco-editor/react": "^4.6.0",
     "@tapdev/core": "workspace:*",
     "@tapdev/types": "workspace:*",
