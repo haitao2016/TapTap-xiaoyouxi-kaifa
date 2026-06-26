@@ -11,7 +11,7 @@
  * - 统计数据：评论数、反馈数、公告阅读量
  */
 import { globalEventBus } from '../event-bus';
-import { randomUUID } from 'node:crypto';
+import { randomUUID } from '../utils/crypto-utils';
 
 export type CommentSort = 'time' | 'hot' | 'rating';
 export type CommentStatus = 'pending' | 'approved' | 'rejected' | 'deleted';

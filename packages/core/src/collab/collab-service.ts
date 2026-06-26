@@ -9,7 +9,7 @@
  * - 模拟协作者
  */
 import { globalEventBus } from '../event-bus';
-import { randomUUID } from 'node:crypto';
+import { randomUUID } from '../utils/crypto-utils';
 
 export interface CRDTDocument {
   id: string;

@@ -1,6 +1,6 @@
 import type { PerformanceMetrics, MonitorAlert } from '@tapdev/types';
 import { globalEventBus } from './event-bus';
-import { randomUUID } from 'node:crypto';
+import { randomUUID } from './utils/crypto-utils';
 
 export type ProfilerType = 'cpu' | 'memory' | 'fps' | 'network' | 'gpu';
 export type AlertSeverity = 'info' | 'warning' | 'critical';

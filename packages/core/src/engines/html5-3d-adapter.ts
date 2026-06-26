@@ -1,6 +1,6 @@
 import type { BuildConfig, BuildResult, BuildStep, EngineType } from '@tapdev/types';
 import { globalEventBus } from '../event-bus';
-import { randomUUID } from 'node:crypto';
+import { randomUUID } from '../utils/crypto-utils';
 import * as fs from 'fs';
 import * as path from 'path';
 

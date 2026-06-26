@@ -8,7 +8,7 @@ import type {
 import { globalEventBus } from './event-bus';
 import { templateService } from './template-service';
 import type { VirtualFile } from './template-service';
-import { randomUUID } from 'node:crypto';
+import { randomUUID } from './utils/crypto-utils';
 import {
   existsSync,
   readFileSync,

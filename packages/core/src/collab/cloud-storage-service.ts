@@ -6,7 +6,7 @@
  * - 项目分享链接
  */
 import { globalEventBus } from '../event-bus';
-import { createHash, randomUUID } from 'node:crypto';
+import { randomUUID, generateHash } from '../utils/crypto-utils';
 
 export interface CloudProject {
   id: string;
@@ -165,7 +165,7 @@ export class CloudStorageService {
   }
 
   private hashContent(content: string): string {
-    return createHash('sha256').update(content).digest('hex').slice(0, 16);
+    return generateHash('sha256').update(content).digest('hex').slice(0, 16);
   }
 
   private async flushOfflineQueue(): Promise<void> {

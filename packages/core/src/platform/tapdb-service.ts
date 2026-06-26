@@ -8,7 +8,7 @@
  * - 数据导出
  */
 import { globalEventBus } from '../event-bus';
-import { randomUUID } from 'node:crypto';
+import { randomUUID } from '../utils/crypto-utils';
 import { tapTapAuthService } from './taptap-auth-service';
 
 export type TapDBMetricType =

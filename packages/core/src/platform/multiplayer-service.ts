@@ -11,7 +11,7 @@
  * - 预设模板：常用多人游戏模式配置
  */
 import { globalEventBus } from '../event-bus';
-import { randomUUID } from 'node:crypto';
+import { randomUUID } from '../utils/crypto-utils';
 
 export type RoomStatus = 'waiting' | 'playing' | 'full' | 'closed';
 export type PlayerStatus = 'idle' | 'ready' | 'playing' | 'offline';

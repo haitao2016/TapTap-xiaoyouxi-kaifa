@@ -1,5 +1,5 @@
 import { globalEventBus } from '../event-bus';
-import { randomUUID } from 'node:crypto';
+import { randomUUID } from '../utils/crypto-utils';
 
 export type ErrorCategory =
   | 'syntax'

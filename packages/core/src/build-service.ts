@@ -8,7 +8,7 @@ import type {
 } from '@tapdev/types';
 import { globalEventBus } from './event-bus';
 import { getNativeBridge } from './debug-service';
-import { randomUUID, createHash } from 'node:crypto';
+import { randomUUID, generateHash } from './utils/crypto-utils';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -537,7 +537,7 @@ export class BuildService {
   }
 
   private sha256(str: string): string {
-    return createHash('sha256').update(str).digest('hex');
+    return generateHash('sha256').update(str).digest('hex');
   }
 
   private rmdirSync(dir: string): void {

@@ -11,7 +11,7 @@
  * - 实验结果：结论建议、数据可视化数据
  */
 import { globalEventBus } from '../event-bus';
-import { randomUUID } from 'node:crypto';
+import { randomUUID } from '../utils/crypto-utils';
 
 export type ExperimentStatus = 'draft' | 'running' | 'paused' | 'completed' | 'archived';
 export type VariableType = 'number' | 'string' | 'boolean' | 'json';

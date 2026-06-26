@@ -8,7 +8,7 @@
  * - 多 SDK 包管理
  */
 import { globalEventBus } from '../event-bus';
-import { randomUUID } from 'node:crypto';
+import { randomUUID } from '../utils/crypto-utils';
 import { tapTapAuthService } from './taptap-auth-service';
 import * as fs from 'fs';
 import * as path from 'path';

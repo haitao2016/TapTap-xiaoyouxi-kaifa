@@ -11,7 +11,7 @@
  * - 奖励配置：排名奖励、成就奖励
  */
 import { globalEventBus } from '../event-bus';
-import { randomUUID } from 'node:crypto';
+import { randomUUID } from '../utils/crypto-utils';
 
 export type AchievementType = 'normal' | 'hidden' | 'stage' | 'limited';
 export type AchievementRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';

@@ -1,6 +1,6 @@
 import type { LogLevel, DebugLogEntry } from '@tapdev/types';
 import { globalEventBus } from './event-bus';
-import { randomUUID } from 'node:crypto';
+import { randomUUID } from './utils/crypto-utils';
 
 export type DevicePlatform = 'android' | 'ios';
 export type DeviceStatus = 'disconnected' | 'connecting' | 'connected' | 'offline';

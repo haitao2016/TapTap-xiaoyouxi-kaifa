@@ -5,7 +5,7 @@ import type {
   WSMessage,
   BreakpointSyncPayload,
 } from '@tapdev/types';
-import { randomUUID } from 'node:crypto';
+import { randomUUID } from './utils/crypto-utils';
 
 export type DebugClientEvents = {
   onLog: (entry: DebugLogEntry) => void;
