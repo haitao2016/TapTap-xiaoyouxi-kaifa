@@ -116,7 +116,7 @@ export class PluginMarketService {
   getInstalledPlugins(): Plugin[] {
     const plugins: Plugin[] = [];
     this.installedPlugins.forEach((install, pluginId) => {
-      const marketplacePlugin = this.marketplacePlugins.find(p => p.id === pluginId);
+      const marketplacePlugin = this.marketplacePlugins.find((p) => p.id === pluginId);
       if (marketplacePlugin) {
         plugins.push({
           ...marketplacePlugin,
@@ -124,7 +124,7 @@ export class PluginMarketService {
           installedVersion: install.version,
         });
       } else {
-        const localPlugin = this.localPlugins.find(p => p.id === pluginId);
+        const localPlugin = this.localPlugins.find((p) => p.id === pluginId);
         if (localPlugin) {
           plugins.push({
             ...localPlugin,
@@ -142,37 +142,36 @@ export class PluginMarketService {
 
     if (options?.query) {
       const query = options.query.toLowerCase();
-      result = result.filter(p => 
-        p.name.toLowerCase().includes(query) ||
-        p.description.toLowerCase().includes(query) ||
-        p.tags.some(t => t.toLowerCase().includes(query)) ||
-        p.author.toLowerCase().includes(query)
+      result = result.filter(
+        (p) =>
+          p.name.toLowerCase().includes(query) ||
+          p.description.toLowerCase().includes(query) ||
+          p.tags.some((t) => t.toLowerCase().includes(query)) ||
+          p.author.toLowerCase().includes(query)
       );
     }
 
     if (options?.category) {
-      result = result.filter(p => p.category === options.category);
+      result = result.filter((p) => p.category === options.category);
     }
 
     if (options?.tags && options.tags.length > 0) {
-      result = result.filter(p => 
-        options.tags!.some(tag => p.tags.includes(tag))
-      );
+      result = result.filter((p) => options.tags!.some((tag) => p.tags.includes(tag)));
     }
 
     if (options?.installed !== undefined) {
-      result = result.filter(p => {
+      result = result.filter((p) => {
         const isInstalled = this.installedPlugins.has(p.id);
         return options.installed ? isInstalled : !isInstalled;
       });
     }
 
     if (options?.featured) {
-      result = result.filter(p => p.featured);
+      result = result.filter((p) => p.featured);
     }
 
     if (options?.verified) {
-      result = result.filter(p => p.verified);
+      result = result.filter((p) => p.verified);
     }
 
     const sortBy = options?.sortBy || 'downloads';
@@ -221,11 +220,11 @@ export class PluginMarketService {
   }
 
   getCategoryById(categoryId: string): PluginCategory | undefined {
-    return this.categories.find(c => c.id === categoryId);
+    return this.categories.find((c) => c.id === categoryId);
   }
 
   getPluginById(pluginId: string): Plugin | undefined {
-    const marketplace = this.marketplacePlugins.find(p => p.id === pluginId);
+    const marketplace = this.marketplacePlugins.find((p) => p.id === pluginId);
     if (marketplace) {
       const installed = this.installedPlugins.has(pluginId);
       return {
@@ -234,7 +233,7 @@ export class PluginMarketService {
         installedVersion: installed ? this.installedPlugins.get(pluginId)?.version : undefined,
       };
     }
-    const local = this.localPlugins.find(p => p.id === pluginId);
+    const local = this.localPlugins.find((p) => p.id === pluginId);
     if (local) {
       const installed = this.installedPlugins.has(pluginId);
       return {
@@ -259,8 +258,9 @@ export class PluginMarketService {
   }
 
   async installPlugin(pluginId: string, options?: InstallOptions): Promise<PluginInstallation> {
-    const plugin = this.marketplacePlugins.find(p => p.id === pluginId) || 
-                   this.localPlugins.find(p => p.id === pluginId);
+    const plugin =
+      this.marketplacePlugins.find((p) => p.id === pluginId) ||
+      this.localPlugins.find((p) => p.id === pluginId);
     if (!plugin) {
       throw new Error(`插件不存在: ${pluginId}`);
     }
@@ -287,9 +287,9 @@ export class PluginMarketService {
     this.installedPlugins.set(pluginId, installation);
     this.saveInstalledPlugins();
 
-    globalEventBus.emit({ 
-      type: 'plugin:installed', 
-      payload: { pluginId, version: targetVersion, plugin } 
+    globalEventBus.emit({
+      type: 'plugin:installed',
+      payload: { pluginId, version: targetVersion, plugin },
     });
 
     return installation;
@@ -324,9 +324,9 @@ export class PluginMarketService {
       return install;
     }
 
-    globalEventBus.emit({ 
-      type: 'plugin:updating', 
-      payload: { pluginId, fromVersion: install.version, toVersion: latestVersion } 
+    globalEventBus.emit({
+      type: 'plugin:updating',
+      payload: { pluginId, fromVersion: install.version, toVersion: latestVersion },
     });
 
     await this.delay(500);
@@ -334,9 +334,9 @@ export class PluginMarketService {
     install.version = latestVersion;
     this.saveInstalledPlugins();
 
-    globalEventBus.emit({ 
-      type: 'plugin:updated', 
-      payload: { pluginId, version: latestVersion } 
+    globalEventBus.emit({
+      type: 'plugin:updated',
+      payload: { pluginId, version: latestVersion },
     });
 
     return install;
@@ -345,7 +345,7 @@ export class PluginMarketService {
   getUpdateInfo(pluginId: string): UpdateInfo | null {
     const install = this.installedPlugins.get(pluginId);
     const plugin = this.getPluginById(pluginId);
-    
+
     if (!install || !plugin) return null;
 
     return {
@@ -387,24 +387,23 @@ export class PluginMarketService {
     }
   }
 
-  async searchPlugins(query: string, options?: Omit<PluginSearchOptions, 'query'>): Promise<PluginSearchResult> {
+  async searchPlugins(
+    query: string,
+    options?: Omit<PluginSearchOptions, 'query'>
+  ): Promise<PluginSearchResult> {
     return this.getMarketplacePlugins({ ...options, query });
   }
 
   getFeaturedPlugins(): Plugin[] {
-    return this.marketplacePlugins.filter(p => p.featured);
+    return this.marketplacePlugins.filter((p) => p.featured);
   }
 
   getPopularPlugins(limit = 10): Plugin[] {
-    return [...this.marketplacePlugins]
-      .sort((a, b) => b.downloads - a.downloads)
-      .slice(0, limit);
+    return [...this.marketplacePlugins].sort((a, b) => b.downloads - a.downloads).slice(0, limit);
   }
 
   getNewestPlugins(limit = 10): Plugin[] {
-    return [...this.marketplacePlugins]
-      .sort((a, b) => b.createdAt - a.createdAt)
-      .slice(0, limit);
+    return [...this.marketplacePlugins].sort((a, b) => b.createdAt - a.createdAt).slice(0, limit);
   }
 
   getRelatedPlugins(pluginId: string, limit = 5): Plugin[] {
@@ -412,23 +411,23 @@ export class PluginMarketService {
     if (!plugin) return [];
 
     return this.marketplacePlugins
-      .filter(p => p.id !== pluginId && p.category === plugin.category)
+      .filter((p) => p.id !== pluginId && p.category === plugin.category)
       .slice(0, limit);
   }
 
   getPluginsByCategory(category: string): Plugin[] {
-    return this.marketplacePlugins.filter(p => p.category === category);
+    return this.marketplacePlugins.filter((p) => p.category === category);
   }
 
   addLocalPlugin(plugin: Omit<Plugin, 'installed'>): void {
-    const existing = this.localPlugins.find(p => p.id === plugin.id);
+    const existing = this.localPlugins.find((p) => p.id === plugin.id);
     if (!existing) {
       this.localPlugins.push({ ...plugin, installed: false });
     }
   }
 
   removeLocalPlugin(pluginId: string): void {
-    this.localPlugins = this.localPlugins.filter(p => p.id !== pluginId);
+    this.localPlugins = this.localPlugins.filter((p) => p.id !== pluginId);
   }
 
   getLocalPlugins(): Plugin[] {
@@ -454,8 +453,7 @@ export class PluginMarketService {
           });
         }
       }
-    } catch {
-    }
+    } catch {}
   }
 
   private saveInstalledPlugins(): void {
@@ -464,8 +462,7 @@ export class PluginMarketService {
         const data = Object.fromEntries(this.installedPlugins.entries());
         localStorage.setItem('tapdev-installed-plugins', JSON.stringify(data));
       }
-    } catch {
-    }
+    } catch {}
   }
 
   private loadMarketplacePlugins(): void {
@@ -494,8 +491,16 @@ export class PluginMarketService {
         readme: '# 主题管理器\n\n提供丰富的主题定制功能...',
         screenshots: ['theme-1.png', 'theme-2.png'],
         changelog: [
-          { version: '1.2.0', releaseDate: now - 2 * 24 * 60 * 60 * 1000, notes: '新增主题编辑器，支持自定义配色方案' },
-          { version: '1.1.0', releaseDate: now - 15 * 24 * 60 * 60 * 1000, notes: '新增 5 款预设主题' },
+          {
+            version: '1.2.0',
+            releaseDate: now - 2 * 24 * 60 * 60 * 1000,
+            notes: '新增主题编辑器，支持自定义配色方案',
+          },
+          {
+            version: '1.1.0',
+            releaseDate: now - 15 * 24 * 60 * 60 * 1000,
+            notes: '新增 5 款预设主题',
+          },
           { version: '1.0.0', releaseDate: now - 60 * 24 * 60 * 60 * 1000, notes: '初始版本' },
         ],
         rating: 4.8,
@@ -523,8 +528,17 @@ export class PluginMarketService {
         license: 'MIT',
         readme: '# 代码格式化\n\n支持多种语言的代码格式化...',
         changelog: [
-          { version: '2.1.0', releaseDate: now - 1 * 24 * 60 * 60 * 1000, notes: '新增 Vue/Svelte 支持，优化格式化性能' },
-          { version: '2.0.0', releaseDate: now - 20 * 24 * 60 * 60 * 1000, notes: '重构格式化引擎，支持更多语言', breakingChanges: true },
+          {
+            version: '2.1.0',
+            releaseDate: now - 1 * 24 * 60 * 60 * 1000,
+            notes: '新增 Vue/Svelte 支持，优化格式化性能',
+          },
+          {
+            version: '2.0.0',
+            releaseDate: now - 20 * 24 * 60 * 60 * 1000,
+            notes: '重构格式化引擎，支持更多语言',
+            breakingChanges: true,
+          },
         ],
         rating: 4.6,
         ratingCount: 89,
@@ -551,8 +565,16 @@ export class PluginMarketService {
         readme: '# Git 集成\n\n完整的 Git 版本控制功能...',
         screenshots: ['git-1.png', 'git-2.png'],
         changelog: [
-          { version: '1.5.0', releaseDate: now - 3 * 24 * 60 * 60 * 1000, notes: '新增交互式变基，优化冲突解决界面' },
-          { version: '1.4.0', releaseDate: now - 10 * 24 * 60 * 60 * 1000, notes: '新增 GitHub/Gitee PR 集成' },
+          {
+            version: '1.5.0',
+            releaseDate: now - 3 * 24 * 60 * 60 * 1000,
+            notes: '新增交互式变基，优化冲突解决界面',
+          },
+          {
+            version: '1.4.0',
+            releaseDate: now - 10 * 24 * 60 * 60 * 1000,
+            notes: '新增 GitHub/Gitee PR 集成',
+          },
         ],
         rating: 4.9,
         ratingCount: 210,
@@ -577,8 +599,16 @@ export class PluginMarketService {
         license: 'MIT',
         readme: '# AI 编程助手\n\n智能代码补全和生成...',
         changelog: [
-          { version: '0.9.0', releaseDate: now - 12 * 60 * 60 * 1000, notes: '新增对话式 AI，支持多模型切换' },
-          { version: '0.8.0', releaseDate: now - 5 * 24 * 60 * 60 * 1000, notes: '优化代码补全准确率' },
+          {
+            version: '0.9.0',
+            releaseDate: now - 12 * 60 * 60 * 1000,
+            notes: '新增对话式 AI，支持多模型切换',
+          },
+          {
+            version: '0.8.0',
+            releaseDate: now - 5 * 24 * 60 * 60 * 1000,
+            notes: '优化代码补全准确率',
+          },
         ],
         rating: 4.7,
         ratingCount: 312,
@@ -603,8 +633,16 @@ export class PluginMarketService {
         license: 'MIT',
         readme: '# 一键部署\n\n支持多平台部署...',
         changelog: [
-          { version: '1.3.0', releaseDate: now - 5 * 24 * 60 * 60 * 1000, notes: '新增微信小游戏部署支持' },
-          { version: '1.2.0', releaseDate: now - 18 * 24 * 60 * 60 * 1000, notes: '新增部署回滚功能' },
+          {
+            version: '1.3.0',
+            releaseDate: now - 5 * 24 * 60 * 60 * 1000,
+            notes: '新增微信小游戏部署支持',
+          },
+          {
+            version: '1.2.0',
+            releaseDate: now - 18 * 24 * 60 * 60 * 1000,
+            notes: '新增部署回滚功能',
+          },
         ],
         rating: 4.5,
         ratingCount: 67,
@@ -711,14 +749,18 @@ export class PluginMarketService {
 
   private loadCategories(): void {
     const categoryMap = new Map<string, number>();
-    this.marketplacePlugins.forEach(p => {
+    this.marketplacePlugins.forEach((p) => {
       categoryMap.set(p.category, (categoryMap.get(p.category) || 0) + 1);
     });
 
     const categoryMeta: Record<string, { name: string; icon: string; description: string }> = {
       ui: { name: '界面美化', icon: 'palette', description: '主题、图标和界面定制插件' },
       editor: { name: '编辑器扩展', icon: 'edit-3', description: '增强编辑器功能的插件' },
-      'version-control': { name: '版本控制', icon: 'git-branch', description: 'Git 和版本管理工具' },
+      'version-control': {
+        name: '版本控制',
+        icon: 'git-branch',
+        description: 'Git 和版本管理工具',
+      },
       ai: { name: 'AI 工具', icon: 'sparkles', description: '人工智能辅助开发工具' },
       deployment: { name: '部署发布', icon: 'rocket', description: '构建、部署和发布工具' },
       debug: { name: '调试分析', icon: 'bug', description: '调试和性能分析工具' },
@@ -736,7 +778,7 @@ export class PluginMarketService {
   }
 
   private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }
 

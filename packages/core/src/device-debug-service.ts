@@ -94,7 +94,7 @@ export class DeviceDebugService {
   }
 
   getActiveDevice(): DeviceInfo | null {
-    return this.activeDeviceId ? this.devices.get(this.activeDeviceId) ?? null : null;
+    return this.activeDeviceId ? (this.devices.get(this.activeDeviceId) ?? null) : null;
   }
 
   setActiveDevice(id: string | null): void {
@@ -110,9 +110,9 @@ export class DeviceDebugService {
 
     try {
       await this.delay(1500);
-      
+
       const mockDevices = this.generateMockDevices();
-      mockDevices.forEach(device => {
+      mockDevices.forEach((device) => {
         const existing = this.devices.get(device.id);
         if (!existing) {
           this.devices.set(device.id, device);
@@ -126,7 +126,10 @@ export class DeviceDebugService {
       globalEventBus.emit({ type: 'device:scanComplete', payload: { devices: this.getDevices() } });
       return this.getDevices();
     } catch (error) {
-      globalEventBus.emit({ type: 'device:scanError', payload: { error: error instanceof Error ? error.message : '扫描失败' } });
+      globalEventBus.emit({
+        type: 'device:scanError',
+        payload: { error: error instanceof Error ? error.message : '扫描失败' },
+      });
       throw error;
     } finally {
       this.isScanning = false;
@@ -146,7 +149,7 @@ export class DeviceDebugService {
 
     try {
       await this.delay(1000 + Math.random() * 1000);
-      
+
       device.status = 'connected';
       device.connectedAt = Date.now();
       device.usedMemory = Math.floor(device.totalMemory * 0.4);
@@ -160,7 +163,10 @@ export class DeviceDebugService {
       return device;
     } catch (error) {
       device.status = 'disconnected';
-      globalEventBus.emit({ type: 'device:connectFailed', payload: { deviceId, error: error instanceof Error ? error.message : '连接失败' } });
+      globalEventBus.emit({
+        type: 'device:connectFailed',
+        payload: { deviceId, error: error instanceof Error ? error.message : '连接失败' },
+      });
       throw error;
     }
   }
@@ -230,26 +236,26 @@ export class DeviceDebugService {
 
   getLogs(deviceId: string, filter?: DeviceLogFilter): DebugLogEntry[] {
     const deviceLogs = this.logs.get(deviceId) || [];
-    
+
     if (!filter) return [...deviceLogs];
 
     let result = [...deviceLogs];
 
     if (filter.level) {
-      result = result.filter(log => log.level === filter.level);
+      result = result.filter((log) => log.level === filter.level);
     }
     if (filter.tag) {
-      result = result.filter(log => log.source === filter.tag);
+      result = result.filter((log) => log.source === filter.tag);
     }
     if (filter.keyword) {
       const keyword = filter.keyword.toLowerCase();
-      result = result.filter(log => log.message.toLowerCase().includes(keyword));
+      result = result.filter((log) => log.message.toLowerCase().includes(keyword));
     }
     if (filter.startTime) {
-      result = result.filter(log => log.timestamp >= filter.startTime!);
+      result = result.filter((log) => log.timestamp >= filter.startTime!);
     }
     if (filter.endTime) {
-      result = result.filter(log => log.timestamp <= filter.endTime!);
+      result = result.filter((log) => log.timestamp <= filter.endTime!);
     }
 
     return result;
@@ -319,9 +325,9 @@ export class DeviceDebugService {
     const startTime = Date.now();
     const pushId = randomUUID();
 
-    globalEventBus.emit({ 
-      type: 'device:hotPushStart', 
-      payload: { id: pushId, deviceId: options.deviceId, totalFiles: options.files.length } 
+    globalEventBus.emit({
+      type: 'device:hotPushStart',
+      payload: { id: pushId, deviceId: options.deviceId, totalFiles: options.files.length },
     });
 
     await this.delay(500 + Math.random() * 1000);
@@ -341,7 +347,12 @@ export class DeviceDebugService {
     if (options.fullReload) {
       this.addLog(options.deviceId, 'info', '热更新完成，正在重新加载...', 'hotpush');
     } else {
-      this.addLog(options.deviceId, 'info', `热更新完成: ${successCount}/${options.files.length} 个文件`, 'hotpush');
+      this.addLog(
+        options.deviceId,
+        'info',
+        `热更新完成: ${successCount}/${options.files.length} 个文件`,
+        'hotpush'
+      );
     }
 
     globalEventBus.emit({ type: 'device:hotPushComplete', payload: result });
@@ -355,7 +366,7 @@ export class DeviceDebugService {
   getAvailableTags(deviceId: string): string[] {
     const deviceLogs = this.logs.get(deviceId) || [];
     const tags = new Set<string>();
-    deviceLogs.forEach(log => {
+    deviceLogs.forEach((log) => {
       if (log.source) tags.add(log.source);
     });
     return Array.from(tags);
@@ -505,31 +516,10 @@ export class DeviceDebugService {
     const source = sources[Math.floor(Math.random() * sources.length)];
 
     const messages: Record<LogLevel, string[]> = {
-      debug: [
-        '资源加载完成',
-        '对象池已回收 10 个对象',
-        '帧时间: 16.5ms',
-        '内存使用: 256MB',
-      ],
-      info: [
-        '游戏场景已加载',
-        '用户登录成功',
-        '网络请求完成',
-        '动画播放完成',
-        '配置已更新',
-      ],
-      warn: [
-        '图片尺寸超过建议值',
-        '帧率下降到 45fps',
-        '网络延迟较高',
-        '内存接近警告阈值',
-      ],
-      error: [
-        '资源加载失败',
-        '网络连接超时',
-        '空指针异常',
-        '文件读取错误',
-      ],
+      debug: ['资源加载完成', '对象池已回收 10 个对象', '帧时间: 16.5ms', '内存使用: 256MB'],
+      info: ['游戏场景已加载', '用户登录成功', '网络请求完成', '动画播放完成', '配置已更新'],
+      warn: ['图片尺寸超过建议值', '帧率下降到 45fps', '网络延迟较高', '内存接近警告阈值'],
+      error: ['资源加载失败', '网络连接超时', '空指针异常', '文件读取错误'],
     };
 
     const message = messages[level][Math.floor(Math.random() * messages[level].length)];
@@ -546,12 +536,12 @@ export class DeviceDebugService {
     const width = device.resolution.width / 4;
     const height = device.resolution.height / 4;
     const platformColor = device.platform === 'ios' ? '#007AFF' : '#3DDC84';
-    
+
     return `data:image/svg+xml;base64,${btoa(`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"><rect width="${width}" height="${height}" fill="${platformColor}" opacity="0.2"/><rect x="10" y="10" width="${width - 20}" height="${height - 20}" fill="white" rx="8"/><text x="50%" y="50%" text-anchor="middle" dy=".3em" font-size="14" fill="#666">${device.name}</text><text x="50%" y="${height / 2 + 20}" text-anchor="middle" font-size="10" fill="#999">${new Date().toLocaleTimeString()}</text></svg>`)}`;
   }
 
   private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }
 

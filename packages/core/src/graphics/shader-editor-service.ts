@@ -4,7 +4,16 @@
 import { globalEventBus } from '../core/event-bus';
 
 // Shader 节点类型
-export type ShaderNodeType = 'input' | 'output' | 'math' | 'texture' | 'color' | 'lighting' | 'noise' | 'utility' | 'template';
+export type ShaderNodeType =
+  | 'input'
+  | 'output'
+  | 'math'
+  | 'texture'
+  | 'color'
+  | 'lighting'
+  | 'noise'
+  | 'utility'
+  | 'template';
 
 // Shader 节点
 export interface ShaderNode {
@@ -12,10 +21,21 @@ export interface ShaderNode {
   type: ShaderNodeType;
   name: string;
   category: string;
-  inputs: { name: string; type: 'float' | 'vec2' | 'vec3' | 'vec4' | 'sampler2D'; defaultValue?: any }[];
+  inputs: {
+    name: string;
+    type: 'float' | 'vec2' | 'vec3' | 'vec4' | 'sampler2D';
+    defaultValue?: any;
+  }[];
   outputs: { name: string; type: 'float' | 'vec2' | 'vec3' | 'vec4' | 'sampler2D' }[];
   position: { x: number; y: number };
-  parameters: { name: string; type: 'float' | 'int' | 'bool' | 'color' | 'enum'; value: any; min?: number; max?: number; options?: string[] }[];
+  parameters: {
+    name: string;
+    type: 'float' | 'int' | 'bool' | 'color' | 'enum';
+    value: any;
+    min?: number;
+    max?: number;
+    options?: string[];
+  }[];
   code: string;
   description?: string;
 }
@@ -33,7 +53,17 @@ export interface ShaderConnection {
 export interface ShaderTemplate {
   id: string;
   name: string;
-  category: 'cartoon' | 'watercolor' | 'pixel' | 'neon' | 'dissolve' | 'glass' | 'fire' | 'water' | 'hologram' | 'plasma';
+  category:
+    | 'cartoon'
+    | 'watercolor'
+    | 'pixel'
+    | 'neon'
+    | 'dissolve'
+    | 'glass'
+    | 'fire'
+    | 'water'
+    | 'hologram'
+    | 'plasma';
   description: string;
   thumbnail?: string;
   uniforms: { name: string; type: string; defaultValue: any }[];
@@ -48,7 +78,9 @@ class ShaderEditorService {
   private connections: ShaderConnection[] = [];
   private currentShader: { nodes: ShaderNode[]; connections: ShaderConnection[] } | null = null;
   private templates: ShaderTemplate[] = [];
-  private listeners = new Set<(data: { nodes: ShaderNode[]; connections: ShaderConnection[] }) => void>();
+  private listeners = new Set<
+    (data: { nodes: ShaderNode[]; connections: ShaderConnection[] }) => void
+  >();
 
   constructor() {
     this.registerBuiltInNodes();
@@ -60,146 +92,221 @@ class ShaderEditorService {
     const builtInNodes: Omit<ShaderNode, 'id' | 'position'>[] = [
       // 输入节点
       {
-        type: 'input', name: 'UV', category: 'input',
-        inputs: [], outputs: [{ name: 'out', type: 'vec2' }],
+        type: 'input',
+        name: 'UV',
+        category: 'input',
+        inputs: [],
+        outputs: [{ name: 'out', type: 'vec2' }],
         parameters: [],
-        code: 'vUv'
+        code: 'vUv',
       },
       {
-        type: 'input', name: 'Time', category: 'input',
-        inputs: [], outputs: [{ name: 'out', type: 'float' }],
+        type: 'input',
+        name: 'Time',
+        category: 'input',
+        inputs: [],
+        outputs: [{ name: 'out', type: 'float' }],
         parameters: [],
-        code: 'uTime'
+        code: 'uTime',
       },
       {
-        type: 'input', name: 'Position', category: 'input',
-        inputs: [], outputs: [{ name: 'out', type: 'vec3' }],
+        type: 'input',
+        name: 'Position',
+        category: 'input',
+        inputs: [],
+        outputs: [{ name: 'out', type: 'vec3' }],
         parameters: [],
-        code: 'vPosition'
+        code: 'vPosition',
       },
       {
-        type: 'input', name: 'Normal', category: 'input',
-        inputs: [], outputs: [{ name: 'out', type: 'vec3' }],
+        type: 'input',
+        name: 'Normal',
+        category: 'input',
+        inputs: [],
+        outputs: [{ name: 'out', type: 'vec3' }],
         parameters: [],
-        code: 'vNormal'
+        code: 'vNormal',
       },
       // 数学节点
       {
-        type: 'math', name: 'Add', category: 'math',
+        type: 'math',
+        name: 'Add',
+        category: 'math',
         inputs: [
-          { name: 'a', type: 'float' }, { name: 'b', type: 'float' }
-        ], outputs: [{ name: 'out', type: 'float' }],
+          { name: 'a', type: 'float' },
+          { name: 'b', type: 'float' },
+        ],
+        outputs: [{ name: 'out', type: 'float' }],
         parameters: [],
-        code: '($a + $b)'
+        code: '($a + $b)',
       },
       {
-        type: 'math', name: 'Multiply', category: 'math',
+        type: 'math',
+        name: 'Multiply',
+        category: 'math',
         inputs: [
-          { name: 'a', type: 'float' }, { name: 'b', type: 'float' }
-        ], outputs: [{ name: 'out', type: 'float' }],
+          { name: 'a', type: 'float' },
+          { name: 'b', type: 'float' },
+        ],
+        outputs: [{ name: 'out', type: 'float' }],
         parameters: [],
-        code: '($a * $b)'
+        code: '($a * $b)',
       },
       {
-        type: 'math', name: 'Sine', category: 'math',
-        inputs: [{ name: 'value', type: 'float' }], outputs: [{ name: 'out', type: 'float' }],
+        type: 'math',
+        name: 'Sine',
+        category: 'math',
+        inputs: [{ name: 'value', type: 'float' }],
+        outputs: [{ name: 'out', type: 'float' }],
         parameters: [],
-        code: 'sin($value)'
+        code: 'sin($value)',
       },
       {
-        type: 'math', name: 'Cosine', category: 'math',
-        inputs: [{ name: 'value', type: 'float' }], outputs: [{ name: 'out', type: 'float' }],
+        type: 'math',
+        name: 'Cosine',
+        category: 'math',
+        inputs: [{ name: 'value', type: 'float' }],
+        outputs: [{ name: 'out', type: 'float' }],
         parameters: [],
-        code: 'cos($value)'
+        code: 'cos($value)',
       },
       {
-        type: 'math', name: 'Lerp', category: 'math',
+        type: 'math',
+        name: 'Lerp',
+        category: 'math',
         inputs: [
-          { name: 'a', type: 'float' }, { name: 'b', type: 'float' }, { name: 't', type: 'float' }
-        ], outputs: [{ name: 'out', type: 'float' }],
+          { name: 'a', type: 'float' },
+          { name: 'b', type: 'float' },
+          { name: 't', type: 'float' },
+        ],
+        outputs: [{ name: 'out', type: 'float' }],
         parameters: [],
-        code: 'mix($a, $b, $t)'
+        code: 'mix($a, $b, $t)',
       },
       {
-        type: 'math', name: 'Power', category: 'math',
+        type: 'math',
+        name: 'Power',
+        category: 'math',
         inputs: [
-          { name: 'base', type: 'float' }, { name: 'exp', type: 'float' }
-        ], outputs: [{ name: 'out', type: 'float' }],
+          { name: 'base', type: 'float' },
+          { name: 'exp', type: 'float' },
+        ],
+        outputs: [{ name: 'out', type: 'float' }],
         parameters: [],
-        code: 'pow($base, $exp)'
+        code: 'pow($base, $exp)',
       },
       // 颜色节点
       {
-        type: 'color', name: 'Color', category: 'color',
-        inputs: [], outputs: [{ name: 'out', type: 'vec4' }],
+        type: 'color',
+        name: 'Color',
+        category: 'color',
+        inputs: [],
+        outputs: [{ name: 'out', type: 'vec4' }],
         parameters: [{ name: 'color', type: 'color', value: '#ffffff' }],
-        code: 'vec4($color, 1.0)'
+        code: 'vec4($color, 1.0)',
       },
       {
-        type: 'color', name: 'RGB to HSV', category: 'color',
-        inputs: [{ name: 'rgb', type: 'vec3' }], outputs: [{ name: 'out', type: 'vec3' }],
+        type: 'color',
+        name: 'RGB to HSV',
+        category: 'color',
+        inputs: [{ name: 'rgb', type: 'vec3' }],
+        outputs: [{ name: 'out', type: 'vec3' }],
         parameters: [],
-        code: 'rgb2hsv($rgb)'
+        code: 'rgb2hsv($rgb)',
       },
       {
-        type: 'color', name: 'HSV to RGB', category: 'color',
-        inputs: [{ name: 'hsv', type: 'vec3' }], outputs: [{ name: 'out', type: 'vec3' }],
+        type: 'color',
+        name: 'HSV to RGB',
+        category: 'color',
+        inputs: [{ name: 'hsv', type: 'vec3' }],
+        outputs: [{ name: 'out', type: 'vec3' }],
         parameters: [],
-        code: 'hsv2rgb($hsv)'
+        code: 'hsv2rgb($hsv)',
       },
       // 纹理节点
       {
-        type: 'texture', name: 'Sample Texture', category: 'texture',
-        inputs: [{ name: 'uv', type: 'vec2' }], outputs: [{ name: 'rgba', type: 'vec4' }],
-        parameters: [{ name: 'texture', type: 'enum', value: 'mainTex', options: ['mainTex', 'normalMap', 'emissionMap'] }],
-        code: 'texture2D($texture, $uv)'
+        type: 'texture',
+        name: 'Sample Texture',
+        category: 'texture',
+        inputs: [{ name: 'uv', type: 'vec2' }],
+        outputs: [{ name: 'rgba', type: 'vec4' }],
+        parameters: [
+          {
+            name: 'texture',
+            type: 'enum',
+            value: 'mainTex',
+            options: ['mainTex', 'normalMap', 'emissionMap'],
+          },
+        ],
+        code: 'texture2D($texture, $uv)',
       },
       // 光照节点
       {
-        type: 'lighting', name: 'Diffuse', category: 'lighting',
+        type: 'lighting',
+        name: 'Diffuse',
+        category: 'lighting',
         inputs: [
-          { name: 'normal', type: 'vec3' }, { name: 'lightDir', type: 'vec3' }
-        ], outputs: [{ name: 'out', type: 'float' }],
+          { name: 'normal', type: 'vec3' },
+          { name: 'lightDir', type: 'vec3' },
+        ],
+        outputs: [{ name: 'out', type: 'float' }],
         parameters: [],
-        code: 'max(dot($normal, $lightDir), 0.0)'
+        code: 'max(dot($normal, $lightDir), 0.0)',
       },
       {
-        type: 'lighting', name: 'Specular', category: 'lighting',
+        type: 'lighting',
+        name: 'Specular',
+        category: 'lighting',
         inputs: [
-          { name: 'normal', type: 'vec3' }, { name: 'lightDir', type: 'vec3' }, { name: 'viewDir', type: 'vec3' }
-        ], outputs: [{ name: 'out', type: 'float' }],
+          { name: 'normal', type: 'vec3' },
+          { name: 'lightDir', type: 'vec3' },
+          { name: 'viewDir', type: 'vec3' },
+        ],
+        outputs: [{ name: 'out', type: 'float' }],
         parameters: [{ name: 'shininess', type: 'float', value: 32, min: 1, max: 256 }],
-        code: 'pow(max(dot(reflect(-$lightDir, $normal), $viewDir), 0.0), $shininess)'
+        code: 'pow(max(dot(reflect(-$lightDir, $normal), $viewDir), 0.0), $shininess)',
       },
       // 噪声节点
       {
-        type: 'noise', name: 'Perlin Noise', category: 'noise',
-        inputs: [{ name: 'uv', type: 'vec2' }], outputs: [{ name: 'out', type: 'float' }],
+        type: 'noise',
+        name: 'Perlin Noise',
+        category: 'noise',
+        inputs: [{ name: 'uv', type: 'vec2' }],
+        outputs: [{ name: 'out', type: 'float' }],
         parameters: [{ name: 'scale', type: 'float', value: 10 }],
-        code: 'perlinNoise($uv * $scale)'
+        code: 'perlinNoise($uv * $scale)',
       },
       {
-        type: 'noise', name: 'Simplex Noise', category: 'noise',
-        inputs: [{ name: 'uv', type: 'vec2' }], outputs: [{ name: 'out', type: 'float' }],
+        type: 'noise',
+        name: 'Simplex Noise',
+        category: 'noise',
+        inputs: [{ name: 'uv', type: 'vec2' }],
+        outputs: [{ name: 'out', type: 'float' }],
         parameters: [{ name: 'scale', type: 'float', value: 10 }],
-        code: 'simplexNoise($uv * $scale)'
+        code: 'simplexNoise($uv * $scale)',
       },
       {
-        type: 'noise', name: 'FBM', category: 'noise',
-        inputs: [{ name: 'uv', type: 'vec2' }], outputs: [{ name: 'out', type: 'float' }],
+        type: 'noise',
+        name: 'FBM',
+        category: 'noise',
+        inputs: [{ name: 'uv', type: 'vec2' }],
+        outputs: [{ name: 'out', type: 'float' }],
         parameters: [
           { name: 'octaves', type: 'int', value: 5, min: 1, max: 8 },
-          { name: 'scale', type: 'float', value: 5 }
+          { name: 'scale', type: 'float', value: 5 },
         ],
-        code: 'fbm($uv * $scale, $octaves)'
+        code: 'fbm($uv * $scale, $octaves)',
       },
       // 工具节点
       {
-        type: 'utility', name: 'Fragment Color', category: 'utility',
-        inputs: [{ name: 'color', type: 'vec4' }], outputs: [],
+        type: 'utility',
+        name: 'Fragment Color',
+        category: 'utility',
+        inputs: [{ name: 'color', type: 'vec4' }],
+        outputs: [],
         parameters: [],
-        code: 'gl_FragColor = $color'
-      }
+        code: 'gl_FragColor = $color',
+      },
     ];
 
     for (const node of builtInNodes) {
@@ -207,7 +314,7 @@ class ShaderEditorService {
       this.nodes.set(id, {
         ...node,
         id,
-        position: { x: 0, y: 0 }
+        position: { x: 0, y: 0 },
       });
     }
   }
@@ -223,7 +330,7 @@ class ShaderEditorService {
         uniforms: [
           { name: 'uTime', type: 'float', defaultValue: 0 },
           { name: 'uOutlineColor', type: 'vec3', defaultValue: [0, 0, 0] },
-          { name: 'uOutlineWidth', type: 'float', defaultValue: 0.02 }
+          { name: 'uOutlineWidth', type: 'float', defaultValue: 0.02 },
         ],
         nodes: [],
         connections: [],
@@ -249,7 +356,7 @@ void main() {
   vUv = uv;
   vNormal = normal;
   gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-}`
+}`,
       },
       {
         id: 'neon',
@@ -259,9 +366,10 @@ void main() {
         uniforms: [
           { name: 'uTime', type: 'float', defaultValue: 0 },
           { name: 'uColor', type: 'vec3', defaultValue: [1.0, 0.2, 0.8] },
-          { name: 'uIntensity', type: 'float', defaultValue: 2.0 }
+          { name: 'uIntensity', type: 'float', defaultValue: 2.0 },
         ],
-        nodes: [], connections: [],
+        nodes: [],
+        connections: [],
         fragmentShader: `precision mediump float;
 uniform float uTime;
 uniform vec3 uColor;
@@ -281,7 +389,7 @@ uniform mat4 projectionMatrix;
 void main() {
   vUv = uv;
   gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-}`
+}`,
       },
       {
         id: 'dissolve',
@@ -291,9 +399,10 @@ void main() {
         uniforms: [
           { name: 'uTime', type: 'float', defaultValue: 0 },
           { name: 'uThreshold', type: 'float', defaultValue: 0.5 },
-          { name: 'uEdgeColor', type: 'vec3', defaultValue: [1.0, 0.5, 0.0] }
+          { name: 'uEdgeColor', type: 'vec3', defaultValue: [1.0, 0.5, 0.0] },
         ],
-        nodes: [], connections: [],
+        nodes: [],
+        connections: [],
         fragmentShader: `precision mediump float;
 uniform float uTime;
 uniform float uThreshold;
@@ -322,7 +431,7 @@ void main() {
   vUv = uv;
   vColor = color;
   gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-}`
+}`,
       },
       {
         id: 'water',
@@ -331,9 +440,10 @@ void main() {
         description: '动态水波纹效果',
         uniforms: [
           { name: 'uTime', type: 'float', defaultValue: 0 },
-          { name: 'uAmplitude', type: 'float', defaultValue: 0.05 }
+          { name: 'uAmplitude', type: 'float', defaultValue: 0.05 },
         ],
-        nodes: [], connections: [],
+        nodes: [],
+        connections: [],
         fragmentShader: `precision mediump float;
 uniform float uTime;
 uniform float uAmplitude;
@@ -354,17 +464,16 @@ uniform mat4 projectionMatrix;
 void main() {
   vUv = uv;
   gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-}`
+}`,
       },
       {
         id: 'plasma',
         name: '等离子',
         category: 'plasma',
         description: '迷幻的等离子效果',
-        uniforms: [
-          { name: 'uTime', type: 'float', defaultValue: 0 }
-        ],
-        nodes: [], connections: [],
+        uniforms: [{ name: 'uTime', type: 'float', defaultValue: 0 }],
+        nodes: [],
+        connections: [],
         fragmentShader: `precision mediump float;
 uniform float uTime;
 varying vec2 vUv;
@@ -384,8 +493,8 @@ uniform mat4 projectionMatrix;
 void main() {
   vUv = uv;
   gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-}`
-      }
+}`,
+      },
     ];
   }
 
@@ -401,7 +510,7 @@ void main() {
   // 移除节点
   removeNode(nodeId: string): void {
     this.nodes.delete(nodeId);
-    this.connections = this.connections.filter(c => c.fromNode !== nodeId && c.toNode !== nodeId);
+    this.connections = this.connections.filter((c) => c.fromNode !== nodeId && c.toNode !== nodeId);
     this.notify();
   }
 
@@ -415,12 +524,22 @@ void main() {
   }
 
   // 添加连接
-  addConnection(fromNode: string, fromOutput: string, toNode: string, toInput: string): ShaderConnection {
+  addConnection(
+    fromNode: string,
+    fromOutput: string,
+    toNode: string,
+    toInput: string
+  ): ShaderConnection {
     // 检查输入是否已连接
-    this.connections = this.connections.filter(c => !(c.toNode === toNode && c.toInput === toInput));
+    this.connections = this.connections.filter(
+      (c) => !(c.toNode === toNode && c.toInput === toInput)
+    );
     const conn: ShaderConnection = {
       id: `conn-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-      fromNode, fromOutput, toNode, toInput
+      fromNode,
+      fromOutput,
+      toNode,
+      toInput,
     };
     this.connections.push(conn);
     this.notify();
@@ -429,7 +548,7 @@ void main() {
 
   // 移除连接
   removeConnection(connectionId: string): void {
-    this.connections = this.connections.filter(c => c.id !== connectionId);
+    this.connections = this.connections.filter((c) => c.id !== connectionId);
     this.notify();
   }
 
@@ -454,7 +573,7 @@ void main() {
 }`;
 
     // 找到 fragment color 输出节点
-    const outputNode = Array.from(this.nodes.values()).find(n => n.type === 'output');
+    const outputNode = Array.from(this.nodes.values()).find((n) => n.type === 'output');
     if (!outputNode) {
       return { vertex, fragment: 'void main() { gl_FragColor = vec4(1.0); }' };
     }
@@ -466,7 +585,7 @@ void main() {
       if (visited.has(nodeId)) return;
       visited.add(nodeId);
       // 先访问所有输入
-      for (const conn of this.connections.filter(c => c.toNode === nodeId)) {
+      for (const conn of this.connections.filter((c) => c.toNode === nodeId)) {
         visit(conn.fromNode);
       }
       order.push(nodeId);
@@ -499,7 +618,7 @@ void main() {
       // 解析输入
       const inputValues: Record<string, string> = {};
       for (const input of node.inputs) {
-        const conn = this.connections.find(c => c.toNode === nodeId && c.toInput === input.name);
+        const conn = this.connections.find((c) => c.toNode === nodeId && c.toInput === input.name);
         if (conn) {
           const fromVar = nodeOutputs.get(conn.fromNode)?.get(conn.fromOutput);
           if (fromVar) inputValues[input.name] = fromVar;
@@ -531,7 +650,9 @@ void main() {
 
     // 最后一行赋值给 gl_FragColor
     if (outputNode.inputs[0]) {
-      const lastConn = this.connections.find(c => c.toNode === outputNode.id && c.toInput === outputNode.inputs[0].name);
+      const lastConn = this.connections.find(
+        (c) => c.toNode === outputNode.id && c.toInput === outputNode.inputs[0].name
+      );
       if (lastConn) {
         const varName = nodeOutputs.get(lastConn.fromNode)?.get(lastConn.fromOutput);
         if (varName) {
@@ -547,7 +668,7 @@ void main() {
 
   // 应用模板
   applyTemplate(templateId: string): ShaderTemplate | null {
-    const template = this.templates.find(t => t.id === templateId);
+    const template = this.templates.find((t) => t.id === templateId);
     if (!template) return null;
 
     // 清空当前
@@ -581,7 +702,7 @@ void main() {
 
   // 获取模板
   getTemplates(category?: ShaderTemplate['category']): ShaderTemplate[] {
-    if (category) return this.templates.filter(t => t.category === category);
+    if (category) return this.templates.filter((t) => t.category === category);
     return [...this.templates];
   }
 
@@ -591,9 +712,13 @@ void main() {
   }
 
   // 订阅更新
-  subscribe(listener: (data: { nodes: ShaderNode[]; connections: ShaderConnection[] }) => void): () => void {
+  subscribe(
+    listener: (data: { nodes: ShaderNode[]; connections: ShaderConnection[] }) => void
+  ): () => void {
     this.listeners.add(listener);
-    return () => { this.listeners.delete(listener); };
+    return () => {
+      this.listeners.delete(listener);
+    };
   }
 
   private notify(): void {
@@ -602,7 +727,11 @@ void main() {
   }
 
   // 保存为自定义模板
-  saveAsTemplate(name: string, category: ShaderTemplate['category'], description: string): ShaderTemplate {
+  saveAsTemplate(
+    name: string,
+    category: ShaderTemplate['category'],
+    description: string
+  ): ShaderTemplate {
     const compiled = this.compileGLSL();
     const template: ShaderTemplate = {
       id: `custom-${Date.now()}`,
@@ -613,7 +742,7 @@ void main() {
       nodes: this.listNodes(),
       connections: this.getConnections(),
       fragmentShader: compiled.fragment,
-      vertexShader: compiled.vertex
+      vertexShader: compiled.vertex,
     };
     this.templates.push(template);
     return template;

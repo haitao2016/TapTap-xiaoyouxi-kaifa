@@ -1,7 +1,7 @@
 import { globalEventBus } from './event-bus';
 import { randomUUID } from 'node:crypto';
 
-export type AssetCategory = 
+export type AssetCategory =
   | 'game-component'
   | 'ui-template'
   | 'audio'
@@ -163,49 +163,48 @@ export class AssetStoreService {
 
     if (options?.query) {
       const query = options.query.toLowerCase();
-      result = result.filter(a =>
-        a.name.toLowerCase().includes(query) ||
-        a.description.toLowerCase().includes(query) ||
-        a.tags.some(t => t.toLowerCase().includes(query)) ||
-        a.author.toLowerCase().includes(query)
+      result = result.filter(
+        (a) =>
+          a.name.toLowerCase().includes(query) ||
+          a.description.toLowerCase().includes(query) ||
+          a.tags.some((t) => t.toLowerCase().includes(query)) ||
+          a.author.toLowerCase().includes(query)
       );
     }
 
     if (options?.category) {
-      result = result.filter(a => a.category === options.category);
+      result = result.filter((a) => a.category === options.category);
     }
 
     if (options?.priceType) {
-      result = result.filter(a => a.priceType === options.priceType);
+      result = result.filter((a) => a.priceType === options.priceType);
     }
 
     if (options?.tags && options.tags.length > 0) {
-      result = result.filter(a =>
-        options.tags!.some(tag => a.tags.includes(tag))
-      );
+      result = result.filter((a) => options.tags!.some((tag) => a.tags.includes(tag)));
     }
 
     if (options?.featured) {
-      result = result.filter(a => a.featured);
+      result = result.filter((a) => a.featured);
     }
 
     if (options?.verified) {
-      result = result.filter(a => a.verified);
+      result = result.filter((a) => a.verified);
     }
 
     if (options?.installed !== undefined) {
-      result = result.filter(a => {
+      result = result.filter((a) => {
         const isInstalled = this.installedAssets.has(a.id);
         return options.installed ? isInstalled : !isInstalled;
       });
     }
 
     if (options?.minRating !== undefined) {
-      result = result.filter(a => a.rating >= options.minRating!);
+      result = result.filter((a) => a.rating >= options.minRating!);
     }
 
     if (options?.maxPrice !== undefined) {
-      result = result.filter(a => a.price <= options.maxPrice!);
+      result = result.filter((a) => a.price <= options.maxPrice!);
     }
 
     const sortBy = options?.sortBy || 'downloads';
@@ -247,7 +246,7 @@ export class AssetStoreService {
     const totalPages = Math.ceil(total / pageSize);
 
     return {
-      assets: result.slice(start, end).map(a => this.enrichAsset(a)),
+      assets: result.slice(start, end).map((a) => this.enrichAsset(a)),
       total,
       page,
       pageSize,
@@ -256,7 +255,7 @@ export class AssetStoreService {
   }
 
   getAssetById(assetId: string): Asset | undefined {
-    const asset = this.assets.find(a => a.id === assetId);
+    const asset = this.assets.find((a) => a.id === assetId);
     return asset ? this.enrichAsset(asset) : undefined;
   }
 
@@ -265,13 +264,13 @@ export class AssetStoreService {
   }
 
   getCategoryById(categoryId: AssetCategory): AssetCategoryInfo | undefined {
-    return this.categories.find(c => c.id === categoryId);
+    return this.categories.find((c) => c.id === categoryId);
   }
 
   getInstalledAssets(): Asset[] {
     const assets: Asset[] = [];
     this.installedAssets.forEach((install, assetId) => {
-      const asset = this.assets.find(a => a.id === assetId);
+      const asset = this.assets.find((a) => a.id === assetId);
       if (asset) {
         assets.push(this.enrichAsset(asset));
       }
@@ -280,9 +279,7 @@ export class AssetStoreService {
   }
 
   getFavoriteAssets(): Asset[] {
-    return this.assets
-      .filter(a => this.favoriteAssets.has(a.id))
-      .map(a => this.enrichAsset(a));
+    return this.assets.filter((a) => this.favoriteAssets.has(a.id)).map((a) => this.enrichAsset(a));
   }
 
   isAssetInstalled(assetId: string): boolean {
@@ -294,7 +291,7 @@ export class AssetStoreService {
   }
 
   async installAsset(assetId: string, options?: InstallAssetOptions): Promise<AssetInstallation> {
-    const asset = this.assets.find(a => a.id === assetId);
+    const asset = this.assets.find((a) => a.id === assetId);
     if (!asset) {
       throw new Error(`资产不存在: ${assetId}`);
     }
@@ -385,7 +382,7 @@ export class AssetStoreService {
   }
 
   toggleFavorite(assetId: string): boolean {
-    const asset = this.assets.find(a => a.id === assetId);
+    const asset = this.assets.find((a) => a.id === assetId);
     if (!asset) {
       throw new Error(`资产不存在: ${assetId}`);
     }
@@ -405,7 +402,11 @@ export class AssetStoreService {
     }
   }
 
-  getAssetReviews(assetId: string, page = 1, pageSize = 10): { reviews: AssetReview[]; total: number; totalPages: number } {
+  getAssetReviews(
+    assetId: string,
+    page = 1,
+    pageSize = 10
+  ): { reviews: AssetReview[]; total: number; totalPages: number } {
     const reviews = this.reviews.get(assetId) || [];
     const total = reviews.length;
     const totalPages = Math.ceil(total / pageSize);
@@ -418,8 +419,15 @@ export class AssetStoreService {
     };
   }
 
-  async addReview(assetId: string, userId: string, userName: string, rating: number, content: string, title?: string): Promise<AssetReview> {
-    const asset = this.assets.find(a => a.id === assetId);
+  async addReview(
+    assetId: string,
+    userId: string,
+    userName: string,
+    rating: number,
+    content: string,
+    title?: string
+  ): Promise<AssetReview> {
+    const asset = this.assets.find((a) => a.id === assetId);
     if (!asset) {
       throw new Error(`资产不存在: ${assetId}`);
     }
@@ -438,7 +446,7 @@ export class AssetStoreService {
     };
 
     const existingReviews = this.reviews.get(assetId) || [];
-    const existingIndex = existingReviews.findIndex(r => r.userId === userId);
+    const existingIndex = existingReviews.findIndex((r) => r.userId === userId);
 
     if (existingIndex >= 0) {
       review.id = existingReviews[existingIndex].id;
@@ -462,48 +470,46 @@ export class AssetStoreService {
 
   markReviewHelpful(reviewId: string, assetId: string): void {
     const reviews = this.reviews.get(assetId) || [];
-    const review = reviews.find(r => r.id === reviewId);
+    const review = reviews.find((r) => r.id === reviewId);
     if (review) {
       review.helpfulCount++;
     }
   }
 
   getAuthor(authorId: string): AssetAuthor | undefined {
-    return this.authors.find(a => a.id === authorId);
+    return this.authors.find((a) => a.id === authorId);
   }
 
   getAuthorAssets(authorId: string): Asset[] {
-    return this.assets
-      .filter(a => a.authorId === authorId)
-      .map(a => this.enrichAsset(a));
+    return this.assets.filter((a) => a.authorId === authorId).map((a) => this.enrichAsset(a));
   }
 
   getFeaturedAssets(limit = 10): Asset[] {
     return this.assets
-      .filter(a => a.featured)
+      .filter((a) => a.featured)
       .slice(0, limit)
-      .map(a => this.enrichAsset(a));
+      .map((a) => this.enrichAsset(a));
   }
 
   getPopularAssets(limit = 10): Asset[] {
     return [...this.assets]
       .sort((a, b) => b.downloads - a.downloads)
       .slice(0, limit)
-      .map(a => this.enrichAsset(a));
+      .map((a) => this.enrichAsset(a));
   }
 
   getNewestAssets(limit = 10): Asset[] {
     return [...this.assets]
       .sort((a, b) => b.createdAt - a.createdAt)
       .slice(0, limit)
-      .map(a => this.enrichAsset(a));
+      .map((a) => this.enrichAsset(a));
   }
 
   getTopRatedAssets(limit = 10): Asset[] {
     return [...this.assets]
       .sort((a, b) => b.rating - a.rating)
       .slice(0, limit)
-      .map(a => this.enrichAsset(a));
+      .map((a) => this.enrichAsset(a));
   }
 
   getRelatedAssets(assetId: string, limit = 5): Asset[] {
@@ -511,20 +517,18 @@ export class AssetStoreService {
     if (!asset) return [];
 
     return this.assets
-      .filter(a => a.id !== assetId && a.category === asset.category)
+      .filter((a) => a.id !== assetId && a.category === asset.category)
       .slice(0, limit)
-      .map(a => this.enrichAsset(a));
+      .map((a) => this.enrichAsset(a));
   }
 
   getAssetsByTag(tag: string): Asset[] {
-    return this.assets
-      .filter(a => a.tags.includes(tag))
-      .map(a => this.enrichAsset(a));
+    return this.assets.filter((a) => a.tags.includes(tag)).map((a) => this.enrichAsset(a));
   }
 
   getAllTags(): string[] {
     const tagSet = new Set<string>();
-    this.assets.forEach(a => a.tags.forEach(t => tagSet.add(t)));
+    this.assets.forEach((a) => a.tags.forEach((t) => tagSet.add(t)));
     return [...tagSet].sort();
   }
 
@@ -562,8 +566,7 @@ export class AssetStoreService {
           });
         }
       }
-    } catch {
-    }
+    } catch {}
   }
 
   private saveInstalledAssets(): void {
@@ -572,8 +575,7 @@ export class AssetStoreService {
         const data = Object.fromEntries(this.installedAssets.entries());
         localStorage.setItem('tapdev-installed-assets', JSON.stringify(data));
       }
-    } catch {
-    }
+    } catch {}
   }
 
   private loadFavoriteAssets(): void {
@@ -582,11 +584,10 @@ export class AssetStoreService {
         const saved = localStorage.getItem('tapdev-favorite-assets');
         if (saved) {
           const data: string[] = JSON.parse(saved);
-          data.forEach(id => this.favoriteAssets.add(id));
+          data.forEach((id) => this.favoriteAssets.add(id));
         }
       }
-    } catch {
-    }
+    } catch {}
   }
 
   private saveFavoriteAssets(): void {
@@ -595,25 +596,29 @@ export class AssetStoreService {
         const data = [...this.favoriteAssets];
         localStorage.setItem('tapdev-favorite-assets', JSON.stringify(data));
       }
-    } catch {
-    }
+    } catch {}
   }
 
   private loadCategories(): void {
     const categoryMap = new Map<AssetCategory, number>();
-    this.assets.forEach(a => {
+    this.assets.forEach((a) => {
       categoryMap.set(a.category, (categoryMap.get(a.category) || 0) + 1);
     });
 
-    const categoryMeta: Record<AssetCategory, { name: string; icon: string; description: string }> = {
-      'game-component': { name: '游戏组件', icon: 'puzzle', description: '可复用的游戏功能组件' },
-      'ui-template': { name: 'UI模板', icon: 'layout', description: '精美游戏界面模板' },
-      'audio': { name: '音效素材', icon: 'music', description: '游戏音效和背景音乐' },
-      'art': { name: '美术资源', icon: 'image', description: '2D/3D 美术素材资源' },
-      'particle': { name: '粒子特效', icon: 'sparkles', description: '炫酷粒子特效系统' },
-      'scene-template': { name: '场景模板', icon: 'map', description: '完整游戏场景模板' },
-      'full-project': { name: '完整项目', icon: 'package', description: '可直接运行的完整游戏项目' },
-    };
+    const categoryMeta: Record<AssetCategory, { name: string; icon: string; description: string }> =
+      {
+        'game-component': { name: '游戏组件', icon: 'puzzle', description: '可复用的游戏功能组件' },
+        'ui-template': { name: 'UI模板', icon: 'layout', description: '精美游戏界面模板' },
+        audio: { name: '音效素材', icon: 'music', description: '游戏音效和背景音乐' },
+        art: { name: '美术资源', icon: 'image', description: '2D/3D 美术素材资源' },
+        particle: { name: '粒子特效', icon: 'sparkles', description: '炫酷粒子特效系统' },
+        'scene-template': { name: '场景模板', icon: 'map', description: '完整游戏场景模板' },
+        'full-project': {
+          name: '完整项目',
+          icon: 'package',
+          description: '可直接运行的完整游戏项目',
+        },
+      };
 
     this.categories = Array.from(categoryMap.entries()).map(([id, count]) => ({
       id,
@@ -633,7 +638,8 @@ export class AssetStoreService {
         id: 'asset-001',
         name: '通用UI框架',
         description: '一套完整的游戏UI框架，包含按钮、弹窗、列表、进度条等常用组件',
-        longDescription: '通用UI框架提供了游戏开发中最常用的UI组件，采用模块化设计，易于扩展和定制。支持多种分辨率自适应，内置主题系统，可以快速切换不同的视觉风格。',
+        longDescription:
+          '通用UI框架提供了游戏开发中最常用的UI组件，采用模块化设计，易于扩展和定制。支持多种分辨率自适应，内置主题系统，可以快速切换不同的视觉风格。',
         author: 'TapDev Studio',
         authorId: 'author-001',
         authorAvatar: 'avatar-1.png',
@@ -650,16 +656,41 @@ export class AssetStoreService {
         icon: 'layout',
         files: [
           { name: 'UIManager.ts', path: 'src/ui/UIManager.ts', size: 15360, type: 'typescript' },
-          { name: 'UIButton.ts', path: 'src/ui/components/UIButton.ts', size: 8192, type: 'typescript' },
-          { name: 'UIDialog.ts', path: 'src/ui/components/UIDialog.ts', size: 12288, type: 'typescript' },
-          { name: 'UIList.ts', path: 'src/ui/components/UIList.ts', size: 10240, type: 'typescript' },
-          { name: 'UIProgressBar.ts', path: 'src/ui/components/UIProgressBar.ts', size: 6144, type: 'typescript' },
+          {
+            name: 'UIButton.ts',
+            path: 'src/ui/components/UIButton.ts',
+            size: 8192,
+            type: 'typescript',
+          },
+          {
+            name: 'UIDialog.ts',
+            path: 'src/ui/components/UIDialog.ts',
+            size: 12288,
+            type: 'typescript',
+          },
+          {
+            name: 'UIList.ts',
+            path: 'src/ui/components/UIList.ts',
+            size: 10240,
+            type: 'typescript',
+          },
+          {
+            name: 'UIProgressBar.ts',
+            path: 'src/ui/components/UIProgressBar.ts',
+            size: 6144,
+            type: 'typescript',
+          },
         ],
         totalSize: 524288,
         dependencies: [],
         changelog: [
           { version: '2.1.0', releaseDate: now - 3 * day, notes: '新增虚拟列表组件，优化性能' },
-          { version: '2.0.0', releaseDate: now - 30 * day, notes: '重构架构，支持主题系统', breakingChanges: true },
+          {
+            version: '2.0.0',
+            releaseDate: now - 30 * day,
+            notes: '重构架构，支持主题系统',
+            breakingChanges: true,
+          },
           { version: '1.0.0', releaseDate: now - 90 * day, notes: '初始版本发布' },
         ],
         compatibleVersions: ['0.3.0', '0.4.0'],
@@ -673,7 +704,8 @@ export class AssetStoreService {
         id: 'asset-002',
         name: '三消游戏核心',
         description: '完整的三消游戏核心玩法系统，支持多种消除规则和道具效果',
-        longDescription: '三消游戏核心提供了完整的三消游戏逻辑，包括棋盘系统、匹配检测、消除动画、关卡生成等功能。支持多种特殊方块和道具效果，可以快速构建各种三消类游戏。',
+        longDescription:
+          '三消游戏核心提供了完整的三消游戏逻辑，包括棋盘系统、匹配检测、消除动画、关卡生成等功能。支持多种特殊方块和道具效果，可以快速构建各种三消类游戏。',
         author: 'GameCraft',
         authorId: 'author-002',
         authorAvatar: 'avatar-2.png',
@@ -692,15 +724,33 @@ export class AssetStoreService {
         previewVideo: 'match3-demo.mp4',
         icon: 'grid',
         files: [
-          { name: 'Match3Board.ts', path: 'src/match3/Match3Board.ts', size: 20480, type: 'typescript' },
-          { name: 'Match3Logic.ts', path: 'src/match3/Match3Logic.ts', size: 25600, type: 'typescript' },
-          { name: 'LevelGenerator.ts', path: 'src/match3/LevelGenerator.ts', size: 15360, type: 'typescript' },
-          { name: 'PowerUpSystem.ts', path: 'src/match3/PowerUpSystem.ts', size: 12288, type: 'typescript' },
+          {
+            name: 'Match3Board.ts',
+            path: 'src/match3/Match3Board.ts',
+            size: 20480,
+            type: 'typescript',
+          },
+          {
+            name: 'Match3Logic.ts',
+            path: 'src/match3/Match3Logic.ts',
+            size: 25600,
+            type: 'typescript',
+          },
+          {
+            name: 'LevelGenerator.ts',
+            path: 'src/match3/LevelGenerator.ts',
+            size: 15360,
+            type: 'typescript',
+          },
+          {
+            name: 'PowerUpSystem.ts',
+            path: 'src/match3/PowerUpSystem.ts',
+            size: 12288,
+            type: 'typescript',
+          },
         ],
         totalSize: 1048576,
-        dependencies: [
-          { name: '通用UI框架', version: '2.0.0', optional: true },
-        ],
+        dependencies: [{ name: '通用UI框架', version: '2.0.0', optional: true }],
         changelog: [
           { version: '1.5.0', releaseDate: now - 5 * day, notes: '新增5种特殊方块效果' },
           { version: '1.4.0', releaseDate: now - 20 * day, notes: '优化关卡生成算法' },
@@ -717,7 +767,8 @@ export class AssetStoreService {
         id: 'asset-003',
         name: '角色控制器',
         description: '2D平台游戏角色控制器，支持跳跃、移动、攻击等多种动作',
-        longDescription: '角色控制器提供了完善的2D平台游戏角色控制功能，包括流畅的移动、精确的跳跃判定、墙壁滑行、二段跳等特性。内置状态机系统，方便扩展新的动作状态。',
+        longDescription:
+          '角色控制器提供了完善的2D平台游戏角色控制功能，包括流畅的移动、精确的跳跃判定、墙壁滑行、二段跳等特性。内置状态机系统，方便扩展新的动作状态。',
         author: 'PixelForge',
         authorId: 'author-003',
         authorAvatar: 'avatar-3.png',
@@ -733,15 +784,35 @@ export class AssetStoreService {
         previewImages: ['character-1.png', 'character-2.png'],
         icon: 'user',
         files: [
-          { name: 'CharacterController2D.ts', path: 'src/character/CharacterController2D.ts', size: 18432, type: 'typescript' },
-          { name: 'CharacterStateMachine.ts', path: 'src/character/CharacterStateMachine.ts', size: 10240, type: 'typescript' },
-          { name: 'PlayerInput.ts', path: 'src/character/PlayerInput.ts', size: 7168, type: 'typescript' },
+          {
+            name: 'CharacterController2D.ts',
+            path: 'src/character/CharacterController2D.ts',
+            size: 18432,
+            type: 'typescript',
+          },
+          {
+            name: 'CharacterStateMachine.ts',
+            path: 'src/character/CharacterStateMachine.ts',
+            size: 10240,
+            type: 'typescript',
+          },
+          {
+            name: 'PlayerInput.ts',
+            path: 'src/character/PlayerInput.ts',
+            size: 7168,
+            type: 'typescript',
+          },
         ],
         totalSize: 524288,
         dependencies: [],
         changelog: [
           { version: '2.0.1', releaseDate: now - 2 * day, notes: '修复跳跃判定问题' },
-          { version: '2.0.0', releaseDate: now - 25 * day, notes: '重写状态机系统', breakingChanges: true },
+          {
+            version: '2.0.0',
+            releaseDate: now - 25 * day,
+            notes: '重写状态机系统',
+            breakingChanges: true,
+          },
           { version: '1.2.0', releaseDate: now - 50 * day, notes: '新增墙壁滑行和蹬墙跳' },
           { version: '1.0.0', releaseDate: now - 80 * day, notes: '初始版本发布' },
         ],
@@ -755,7 +826,8 @@ export class AssetStoreService {
         id: 'asset-004',
         name: 'RPG音效包',
         description: '包含100+高品质RPG游戏音效，涵盖战斗、UI、环境等多种场景',
-        longDescription: 'RPG音效包含了丰富的角色扮演游戏音效资源，包括攻击音效、技能音效、UI交互音效、环境音效等。所有音效均为高品质无损格式，可直接用于商业项目。',
+        longDescription:
+          'RPG音效包含了丰富的角色扮演游戏音效资源，包括攻击音效、技能音效、UI交互音效、环境音效等。所有音效均为高品质无损格式，可直接用于商业项目。',
         author: 'SoundMasters',
         authorId: 'author-004',
         authorAvatar: 'avatar-4.png',
@@ -775,7 +847,12 @@ export class AssetStoreService {
         files: [
           { name: 'combat_bundle', path: 'audio/combat', size: 10485760, type: 'directory' },
           { name: 'ui_bundle', path: 'audio/ui', size: 5242880, type: 'directory' },
-          { name: 'environment_bundle', path: 'audio/environment', size: 15728640, type: 'directory' },
+          {
+            name: 'environment_bundle',
+            path: 'audio/environment',
+            size: 15728640,
+            type: 'directory',
+          },
           { name: 'magic_bundle', path: 'audio/magic', size: 8388608, type: 'directory' },
         ],
         totalSize: 41943040,
@@ -796,7 +873,8 @@ export class AssetStoreService {
         id: 'asset-005',
         name: '像素风格角色包',
         description: '32x32像素风格角色素材包，包含4个主角和20个敌人角色',
-        longDescription: '像素风格角色包提供了精美的32x32像素艺术风格角色素材。每个角色都有完整的动画序列，包括待机、行走、奔跑、跳跃、攻击、受伤等状态。',
+        longDescription:
+          '像素风格角色包提供了精美的32x32像素艺术风格角色素材。每个角色都有完整的动画序列，包括待机、行走、奔跑、跳跃、攻击、受伤等状态。',
         author: 'PixelArt Studio',
         authorId: 'author-005',
         authorAvatar: 'avatar-5.png',
@@ -818,9 +896,7 @@ export class AssetStoreService {
         ],
         totalSize: 25165824,
         dependencies: [],
-        changelog: [
-          { version: '1.0.0', releaseDate: now - 15 * day, notes: '初始版本发布' },
-        ],
+        changelog: [{ version: '1.0.0', releaseDate: now - 15 * day, notes: '初始版本发布' }],
         compatibleVersions: ['0.3.0', '0.4.0'],
         createdAt: now - 15 * day,
         updatedAt: now - 15 * day,
@@ -832,7 +908,8 @@ export class AssetStoreService {
         id: 'asset-006',
         name: '粒子特效系统',
         description: '功能强大的粒子特效系统，支持火焰、爆炸、魔法等多种特效',
-        longDescription: '粒子特效系统提供了丰富的粒子效果和可视化编辑器。支持多种粒子发射器类型，包括点、线、面、球体等。内置200+预设特效，可直接使用。',
+        longDescription:
+          '粒子特效系统提供了丰富的粒子效果和可视化编辑器。支持多种粒子发射器类型，包括点、线、面、球体等。内置200+预设特效，可直接使用。',
         author: 'FXLab',
         authorId: 'author-006',
         authorAvatar: 'avatar-6.png',
@@ -851,16 +928,36 @@ export class AssetStoreService {
         previewVideo: 'particle-demo.mp4',
         icon: 'sparkles',
         files: [
-          { name: 'ParticleSystem.ts', path: 'src/particles/ParticleSystem.ts', size: 25600, type: 'typescript' },
-          { name: 'ParticleEmitter.ts', path: 'src/particles/ParticleEmitter.ts', size: 20480, type: 'typescript' },
-          { name: 'ParticlePresets.ts', path: 'src/particles/ParticlePresets.ts', size: 30720, type: 'typescript' },
+          {
+            name: 'ParticleSystem.ts',
+            path: 'src/particles/ParticleSystem.ts',
+            size: 25600,
+            type: 'typescript',
+          },
+          {
+            name: 'ParticleEmitter.ts',
+            path: 'src/particles/ParticleEmitter.ts',
+            size: 20480,
+            type: 'typescript',
+          },
+          {
+            name: 'ParticlePresets.ts',
+            path: 'src/particles/ParticlePresets.ts',
+            size: 30720,
+            type: 'typescript',
+          },
         ],
         totalSize: 2097152,
         dependencies: [],
         changelog: [
           { version: '3.2.0', releaseDate: now - 7 * day, notes: '新增50个魔法特效预设' },
           { version: '3.1.0', releaseDate: now - 35 * day, notes: '性能优化，支持GPU加速' },
-          { version: '3.0.0', releaseDate: now - 70 * day, notes: '全新架构设计', breakingChanges: true },
+          {
+            version: '3.0.0',
+            releaseDate: now - 70 * day,
+            notes: '全新架构设计',
+            breakingChanges: true,
+          },
         ],
         compatibleVersions: ['0.4.0'],
         createdAt: now - 120 * day,
@@ -873,7 +970,8 @@ export class AssetStoreService {
         id: 'asset-007',
         name: '森林场景包',
         description: '完整的森林场景模板，包含地形、树木、岩石、植被等元素',
-        longDescription: '森林场景包提供了一整套森林环境的场景资源，包括模块化的地形瓦片、各种树木、岩石、草地、花朵等装饰元素。可以快速搭建出精美的2D森林场景。',
+        longDescription:
+          '森林场景包提供了一整套森林环境的场景资源，包括模块化的地形瓦片、各种树木、岩石、草地、花朵等装饰元素。可以快速搭建出精美的2D森林场景。',
         author: 'Environment Art',
         authorId: 'author-007',
         authorAvatar: 'avatar-7.png',
@@ -910,7 +1008,8 @@ export class AssetStoreService {
         id: 'asset-008',
         name: '塔防游戏模板',
         description: '完整的塔防游戏项目模板，包含多种防御塔和敌人类型',
-        longDescription: '塔防游戏模板是一个完整可运行的塔防游戏项目，包含完整的游戏逻辑、关卡系统、升级系统、多种防御塔和敌人类型。代码结构清晰，易于学习和扩展。',
+        longDescription:
+          '塔防游戏模板是一个完整可运行的塔防游戏项目，包含完整的游戏逻辑、关卡系统、升级系统、多种防御塔和敌人类型。代码结构清晰，易于学习和扩展。',
         author: 'TapDev Studio',
         authorId: 'author-001',
         authorAvatar: 'avatar-1.png',
@@ -928,17 +1027,13 @@ export class AssetStoreService {
         previewImages: ['towerdefense-1.png', 'towerdefense-2.png', 'towerdefense-3.png'],
         previewVideo: 'towerdefense-demo.mp4',
         icon: 'shield',
-        files: [
-          { name: 'project', path: '/', size: 52428800, type: 'directory' },
-        ],
+        files: [{ name: 'project', path: '/', size: 52428800, type: 'directory' }],
         totalSize: 52428800,
         dependencies: [
           { name: '通用UI框架', version: '2.0.0', optional: false },
           { name: '粒子特效系统', version: '3.0.0', optional: true },
         ],
-        changelog: [
-          { version: '1.0.0', releaseDate: now - 20 * day, notes: '初始版本发布' },
-        ],
+        changelog: [{ version: '1.0.0', releaseDate: now - 20 * day, notes: '初始版本发布' }],
         compatibleVersions: ['0.4.0'],
         createdAt: now - 20 * day,
         updatedAt: now - 20 * day,
@@ -950,7 +1045,8 @@ export class AssetStoreService {
         id: 'asset-009',
         name: 'Roguelike地牢生成器',
         description: '程序化地牢生成系统，支持多种房间类型和走廊生成算法',
-        longDescription: 'Roguelike地牢生成器提供了强大的程序化地牢生成功能。支持房间放置、走廊连接、门和钥匙系统、宝箱放置等功能，可以生成无限变化的地牢布局。',
+        longDescription:
+          'Roguelike地牢生成器提供了强大的程序化地牢生成功能。支持房间放置、走廊连接、门和钥匙系统、宝箱放置等功能，可以生成无限变化的地牢布局。',
         author: 'Procedural Labs',
         authorId: 'author-008',
         authorAvatar: 'avatar-8.png',
@@ -966,9 +1062,24 @@ export class AssetStoreService {
         previewImages: ['dungeon-1.png', 'dungeon-2.png'],
         icon: 'map',
         files: [
-          { name: 'DungeonGenerator.ts', path: 'src/dungeon/DungeonGenerator.ts', size: 22528, type: 'typescript' },
-          { name: 'RoomGenerator.ts', path: 'src/dungeon/RoomGenerator.ts', size: 15360, type: 'typescript' },
-          { name: 'CorridorGenerator.ts', path: 'src/dungeon/CorridorGenerator.ts', size: 10240, type: 'typescript' },
+          {
+            name: 'DungeonGenerator.ts',
+            path: 'src/dungeon/DungeonGenerator.ts',
+            size: 22528,
+            type: 'typescript',
+          },
+          {
+            name: 'RoomGenerator.ts',
+            path: 'src/dungeon/RoomGenerator.ts',
+            size: 15360,
+            type: 'typescript',
+          },
+          {
+            name: 'CorridorGenerator.ts',
+            path: 'src/dungeon/CorridorGenerator.ts',
+            size: 10240,
+            type: 'typescript',
+          },
         ],
         totalSize: 786432,
         dependencies: [],
@@ -987,7 +1098,8 @@ export class AssetStoreService {
         id: 'asset-010',
         name: '卡牌战斗系统',
         description: '完整的卡牌战斗系统，支持卡组构建、战斗结算、特效展示',
-        longDescription: '卡牌战斗系统提供了完整的TCG卡牌游戏核心功能，包括卡牌数据管理、卡组构建、战斗系统、AI对手、特效展示等。支持多种卡牌类型和技能效果。',
+        longDescription:
+          '卡牌战斗系统提供了完整的TCG卡牌游戏核心功能，包括卡牌数据管理、卡组构建、战斗系统、AI对手、特效展示等。支持多种卡牌类型和技能效果。',
         author: 'CardGame Pro',
         authorId: 'author-009',
         authorAvatar: 'avatar-9.png',
@@ -1004,17 +1116,40 @@ export class AssetStoreService {
         previewVideo: 'card-demo.mp4',
         icon: 'layers',
         files: [
-          { name: 'CardSystem.ts', path: 'src/cards/CardSystem.ts', size: 25600, type: 'typescript' },
-          { name: 'BattleManager.ts', path: 'src/cards/BattleManager.ts', size: 20480, type: 'typescript' },
-          { name: 'DeckBuilder.ts', path: 'src/cards/DeckBuilder.ts', size: 15360, type: 'typescript' },
-          { name: 'CardEffects.ts', path: 'src/cards/CardEffects.ts', size: 18432, type: 'typescript' },
+          {
+            name: 'CardSystem.ts',
+            path: 'src/cards/CardSystem.ts',
+            size: 25600,
+            type: 'typescript',
+          },
+          {
+            name: 'BattleManager.ts',
+            path: 'src/cards/BattleManager.ts',
+            size: 20480,
+            type: 'typescript',
+          },
+          {
+            name: 'DeckBuilder.ts',
+            path: 'src/cards/DeckBuilder.ts',
+            size: 15360,
+            type: 'typescript',
+          },
+          {
+            name: 'CardEffects.ts',
+            path: 'src/cards/CardEffects.ts',
+            size: 18432,
+            type: 'typescript',
+          },
         ],
         totalSize: 1572864,
-        dependencies: [
-          { name: '通用UI框架', version: '2.0.0', optional: false },
-        ],
+        dependencies: [{ name: '通用UI框架', version: '2.0.0', optional: false }],
         changelog: [
-          { version: '2.0.0', releaseDate: now - 15 * day, notes: '全新战斗系统', breakingChanges: true },
+          {
+            version: '2.0.0',
+            releaseDate: now - 15 * day,
+            notes: '全新战斗系统',
+            breakingChanges: true,
+          },
           { version: '1.2.0', releaseDate: now - 55 * day, notes: '新增AI对手' },
           { version: '1.0.0', releaseDate: now - 100 * day, notes: '初始版本发布' },
         ],
@@ -1029,7 +1164,8 @@ export class AssetStoreService {
         id: 'asset-011',
         name: '对话系统',
         description: '分支对话系统，支持条件判断、变量、表情和打字机效果',
-        longDescription: '对话系统提供了功能丰富的NPC对话功能，支持分支对话、条件分支、变量存储、角色表情、打字机效果、语音播放等特性。可视化编辑器让对话设计变得简单。',
+        longDescription:
+          '对话系统提供了功能丰富的NPC对话功能，支持分支对话、条件分支、变量存储、角色表情、打字机效果、语音播放等特性。可视化编辑器让对话设计变得简单。',
         author: 'StoryTools',
         authorId: 'author-010',
         authorAvatar: 'avatar-10.png',
@@ -1045,8 +1181,18 @@ export class AssetStoreService {
         previewImages: ['dialogue-1.png', 'dialogue-2.png'],
         icon: 'message-circle',
         files: [
-          { name: 'DialogueSystem.ts', path: 'src/dialogue/DialogueSystem.ts', size: 18432, type: 'typescript' },
-          { name: 'DialogueParser.ts', path: 'src/dialogue/DialogueParser.ts', size: 12288, type: 'typescript' },
+          {
+            name: 'DialogueSystem.ts',
+            path: 'src/dialogue/DialogueSystem.ts',
+            size: 18432,
+            type: 'typescript',
+          },
+          {
+            name: 'DialogueParser.ts',
+            path: 'src/dialogue/DialogueParser.ts',
+            size: 12288,
+            type: 'typescript',
+          },
         ],
         totalSize: 524288,
         dependencies: [],
@@ -1065,7 +1211,8 @@ export class AssetStoreService {
         id: 'asset-012',
         name: '库存背包系统',
         description: '游戏背包和物品管理系统，支持物品堆叠、分类、拖拽排序',
-        longDescription: '库存背包系统提供了完整的游戏背包管理功能，支持多种物品类型、物品堆叠、物品分类、拖拽排序、物品使用、装备系统等功能。界面精美，交互流畅。',
+        longDescription:
+          '库存背包系统提供了完整的游戏背包管理功能，支持多种物品类型、物品堆叠、物品分类、拖拽排序、物品使用、装备系统等功能。界面精美，交互流畅。',
         author: 'GameCraft',
         authorId: 'author-002',
         authorAvatar: 'avatar-2.png',
@@ -1081,14 +1228,27 @@ export class AssetStoreService {
         previewImages: ['inventory-1.png', 'inventory-2.png'],
         icon: 'package',
         files: [
-          { name: 'InventoryManager.ts', path: 'src/inventory/InventoryManager.ts', size: 15360, type: 'typescript' },
-          { name: 'InventoryUI.ts', path: 'src/inventory/InventoryUI.ts', size: 18432, type: 'typescript' },
-          { name: 'ItemDatabase.ts', path: 'src/inventory/ItemDatabase.ts', size: 10240, type: 'typescript' },
+          {
+            name: 'InventoryManager.ts',
+            path: 'src/inventory/InventoryManager.ts',
+            size: 15360,
+            type: 'typescript',
+          },
+          {
+            name: 'InventoryUI.ts',
+            path: 'src/inventory/InventoryUI.ts',
+            size: 18432,
+            type: 'typescript',
+          },
+          {
+            name: 'ItemDatabase.ts',
+            path: 'src/inventory/ItemDatabase.ts',
+            size: 10240,
+            type: 'typescript',
+          },
         ],
         totalSize: 786432,
-        dependencies: [
-          { name: '通用UI框架', version: '2.0.0', optional: false },
-        ],
+        dependencies: [{ name: '通用UI框架', version: '2.0.0', optional: false }],
         changelog: [
           { version: '1.2.0', releaseDate: now - 18 * day, notes: '新增装备系统' },
           { version: '1.1.0', releaseDate: now - 45 * day, notes: '优化拖拽体验' },
@@ -1104,7 +1264,8 @@ export class AssetStoreService {
         id: 'asset-013',
         name: '背景音乐包',
         description: '10首高品质游戏背景音乐，涵盖多种风格和氛围',
-        longDescription: '背景音乐包含10首精心制作的游戏背景音乐，风格涵盖史诗、冒险、轻松、神秘、战斗等多种氛围。所有音乐均为循环优化，可无缝循环播放。',
+        longDescription:
+          '背景音乐包含10首精心制作的游戏背景音乐，风格涵盖史诗、冒险、轻松、神秘、战斗等多种氛围。所有音乐均为循环优化，可无缝循环播放。',
         author: 'SoundMasters',
         authorId: 'author-004',
         authorAvatar: 'avatar-4.png',
@@ -1120,9 +1281,19 @@ export class AssetStoreService {
         previewImages: ['bgm-1.png'],
         icon: 'headphones',
         files: [
-          { name: 'epic_theme.ogg', path: 'audio/bgm/epic_theme.ogg', size: 8388608, type: 'audio' },
+          {
+            name: 'epic_theme.ogg',
+            path: 'audio/bgm/epic_theme.ogg',
+            size: 8388608,
+            type: 'audio',
+          },
           { name: 'adventure.ogg', path: 'audio/bgm/adventure.ogg', size: 7340032, type: 'audio' },
-          { name: 'mysterious.ogg', path: 'audio/bgm/mysterious.ogg', size: 6291456, type: 'audio' },
+          {
+            name: 'mysterious.ogg',
+            path: 'audio/bgm/mysterious.ogg',
+            size: 6291456,
+            type: 'audio',
+          },
           { name: 'battle.ogg', path: 'audio/bgm/battle.ogg', size: 5242880, type: 'audio' },
           { name: 'peaceful.ogg', path: 'audio/bgm/peaceful.ogg', size: 4194304, type: 'audio' },
         ],
@@ -1142,7 +1313,8 @@ export class AssetStoreService {
         id: 'asset-014',
         name: '科幻UI套件',
         description: '赛博朋克风格的科幻UI界面套件，包含HUD、菜单、数据面板',
-        longDescription: '科幻UI套件提供了精美的赛博朋克风格UI组件，包括全息效果、扫描线、发光边框等特效。适合科幻、赛博朋克、未来题材的游戏项目。',
+        longDescription:
+          '科幻UI套件提供了精美的赛博朋克风格UI组件，包括全息效果、扫描线、发光边框等特效。适合科幻、赛博朋克、未来题材的游戏项目。',
         author: 'UI Masters',
         authorId: 'author-011',
         authorAvatar: 'avatar-11.png',
@@ -1160,15 +1332,16 @@ export class AssetStoreService {
         files: [
           { name: 'SciFiHUD.ts', path: 'src/scifi/SciFiHUD.ts', size: 20480, type: 'typescript' },
           { name: 'SciFiMenu.ts', path: 'src/scifi/SciFiMenu.ts', size: 15360, type: 'typescript' },
-          { name: 'GlowEffects.ts', path: 'src/scifi/GlowEffects.ts', size: 10240, type: 'typescript' },
+          {
+            name: 'GlowEffects.ts',
+            path: 'src/scifi/GlowEffects.ts',
+            size: 10240,
+            type: 'typescript',
+          },
         ],
         totalSize: 1048576,
-        dependencies: [
-          { name: '通用UI框架', version: '2.0.0', optional: false },
-        ],
-        changelog: [
-          { version: '1.0.0', releaseDate: now - 10 * day, notes: '初始版本发布' },
-        ],
+        dependencies: [{ name: '通用UI框架', version: '2.0.0', optional: false }],
+        changelog: [{ version: '1.0.0', releaseDate: now - 10 * day, notes: '初始版本发布' }],
         compatibleVersions: ['0.4.0'],
         createdAt: now - 10 * day,
         updatedAt: now - 10 * day,
@@ -1180,7 +1353,8 @@ export class AssetStoreService {
         id: 'asset-015',
         name: '平台跳跃游戏模板',
         description: '完整的2D平台跳跃游戏项目，包含关卡编辑器和多种机关',
-        longDescription: '平台跳跃游戏模板是一个完整可运行的2D平台游戏项目，包含角色控制、关卡系统、金币收集、敌人、机关等完整游戏要素。附带关卡编辑器，方便创建更多关卡。',
+        longDescription:
+          '平台跳跃游戏模板是一个完整可运行的2D平台游戏项目，包含角色控制、关卡系统、金币收集、敌人、机关等完整游戏要素。附带关卡编辑器，方便创建更多关卡。',
         author: 'TapDev Studio',
         authorId: 'author-001',
         authorAvatar: 'avatar-1.png',
@@ -1198,9 +1372,7 @@ export class AssetStoreService {
         previewImages: ['platformer-1.png', 'platformer-2.png', 'platformer-3.png'],
         previewVideo: 'platformer-demo.mp4',
         icon: 'play',
-        files: [
-          { name: 'project', path: '/', size: 41943040, type: 'directory' },
-        ],
+        files: [{ name: 'project', path: '/', size: 41943040, type: 'directory' }],
         totalSize: 41943040,
         dependencies: [
           { name: '通用UI框架', version: '2.0.0', optional: false },
@@ -1221,7 +1393,8 @@ export class AssetStoreService {
         id: 'asset-016',
         name: '3D低多边形角色包',
         description: '低多边形风格3D角色模型包，包含10个角色和动画',
-        longDescription: '3D低多边形角色包提供了风格统一的低多边形3D角色模型，每个角色都有完整的动画绑定和常用动画剪辑。适合卡通风格的3D游戏项目。',
+        longDescription:
+          '3D低多边形角色包提供了风格统一的低多边形3D角色模型，每个角色都有完整的动画绑定和常用动画剪辑。适合卡通风格的3D游戏项目。',
         author: '3D Model Studio',
         authorId: 'author-012',
         authorAvatar: 'avatar-12.png',
@@ -1242,9 +1415,7 @@ export class AssetStoreService {
         ],
         totalSize: 52428800,
         dependencies: [],
-        changelog: [
-          { version: '1.0.0', releaseDate: now - 18 * day, notes: '初始版本发布' },
-        ],
+        changelog: [{ version: '1.0.0', releaseDate: now - 18 * day, notes: '初始版本发布' }],
         compatibleVersions: ['0.4.0'],
         createdAt: now - 18 * day,
         updatedAt: now - 18 * day,
@@ -1255,7 +1426,8 @@ export class AssetStoreService {
         id: 'asset-017',
         name: '成就系统',
         description: '游戏成就和统计系统，支持Steam/ TapTap等平台集成',
-        longDescription: '成就系统提供了完整的游戏成就管理功能，包括成就定义、进度追踪、成就解锁、统计数据等。支持多平台成就系统集成。',
+        longDescription:
+          '成就系统提供了完整的游戏成就管理功能，包括成就定义、进度追踪、成就解锁、统计数据等。支持多平台成就系统集成。',
         author: 'GameCraft',
         authorId: 'author-002',
         authorAvatar: 'avatar-2.png',
@@ -1271,8 +1443,18 @@ export class AssetStoreService {
         previewImages: ['achievement-1.png'],
         icon: 'award',
         files: [
-          { name: 'AchievementManager.ts', path: 'src/achievements/AchievementManager.ts', size: 12288, type: 'typescript' },
-          { name: 'StatsTracker.ts', path: 'src/achievements/StatsTracker.ts', size: 10240, type: 'typescript' },
+          {
+            name: 'AchievementManager.ts',
+            path: 'src/achievements/AchievementManager.ts',
+            size: 12288,
+            type: 'typescript',
+          },
+          {
+            name: 'StatsTracker.ts',
+            path: 'src/achievements/StatsTracker.ts',
+            size: 10240,
+            type: 'typescript',
+          },
         ],
         totalSize: 393216,
         dependencies: [],
@@ -1290,7 +1472,8 @@ export class AssetStoreService {
         id: 'asset-018',
         name: '新手引导系统',
         description: '游戏新手引导和教程系统，支持高亮、对话、手势引导',
-        longDescription: '新手引导系统提供了完整的游戏教程功能，支持高亮指定UI元素、对话引导、手势动画、步骤控制等功能。可以快速创建游戏新手教程。',
+        longDescription:
+          '新手引导系统提供了完整的游戏教程功能，支持高亮指定UI元素、对话引导、手势动画、步骤控制等功能。可以快速创建游戏新手教程。',
         author: 'UX Tools',
         authorId: 'author-013',
         authorAvatar: 'avatar-13.png',
@@ -1306,16 +1489,22 @@ export class AssetStoreService {
         previewImages: ['tutorial-1.png', 'tutorial-2.png'],
         icon: 'help-circle',
         files: [
-          { name: 'TutorialManager.ts', path: 'src/tutorial/TutorialManager.ts', size: 15360, type: 'typescript' },
-          { name: 'TutorialStep.ts', path: 'src/tutorial/TutorialStep.ts', size: 10240, type: 'typescript' },
+          {
+            name: 'TutorialManager.ts',
+            path: 'src/tutorial/TutorialManager.ts',
+            size: 15360,
+            type: 'typescript',
+          },
+          {
+            name: 'TutorialStep.ts',
+            path: 'src/tutorial/TutorialStep.ts',
+            size: 10240,
+            type: 'typescript',
+          },
         ],
         totalSize: 393216,
-        dependencies: [
-          { name: '通用UI框架', version: '2.0.0', optional: false },
-        ],
-        changelog: [
-          { version: '1.0.0', releaseDate: now - 12 * day, notes: '初始版本发布' },
-        ],
+        dependencies: [{ name: '通用UI框架', version: '2.0.0', optional: false }],
+        changelog: [{ version: '1.0.0', releaseDate: now - 12 * day, notes: '初始版本发布' }],
         compatibleVersions: ['0.3.0', '0.4.0'],
         createdAt: now - 12 * day,
         updatedAt: now - 12 * day,
@@ -1326,7 +1515,8 @@ export class AssetStoreService {
         id: 'asset-019',
         name: 'Roguelike完整项目',
         description: '完整的Roguelike动作游戏项目，包含随机地牢和装备系统',
-        longDescription: 'Roguelike完整项目是一个功能完整的Roguelike动作游戏，包含随机地牢生成、角色成长、装备系统、技能树、多种敌人和Boss。代码结构清晰，易于学习和扩展。',
+        longDescription:
+          'Roguelike完整项目是一个功能完整的Roguelike动作游戏，包含随机地牢生成、角色成长、装备系统、技能树、多种敌人和Boss。代码结构清晰，易于学习和扩展。',
         author: 'TapDev Studio',
         authorId: 'author-001',
         authorAvatar: 'avatar-1.png',
@@ -1344,18 +1534,14 @@ export class AssetStoreService {
         previewImages: ['roguelike-1.png', 'roguelike-2.png', 'roguelike-3.png'],
         previewVideo: 'roguelike-demo.mp4',
         icon: 'sword',
-        files: [
-          { name: 'project', path: '/', size: 73400320, type: 'directory' },
-        ],
+        files: [{ name: 'project', path: '/', size: 73400320, type: 'directory' }],
         totalSize: 73400320,
         dependencies: [
           { name: '通用UI框架', version: '2.0.0', optional: false },
           { name: 'Roguelike地牢生成器', version: '1.3.0', optional: false },
           { name: '粒子特效系统', version: '3.0.0', optional: true },
         ],
-        changelog: [
-          { version: '1.0.0', releaseDate: now - 25 * day, notes: '初始版本发布' },
-        ],
+        changelog: [{ version: '1.0.0', releaseDate: now - 25 * day, notes: '初始版本发布' }],
         compatibleVersions: ['0.4.0'],
         createdAt: now - 25 * day,
         updatedAt: now - 25 * day,
@@ -1367,7 +1553,8 @@ export class AssetStoreService {
         id: 'asset-020',
         name: '技能树系统',
         description: '可定制的技能树系统，支持多种技能节点和解锁条件',
-        longDescription: '技能树系统提供了灵活的技能树管理功能，支持多种技能节点类型、解锁条件、技能升级、技能效果等。可视化编辑器让技能树设计变得简单直观。',
+        longDescription:
+          '技能树系统提供了灵活的技能树管理功能，支持多种技能节点类型、解锁条件、技能升级、技能效果等。可视化编辑器让技能树设计变得简单直观。',
         author: 'Procedural Labs',
         authorId: 'author-008',
         authorAvatar: 'avatar-8.png',
@@ -1383,8 +1570,18 @@ export class AssetStoreService {
         previewImages: ['skilltree-1.png', 'skilltree-2.png'],
         icon: 'git-branch',
         files: [
-          { name: 'SkillTreeManager.ts', path: 'src/skilltree/SkillTreeManager.ts', size: 18432, type: 'typescript' },
-          { name: 'SkillNode.ts', path: 'src/skilltree/SkillNode.ts', size: 12288, type: 'typescript' },
+          {
+            name: 'SkillTreeManager.ts',
+            path: 'src/skilltree/SkillTreeManager.ts',
+            size: 18432,
+            type: 'typescript',
+          },
+          {
+            name: 'SkillNode.ts',
+            path: 'src/skilltree/SkillNode.ts',
+            size: 12288,
+            type: 'typescript',
+          },
         ],
         totalSize: 524288,
         dependencies: [],
@@ -1403,7 +1600,8 @@ export class AssetStoreService {
         id: 'asset-021',
         name: '卡通UI素材包',
         description: '可爱卡通风格UI素材，包含按钮、图标、边框和背景',
-        longDescription: '卡通UI素材包提供了一套完整的卡通风格UI素材资源，包括各种按钮、图标、边框、面板背景等。矢量格式，可任意缩放不失真。',
+        longDescription:
+          '卡通UI素材包提供了一套完整的卡通风格UI素材资源，包括各种按钮、图标、边框、面板背景等。矢量格式，可任意缩放不失真。',
         author: 'UI Masters',
         authorId: 'author-011',
         authorAvatar: 'avatar-11.png',
@@ -1425,9 +1623,7 @@ export class AssetStoreService {
         ],
         totalSize: 8388608,
         dependencies: [],
-        changelog: [
-          { version: '1.0.0', releaseDate: now - 5 * day, notes: '初始版本发布' },
-        ],
+        changelog: [{ version: '1.0.0', releaseDate: now - 5 * day, notes: '初始版本发布' }],
         compatibleVersions: ['0.3.0', '0.4.0'],
         createdAt: now - 5 * day,
         updatedAt: now - 5 * day,
@@ -1438,7 +1634,8 @@ export class AssetStoreService {
         id: 'asset-022',
         name: '三消游戏完整项目',
         description: '完整的三消游戏项目，包含100个关卡和多种道具',
-        longDescription: '三消游戏完整项目是一个完整可运行的三消游戏，包含100个精心设计的关卡、多种特殊方块、道具系统、分数系统、排行榜等完整游戏功能。',
+        longDescription:
+          '三消游戏完整项目是一个完整可运行的三消游戏，包含100个精心设计的关卡、多种特殊方块、道具系统、分数系统、排行榜等完整游戏功能。',
         author: 'TapDev Studio',
         authorId: 'author-001',
         authorAvatar: 'avatar-1.png',
@@ -1456,17 +1653,13 @@ export class AssetStoreService {
         previewImages: ['match3-full-1.png', 'match3-full-2.png', 'match3-full-3.png'],
         previewVideo: 'match3-full-demo.mp4',
         icon: 'grid-3x3',
-        files: [
-          { name: 'project', path: '/', size: 31457280, type: 'directory' },
-        ],
+        files: [{ name: 'project', path: '/', size: 31457280, type: 'directory' }],
         totalSize: 31457280,
         dependencies: [
           { name: '通用UI框架', version: '2.0.0', optional: false },
           { name: '三消游戏核心', version: '1.5.0', optional: false },
         ],
-        changelog: [
-          { version: '1.0.0', releaseDate: now - 15 * day, notes: '初始版本发布' },
-        ],
+        changelog: [{ version: '1.0.0', releaseDate: now - 15 * day, notes: '初始版本发布' }],
         compatibleVersions: ['0.4.0'],
         createdAt: now - 15 * day,
         updatedAt: now - 15 * day,
@@ -1478,7 +1671,8 @@ export class AssetStoreService {
         id: 'asset-023',
         name: '城市场景包',
         description: '现代城市场景资源包，包含建筑、街道、车辆和装饰',
-        longDescription: '城市场景包提供了完整的现代城市场景资源，包括多种建筑、街道、车辆、交通标志、树木等装饰元素。模块化设计，可以自由组合搭建不同的城市场景。',
+        longDescription:
+          '城市场景包提供了完整的现代城市场景资源，包括多种建筑、街道、车辆、交通标志、树木等装饰元素。模块化设计，可以自由组合搭建不同的城市场景。',
         author: 'Environment Art',
         authorId: 'author-007',
         authorAvatar: 'avatar-7.png',
@@ -1497,13 +1691,16 @@ export class AssetStoreService {
           { name: 'buildings', path: 'assets/city/buildings', size: 8388608, type: 'directory' },
           { name: 'streets', path: 'assets/city/streets', size: 4194304, type: 'directory' },
           { name: 'vehicles', path: 'assets/city/vehicles', size: 3145728, type: 'directory' },
-          { name: 'decorations', path: 'assets/city/decorations', size: 2097152, type: 'directory' },
+          {
+            name: 'decorations',
+            path: 'assets/city/decorations',
+            size: 2097152,
+            type: 'directory',
+          },
         ],
         totalSize: 20971520,
         dependencies: [],
-        changelog: [
-          { version: '1.0.0', releaseDate: now - 20 * day, notes: '初始版本发布' },
-        ],
+        changelog: [{ version: '1.0.0', releaseDate: now - 20 * day, notes: '初始版本发布' }],
         compatibleVersions: ['0.3.0', '0.4.0'],
         createdAt: now - 20 * day,
         updatedAt: now - 20 * day,
@@ -1514,7 +1711,8 @@ export class AssetStoreService {
         id: 'asset-024',
         name: '环境音效包',
         description: '50+高质量环境音效，包含自然、城市、室内等多种场景',
-        longDescription: '环境音效包含了丰富的环境音资源，涵盖森林、海洋、雨天、城市、室内等多种场景。所有音效均为高品质录制，可营造沉浸式的游戏氛围。',
+        longDescription:
+          '环境音效包含了丰富的环境音资源，涵盖森林、海洋、雨天、城市、室内等多种场景。所有音效均为高品质录制，可营造沉浸式的游戏氛围。',
         author: 'SoundMasters',
         authorId: 'author-004',
         authorAvatar: 'avatar-4.png',
@@ -1537,9 +1735,7 @@ export class AssetStoreService {
         ],
         totalSize: 52428800,
         dependencies: [],
-        changelog: [
-          { version: '1.0.0', releaseDate: now - 30 * day, notes: '初始版本发布' },
-        ],
+        changelog: [{ version: '1.0.0', releaseDate: now - 30 * day, notes: '初始版本发布' }],
         compatibleVersions: ['0.3.0', '0.4.0'],
         createdAt: now - 30 * day,
         updatedAt: now - 30 * day,
@@ -1550,7 +1746,8 @@ export class AssetStoreService {
         id: 'asset-025',
         name: '卡牌游戏完整项目',
         description: '完整的卡牌对战游戏项目，包含卡组构建和单人战役',
-        longDescription: '卡牌游戏完整项目是一个完整可运行的TCG卡牌对战游戏，包含卡组构建、战斗系统、单人战役、卡牌收集、商店系统等完整功能。',
+        longDescription:
+          '卡牌游戏完整项目是一个完整可运行的TCG卡牌对战游戏，包含卡组构建、战斗系统、单人战役、卡牌收集、商店系统等完整功能。',
         author: 'CardGame Pro',
         authorId: 'author-009',
         authorAvatar: 'avatar-9.png',
@@ -1568,18 +1765,14 @@ export class AssetStoreService {
         previewImages: ['card-full-1.png', 'card-full-2.png', 'card-full-3.png'],
         previewVideo: 'card-full-demo.mp4',
         icon: 'layers',
-        files: [
-          { name: 'project', path: '/', size: 62914560, type: 'directory' },
-        ],
+        files: [{ name: 'project', path: '/', size: 62914560, type: 'directory' }],
         totalSize: 62914560,
         dependencies: [
           { name: '通用UI框架', version: '2.0.0', optional: false },
           { name: '卡牌战斗系统', version: '2.0.0', optional: false },
           { name: '粒子特效系统', version: '3.0.0', optional: true },
         ],
-        changelog: [
-          { version: '1.0.0', releaseDate: now - 10 * day, notes: '初始版本发布' },
-        ],
+        changelog: [{ version: '1.0.0', releaseDate: now - 10 * day, notes: '初始版本发布' }],
         compatibleVersions: ['0.4.0'],
         createdAt: now - 10 * day,
         updatedAt: now - 10 * day,
@@ -1591,7 +1784,8 @@ export class AssetStoreService {
         id: 'asset-026',
         name: '排行榜系统',
         description: '游戏排行榜系统，支持本地和在线排行榜',
-        longDescription: '排行榜系统提供了完整的游戏排行榜功能，支持多种排行类型、分数提交、排名查询、本地排行榜等功能。可扩展支持在线排行榜服务。',
+        longDescription:
+          '排行榜系统提供了完整的游戏排行榜功能，支持多种排行类型、分数提交、排名查询、本地排行榜等功能。可扩展支持在线排行榜服务。',
         author: 'GameCraft',
         authorId: 'author-002',
         authorAvatar: 'avatar-2.png',
@@ -1607,13 +1801,16 @@ export class AssetStoreService {
         previewImages: ['leaderboard-1.png'],
         icon: 'trophy',
         files: [
-          { name: 'LeaderboardManager.ts', path: 'src/leaderboard/LeaderboardManager.ts', size: 12288, type: 'typescript' },
+          {
+            name: 'LeaderboardManager.ts',
+            path: 'src/leaderboard/LeaderboardManager.ts',
+            size: 12288,
+            type: 'typescript',
+          },
         ],
         totalSize: 262144,
         dependencies: [],
-        changelog: [
-          { version: '1.0.0', releaseDate: now - 35 * day, notes: '初始版本发布' },
-        ],
+        changelog: [{ version: '1.0.0', releaseDate: now - 35 * day, notes: '初始版本发布' }],
         compatibleVersions: ['0.3.0', '0.4.0'],
         createdAt: now - 35 * day,
         updatedAt: now - 35 * day,
@@ -1624,7 +1821,8 @@ export class AssetStoreService {
         id: 'asset-027',
         name: '像素风格瓦片包',
         description: '像素风格游戏瓦片地图资源，包含多种主题的瓦片集',
-        longDescription: '像素风格瓦片包提供了多种主题的像素风格瓦片地图资源，包括地牢、森林、沙漠、雪地等主题。每个主题都有完整的瓦片集和装饰元素。',
+        longDescription:
+          '像素风格瓦片包提供了多种主题的像素风格瓦片地图资源，包括地牢、森林、沙漠、雪地等主题。每个主题都有完整的瓦片集和装饰元素。',
         author: 'PixelArt Studio',
         authorId: 'author-005',
         authorAvatar: 'avatar-5.png',
@@ -1640,16 +1838,34 @@ export class AssetStoreService {
         previewImages: ['tileset-1.png', 'tileset-2.png'],
         icon: 'grid-3x3',
         files: [
-          { name: 'dungeon_tileset.png', path: 'assets/tilesets/dungeon_tileset.png', size: 2097152, type: 'image' },
-          { name: 'forest_tileset.png', path: 'assets/tilesets/forest_tileset.png', size: 2097152, type: 'image' },
-          { name: 'desert_tileset.png', path: 'assets/tilesets/desert_tileset.png', size: 1572864, type: 'image' },
-          { name: 'snow_tileset.png', path: 'assets/tilesets/snow_tileset.png', size: 1572864, type: 'image' },
+          {
+            name: 'dungeon_tileset.png',
+            path: 'assets/tilesets/dungeon_tileset.png',
+            size: 2097152,
+            type: 'image',
+          },
+          {
+            name: 'forest_tileset.png',
+            path: 'assets/tilesets/forest_tileset.png',
+            size: 2097152,
+            type: 'image',
+          },
+          {
+            name: 'desert_tileset.png',
+            path: 'assets/tilesets/desert_tileset.png',
+            size: 1572864,
+            type: 'image',
+          },
+          {
+            name: 'snow_tileset.png',
+            path: 'assets/tilesets/snow_tileset.png',
+            size: 1572864,
+            type: 'image',
+          },
         ],
         totalSize: 10485760,
         dependencies: [],
-        changelog: [
-          { version: '1.0.0', releaseDate: now - 22 * day, notes: '初始版本发布' },
-        ],
+        changelog: [{ version: '1.0.0', releaseDate: now - 22 * day, notes: '初始版本发布' }],
         compatibleVersions: ['0.3.0', '0.4.0'],
         createdAt: now - 22 * day,
         updatedAt: now - 22 * day,
@@ -1660,7 +1876,8 @@ export class AssetStoreService {
         id: 'asset-028',
         name: '战斗伤害数字',
         description: '漂浮伤害数字特效，支持多种样式和动画效果',
-        longDescription: '战斗伤害数字特效提供了漂亮的伤害数字显示效果，支持普通伤害、暴击、治疗、miss等多种类型，内置多种动画效果和样式配置。',
+        longDescription:
+          '战斗伤害数字特效提供了漂亮的伤害数字显示效果，支持普通伤害、暴击、治疗、miss等多种类型，内置多种动画效果和样式配置。',
         author: 'FXLab',
         authorId: 'author-006',
         authorAvatar: 'avatar-6.png',
@@ -1676,8 +1893,18 @@ export class AssetStoreService {
         previewImages: ['damage-1.png', 'damage-2.png'],
         icon: 'zap',
         files: [
-          { name: 'DamageNumber.ts', path: 'src/damage/DamageNumber.ts', size: 8192, type: 'typescript' },
-          { name: 'DamageTextManager.ts', path: 'src/damage/DamageTextManager.ts', size: 10240, type: 'typescript' },
+          {
+            name: 'DamageNumber.ts',
+            path: 'src/damage/DamageNumber.ts',
+            size: 8192,
+            type: 'typescript',
+          },
+          {
+            name: 'DamageTextManager.ts',
+            path: 'src/damage/DamageTextManager.ts',
+            size: 10240,
+            type: 'typescript',
+          },
         ],
         totalSize: 262144,
         dependencies: [],
@@ -1695,7 +1922,8 @@ export class AssetStoreService {
         id: 'asset-029',
         name: '解谜游戏模板',
         description: '第一人称解谜游戏模板，包含交互系统和谜题框架',
-        longDescription: '解谜游戏模板提供了第一人称解谜游戏的基础框架，包括角色控制、物品交互、谜题系统、库存管理等功能。可以快速构建各种解谜游戏。',
+        longDescription:
+          '解谜游戏模板提供了第一人称解谜游戏的基础框架，包括角色控制、物品交互、谜题系统、库存管理等功能。可以快速构建各种解谜游戏。',
         author: 'PuzzleWorks',
         authorId: 'author-014',
         authorAvatar: 'avatar-14.png',
@@ -1710,17 +1938,13 @@ export class AssetStoreService {
         favorites: 420,
         previewImages: ['puzzle-1.png', 'puzzle-2.png'],
         icon: 'puzzle',
-        files: [
-          { name: 'project', path: '/', size: 41943040, type: 'directory' },
-        ],
+        files: [{ name: 'project', path: '/', size: 41943040, type: 'directory' }],
         totalSize: 41943040,
         dependencies: [
           { name: '库存背包系统', version: '1.2.0', optional: false },
           { name: '对话系统', version: '1.4.0', optional: true },
         ],
-        changelog: [
-          { version: '1.0.0', releaseDate: now - 28 * day, notes: '初始版本发布' },
-        ],
+        changelog: [{ version: '1.0.0', releaseDate: now - 28 * day, notes: '初始版本发布' }],
         compatibleVersions: ['0.4.0'],
         createdAt: now - 28 * day,
         updatedAt: now - 28 * day,
@@ -1731,7 +1955,8 @@ export class AssetStoreService {
         id: 'asset-030',
         name: '太空场景包',
         description: '太空科幻场景资源，包含星球、星云、飞船和特效',
-        longDescription: '太空场景包提供了完整的太空科幻场景资源，包括各种行星、星云背景、飞船模型、陨石、太空站等元素。适合太空题材的游戏项目。',
+        longDescription:
+          '太空场景包提供了完整的太空科幻场景资源，包括各种行星、星云背景、飞船模型、陨石、太空站等元素。适合太空题材的游戏项目。',
         author: 'Environment Art',
         authorId: 'author-007',
         authorAvatar: 'avatar-7.png',
@@ -1748,15 +1973,18 @@ export class AssetStoreService {
         icon: 'star',
         files: [
           { name: 'planets', path: 'assets/space/planets', size: 10485760, type: 'directory' },
-          { name: 'backgrounds', path: 'assets/space/backgrounds', size: 8388608, type: 'directory' },
+          {
+            name: 'backgrounds',
+            path: 'assets/space/backgrounds',
+            size: 8388608,
+            type: 'directory',
+          },
           { name: 'ships', path: 'assets/space/ships', size: 12582912, type: 'directory' },
           { name: 'effects', path: 'assets/space/effects', size: 6291456, type: 'directory' },
         ],
         totalSize: 41943040,
         dependencies: [],
-        changelog: [
-          { version: '1.0.0', releaseDate: now - 15 * day, notes: '初始版本发布' },
-        ],
+        changelog: [{ version: '1.0.0', releaseDate: now - 15 * day, notes: '初始版本发布' }],
         compatibleVersions: ['0.4.0'],
         createdAt: now - 15 * day,
         updatedAt: now - 15 * day,
@@ -1767,7 +1995,8 @@ export class AssetStoreService {
         id: 'asset-031',
         name: 'UI图标包',
         description: '500+精美游戏UI图标，涵盖物品、技能、装备等类型',
-        longDescription: 'UI图标包含了游戏开发中常用的各类图标资源，包括物品图标、技能图标、装备图标、UI功能图标等。统一的美术风格，多种尺寸规格。',
+        longDescription:
+          'UI图标包含了游戏开发中常用的各类图标资源，包括物品图标、技能图标、装备图标、UI功能图标等。统一的美术风格，多种尺寸规格。',
         author: 'UI Masters',
         authorId: 'author-011',
         authorAvatar: 'avatar-11.png',
@@ -1806,7 +2035,8 @@ export class AssetStoreService {
         id: 'asset-032',
         name: '存档系统',
         description: '游戏存档和数据持久化系统，支持多存档位和云存档',
-        longDescription: '存档系统提供了完整的游戏存档管理功能，支持多存档位、自动存档、快速存档、存档加密、云存档同步等功能。',
+        longDescription:
+          '存档系统提供了完整的游戏存档管理功能，支持多存档位、自动存档、快速存档、存档加密、云存档同步等功能。',
         author: 'GameCraft',
         authorId: 'author-002',
         authorAvatar: 'avatar-2.png',
@@ -1822,7 +2052,12 @@ export class AssetStoreService {
         previewImages: ['save-1.png'],
         icon: 'save',
         files: [
-          { name: 'SaveManager.ts', path: 'src/save/SaveManager.ts', size: 15360, type: 'typescript' },
+          {
+            name: 'SaveManager.ts',
+            path: 'src/save/SaveManager.ts',
+            size: 15360,
+            type: 'typescript',
+          },
           { name: 'SaveSlot.ts', path: 'src/save/SaveSlot.ts', size: 10240, type: 'typescript' },
         ],
         totalSize: 393216,
@@ -2053,7 +2288,8 @@ export class AssetStoreService {
           userName: '三消爱好者',
           rating: 5,
           title: '三消游戏的福音',
-          content: '作为一个想做三消游戏的开发者，这个资产简直是救星！核心逻辑都写好了，只需要做美术和关卡。',
+          content:
+            '作为一个想做三消游戏的开发者，这个资产简直是救星！核心逻辑都写好了，只需要做美术和关卡。',
           helpfulCount: 42,
           createdAt: now - 5 * day,
           updatedAt: now - 5 * day,
@@ -2079,7 +2315,7 @@ export class AssetStoreService {
   }
 
   private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }
 

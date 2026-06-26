@@ -5,22 +5,22 @@ import { globalEventBus } from '../core/event-bus';
 
 // 扩展点
 export type ExtensionPoint =
-  | 'editor:toolbar'      // 编辑器工具栏
+  | 'editor:toolbar' // 编辑器工具栏
   | 'editor:context-menu' // 右键菜单
-  | 'editor:status-bar'   // 状态栏
-  | 'editor:panel'        // 侧边面板
-  | 'editor:command'      // 命令
-  | 'editor:language'     // 语言服务
-  | 'editor:theme'        // 主题
-  | 'editor:webview'      // WebView
-  | 'build:task'          // 构建任务
-  | 'build:target'        // 构建目标
-  | 'debug:adapter'       // 调试适配器
-  | 'project:template'    // 项目模板
-  | 'asset:importer'      // 资源导入器
-  | 'asset:exporter'      // 资源导出器
-  | 'ai:provider'         // AI 提供商
-  | 'cloud:sync';         // 云同步
+  | 'editor:status-bar' // 状态栏
+  | 'editor:panel' // 侧边面板
+  | 'editor:command' // 命令
+  | 'editor:language' // 语言服务
+  | 'editor:theme' // 主题
+  | 'editor:webview' // WebView
+  | 'build:task' // 构建任务
+  | 'build:target' // 构建目标
+  | 'debug:adapter' // 调试适配器
+  | 'project:template' // 项目模板
+  | 'asset:importer' // 资源导入器
+  | 'asset:exporter' // 资源导出器
+  | 'ai:provider' // AI 提供商
+  | 'cloud:sync'; // 云同步
 
 // 插件清单
 export interface PluginManifest {
@@ -62,7 +62,12 @@ export interface PluginContribution {
   // 主题
   theme?: { id: string; label: string; type: 'light' | 'dark' | 'high-contrast' };
   // 模板
-  template?: { id: string; name: string; description: string; files: { path: string; content: string }[] };
+  template?: {
+    id: string;
+    name: string;
+    description: string;
+    files: { path: string; content: string }[];
+  };
   // AI Provider
   aiProvider?: { id: string; name: string; endpoint: string; models: string[] };
   // 自定义
@@ -84,7 +89,11 @@ export interface PluginDeveloper {
   pluginIds: string[];
   joinedAt: number;
   // 银行信息（实际不应存于代码中）
-  payoutInfo: { method: 'paypal' | 'alipay' | 'wechat' | 'bank'; account: string; verified: boolean };
+  payoutInfo: {
+    method: 'paypal' | 'alipay' | 'wechat' | 'bank';
+    account: string;
+    verified: boolean;
+  };
 }
 
 // 收入分成
@@ -98,7 +107,7 @@ export interface RevenueShare {
   revenue: number;
   // 分成
   developerShare: number; // 0.7 (70%)
-  platformShare: number;  // 0.3 (30%)
+  platformShare: number; // 0.3 (30%)
   // 支付
   status: 'pending' | 'paid' | 'processing';
   paidAt?: number;
@@ -147,7 +156,7 @@ class PluginSDKService {
       status: 'pending',
       comments: [],
       automatedChecks: this.runAutomatedChecks(pluginId),
-      submittedAt: Date.now()
+      submittedAt: Date.now(),
     };
 
     if (!this.reviews.has(pluginId)) this.reviews.set(pluginId, []);
@@ -162,14 +171,19 @@ class PluginSDKService {
       security: Math.random() < 0.9 ? 'pass' : 'warning',
       performance: Math.random() < 0.85 ? 'pass' : 'warning',
       compatibility: Math.random() < 0.95 ? 'pass' : 'warning',
-      codeQuality: Math.random() < 0.8 ? 'pass' : 'warning'
+      codeQuality: Math.random() < 0.8 ? 'pass' : 'warning',
     };
   }
 
   // 审核插件
-  reviewPlugin(reviewId: string, decision: PluginReview['status'], reviewer: string, comment: string): void {
+  reviewPlugin(
+    reviewId: string,
+    decision: PluginReview['status'],
+    reviewer: string,
+    comment: string
+  ): void {
     for (const reviews of this.reviews.values()) {
-      const review = reviews.find(r => r.id === reviewId);
+      const review = reviews.find((r) => r.id === reviewId);
       if (review) {
         review.status = decision;
         review.reviewer = reviewer;
@@ -182,24 +196,37 @@ class PluginSDKService {
   }
 
   // 创建开发者账户
-  createDeveloper(developer: Omit<PluginDeveloper, 'id' | 'totalEarnings' | 'monthlyEarnings' | 'pluginIds' | 'joinedAt'>): PluginDeveloper {
+  createDeveloper(
+    developer: Omit<
+      PluginDeveloper,
+      'id' | 'totalEarnings' | 'monthlyEarnings' | 'pluginIds' | 'joinedAt'
+    >
+  ): PluginDeveloper {
     const newDeveloper: PluginDeveloper = {
       ...developer,
       id: `dev-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       totalEarnings: 0,
       monthlyEarnings: 0,
       pluginIds: [],
-      joinedAt: Date.now()
+      joinedAt: Date.now(),
     };
     this.developers.set(newDeveloper.id, newDeveloper);
     return newDeveloper;
   }
 
   // 计算收入分成
-  calculateRevenueShare(pluginId: string, period: { start: number; end: number }, revenue: number, downloads: number, activeUsers: number): RevenueShare {
+  calculateRevenueShare(
+    pluginId: string,
+    period: { start: number; end: number },
+    revenue: number,
+    downloads: number,
+    activeUsers: number
+  ): RevenueShare {
     const manifest = this.plugins.get(pluginId);
     if (!manifest) throw new Error('插件不存在');
-    const developer = Array.from(this.developers.values()).find(d => d.pluginIds.includes(pluginId));
+    const developer = Array.from(this.developers.values()).find((d) =>
+      d.pluginIds.includes(pluginId)
+    );
     if (!developer) throw new Error('开发者不存在');
 
     const share: RevenueShare = {
@@ -211,7 +238,7 @@ class PluginSDKService {
       revenue,
       developerShare: revenue * this.DEVELOPER_SHARE,
       platformShare: revenue * (1 - this.DEVELOPER_SHARE),
-      status: 'pending'
+      status: 'pending',
     };
 
     this.revenueShares.push(share);
@@ -222,7 +249,11 @@ class PluginSDKService {
 
   // 支付分成
   payShare(shareId: string): void {
-    const share = this.revenueShares.find(s => `${s.pluginId}-${s.period.start}` === shareId || this.revenueShares.indexOf(s) === this.revenueShares.length - 1);
+    const share = this.revenueShares.find(
+      (s) =>
+        `${s.pluginId}-${s.period.start}` === shareId ||
+        this.revenueShares.indexOf(s) === this.revenueShares.length - 1
+    );
     if (!share) return;
     share.status = 'paid';
     share.paidAt = Date.now();
@@ -236,10 +267,10 @@ class PluginSDKService {
   // 列出插件
   listPlugins(filter?: { category?: string; verified?: boolean }): PluginManifest[] {
     let plugins = Array.from(this.plugins.values());
-    if (filter?.category) plugins = plugins.filter(p => p.categories.includes(filter.category!));
+    if (filter?.category) plugins = plugins.filter((p) => p.categories.includes(filter.category!));
     if (filter?.verified !== undefined) {
-      plugins = plugins.filter(p => {
-        const dev = Array.from(this.developers.values()).find(d => d.pluginIds.includes(p.id));
+      plugins = plugins.filter((p) => {
+        const dev = Array.from(this.developers.values()).find((d) => d.pluginIds.includes(p.id));
         return dev?.verified === filter.verified;
       });
     }
@@ -262,22 +293,29 @@ class PluginSDKService {
   }
 
   // 插件脚手架
-  generateScaffolding(name: string, template: 'tool' | 'theme' | 'language' | 'panel' | 'ai-provider'): { path: string; content: string }[] {
+  generateScaffolding(
+    name: string,
+    template: 'tool' | 'theme' | 'language' | 'panel' | 'ai-provider'
+  ): { path: string; content: string }[] {
     const id = name.toLowerCase().replace(/\s+/g, '-');
     const files: { path: string; content: string }[] = [
       {
         path: 'package.json',
-        content: JSON.stringify({
-          name: id,
-          displayName: name,
-          version: '0.1.0',
-          description: `${name} 插件`,
-          engines: { tapdev: '^3.0.0' },
-          main: './out/extension.js',
-          activationEvents: ['*'],
-          contributes: [],
-          keywords: []
-        }, null, 2)
+        content: JSON.stringify(
+          {
+            name: id,
+            displayName: name,
+            version: '0.1.0',
+            description: `${name} 插件`,
+            engines: { tapdev: '^3.0.0' },
+            main: './out/extension.js',
+            activationEvents: ['*'],
+            contributes: [],
+            keywords: [],
+          },
+          null,
+          2
+        ),
       },
       {
         path: 'src/extension.ts',
@@ -295,7 +333,7 @@ export function activate(context: tapdev.ExtensionContext) {
 }
 
 export function deactivate() {}
-`
+`,
       },
       {
         path: 'README.md',
@@ -311,22 +349,26 @@ export function deactivate() {}
 \`\`\`typescript
 // 激活后可在命令面板找到相关命令
 \`\`\`
-`
-      }
+`,
+      },
     ];
 
     if (template === 'theme') {
       files.push({
         path: 'themes/theme.json',
-        content: JSON.stringify({
-          id: `${id}-theme`,
-          label: name,
-          type: 'dark',
-          colors: {
-            'editor.background': '#1e1e1e',
-            'editor.foreground': '#d4d4d4'
-          }
-        }, null, 2)
+        content: JSON.stringify(
+          {
+            id: `${id}-theme`,
+            label: name,
+            type: 'dark',
+            colors: {
+              'editor.background': '#1e1e1e',
+              'editor.foreground': '#d4d4d4',
+            },
+          },
+          null,
+          2
+        ),
       });
     }
 
@@ -336,7 +378,9 @@ export function deactivate() {}
   // 订阅
   subscribe(listener: (event: string, data: any) => void): () => void {
     this.listeners.add(listener);
-    return () => { this.listeners.delete(listener); };
+    return () => {
+      this.listeners.delete(listener);
+    };
   }
 
   private notify(event: string, data: any): void {

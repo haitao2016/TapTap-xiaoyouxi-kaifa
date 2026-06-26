@@ -51,7 +51,14 @@ export interface ReviewReport {
 // 重构建议
 export interface RefactorSuggestion {
   id: string;
-  type: 'extract-function' | 'extract-class' | 'rename' | 'inline' | 'move' | 'simplify' | 'modernize';
+  type:
+    | 'extract-function'
+    | 'extract-class'
+    | 'rename'
+    | 'inline'
+    | 'move'
+    | 'simplify'
+    | 'modernize';
   title: string;
   description: string;
   filePath: string;
@@ -71,7 +78,11 @@ interface ReviewRule {
   severity: IssueSeverity;
   category: ReviewIssue['category'];
   description: string;
-  check: (content: string, lines: string[], filePath: string) => Omit<ReviewIssue, 'id' | 'ruleId' | 'ruleName'>[];
+  check: (
+    content: string,
+    lines: string[],
+    filePath: string
+  ) => Omit<ReviewIssue, 'id' | 'ruleId' | 'ruleName'>[];
   fixSuggestion?: (issue: ReviewIssue) => string;
 }
 
@@ -96,7 +107,11 @@ class CodeReviewService {
         check: (content, lines, filePath) => {
           const issues: any[] = [];
           for (let i = 0; i < lines.length; i++) {
-            if (lines[i].includes('console.log') && !filePath.includes('debug') && !filePath.includes('test')) {
+            if (
+              lines[i].includes('console.log') &&
+              !filePath.includes('debug') &&
+              !filePath.includes('test')
+            ) {
               issues.push({
                 severity: 'warning',
                 category: 'best-practice',
@@ -106,12 +121,12 @@ class CodeReviewService {
                 endLine: i + 1,
                 codeSnippet: lines[i].trim(),
                 suggestion: '使用项目统一的 logger 替代',
-                fixCode: lines[i].replace(/console\.log/g, 'logger.info')
+                fixCode: lines[i].replace(/console\.log/g, 'logger.info'),
               });
             }
           }
           return issues;
-        }
+        },
       },
       {
         id: 'no-any-type',
@@ -134,12 +149,12 @@ class CodeReviewService {
                 startLine: i + 1,
                 endLine: i + 1,
                 codeSnippet: line.trim(),
-                suggestion: '使用具体类型或 unknown'
+                suggestion: '使用具体类型或 unknown',
               });
             }
           }
           return issues;
-        }
+        },
       },
       {
         id: 'function-length',
@@ -179,7 +194,7 @@ class CodeReviewService {
                         startLine: functionStart + 1,
                         endLine: i + 1,
                         codeSnippet: `function ${functionName}() { ... ${length} lines ... }`,
-                        suggestion: '将函数拆分为多个职责单一的小函数'
+                        suggestion: '将函数拆分为多个职责单一的小函数',
                       });
                     }
                     inFunction = false;
@@ -190,7 +205,7 @@ class CodeReviewService {
             }
           }
           return issues;
-        }
+        },
       },
       {
         id: 'naming-convention',
@@ -206,8 +221,11 @@ class CodeReviewService {
             const constMatch = line.match(/^const\s+([a-z][a-zA-Z0-9]*)\s*=/);
             // 检查类名（应为 PascalCase）
             const classMatch = line.match(/^class\s+([a-z][a-zA-Z0-9]*)/);
-            if (constMatch && /^[A-Z_]+$/.test(constMatch[1]) === false &&
-                /^[a-z][a-zA-Z0-9]*$/.test(constMatch[1]) === false) {
+            if (
+              constMatch &&
+              /^[A-Z_]+$/.test(constMatch[1]) === false &&
+              /^[a-z][a-zA-Z0-9]*$/.test(constMatch[1]) === false
+            ) {
               // OK - camelCase
             }
             if (classMatch) {
@@ -219,12 +237,12 @@ class CodeReviewService {
                 startLine: i + 1,
                 endLine: i + 1,
                 codeSnippet: line.trim(),
-                suggestion: `重命名为 ${classMatch[1].charAt(0).toUpperCase() + classMatch[1].slice(1)}`
+                suggestion: `重命名为 ${classMatch[1].charAt(0).toUpperCase() + classMatch[1].slice(1)}`,
               });
             }
           }
           return issues;
-        }
+        },
       },
       {
         id: 'missing-return-type',
@@ -236,7 +254,9 @@ class CodeReviewService {
           const issues: any[] = [];
           for (let i = 0; i < lines.length; i++) {
             const line = lines[i];
-            const funcMatch = line.match(/^(?:export\s+)?(?:async\s+)?function\s+(\w+)\s*\(([^)]*)\)(?!\s*:\s*\w)/);
+            const funcMatch = line.match(
+              /^(?:export\s+)?(?:async\s+)?function\s+(\w+)\s*\(([^)]*)\)(?!\s*:\s*\w)/
+            );
             if (funcMatch && !line.includes('=>')) {
               issues.push({
                 severity: 'info',
@@ -246,12 +266,12 @@ class CodeReviewService {
                 startLine: i + 1,
                 endLine: i + 1,
                 codeSnippet: line.trim(),
-                suggestion: '添加返回类型注解以提高可读性'
+                suggestion: '添加返回类型注解以提高可读性',
               });
             }
           }
           return issues;
-        }
+        },
       },
       {
         id: 'no-error-handling',
@@ -281,13 +301,13 @@ class CodeReviewService {
                   startLine: i + 1,
                   endLine: i + 1,
                   codeSnippet: line.trim(),
-                  suggestion: '添加 try/catch 处理可能的异常'
+                  suggestion: '添加 try/catch 处理可能的异常',
                 });
               }
             }
           }
           return issues;
-        }
+        },
       },
       {
         id: 'hardcoded-secret',
@@ -301,7 +321,7 @@ class CodeReviewService {
             /api[_-]?key\s*[:=]\s*['"][a-zA-Z0-9]{16,}['"]/i,
             /password\s*[:=]\s*['"][^'"]+['"]/i,
             /token\s*[:=]\s*['"][a-zA-Z0-9]{16,}['"]/i,
-            /secret\s*[:=]\s*['"][^'"]+['"]/i
+            /secret\s*[:=]\s*['"][^'"]+['"]/i,
           ];
           for (let i = 0; i < lines.length; i++) {
             const line = lines[i];
@@ -318,13 +338,13 @@ class CodeReviewService {
                   startLine: i + 1,
                   endLine: i + 1,
                   codeSnippet: line.replace(/['"][^'"]+['"]/, '"***REDACTED***"'),
-                  suggestion: '将敏感信息移到环境变量或配置文件中'
+                  suggestion: '将敏感信息移到环境变量或配置文件中',
                 });
               }
             }
           }
           return issues;
-        }
+        },
       },
       {
         id: 'unused-imports',
@@ -339,7 +359,9 @@ class CodeReviewService {
           for (let i = 0; i < lines.length; i++) {
             const importMatch = lines[i].match(/import\s+(?:\{([^}]+)\}|(\w+))/);
             if (importMatch) {
-              const names = importMatch[1] ? importMatch[1].split(',').map(s => s.trim()) : [importMatch[2]];
+              const names = importMatch[1]
+                ? importMatch[1].split(',').map((s) => s.trim())
+                : [importMatch[2]];
               for (const name of names) {
                 if (name) imports.push({ name, line: i + 1 });
               }
@@ -351,7 +373,10 @@ class CodeReviewService {
             for (let i = 0; i < lines.length; i++) {
               if (i + 1 === imp.line) continue;
               const regex = new RegExp(`\\b${imp.name}\\b`);
-              if (regex.test(lines[i])) { used = true; break; }
+              if (regex.test(lines[i])) {
+                used = true;
+                break;
+              }
             }
             if (!used) {
               issues.push({
@@ -362,12 +387,12 @@ class CodeReviewService {
                 startLine: imp.line,
                 endLine: imp.line,
                 codeSnippet: lines[imp.line - 1].trim(),
-                suggestion: '移除未使用的导入'
+                suggestion: '移除未使用的导入',
               });
             }
           }
           return issues;
-        }
+        },
       },
       {
         id: 'sync-loop',
@@ -390,13 +415,13 @@ class CodeReviewService {
                 startLine: i + 1,
                 endLine: i + 1,
                 codeSnippet: line.trim(),
-                suggestion: '使用 Promise.all 替代串行 await'
+                suggestion: '使用 Promise.all 替代串行 await',
               });
             }
             if (line.includes('}') && inLoop) inLoop = false;
           }
           return issues;
-        }
+        },
       }
     );
   }
@@ -414,7 +439,7 @@ class CodeReviewService {
             id: `issue-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
             ruleId: rule.id,
             ruleName: rule.name,
-            ...f
+            ...f,
           });
         }
       } catch (e) {
@@ -445,8 +470,8 @@ class CodeReviewService {
         linesOfCode: totalLines,
         cyclomaticComplexity: 0,
         maintainabilityIndex: 0,
-        duplicateLines: 0
-      }
+        duplicateLines: 0,
+      },
     };
   }
 
@@ -459,11 +484,11 @@ class CodeReviewService {
       issues,
       summary: this.summarize(issues),
       metrics: {
-        linesOfCode: lines.filter(l => l.trim() && !l.trim().startsWith('//')).length,
+        linesOfCode: lines.filter((l) => l.trim() && !l.trim().startsWith('//')).length,
         cyclomaticComplexity: this.calcComplexity(lines),
         maintainabilityIndex: this.calcMaintainability(lines, issues.length),
-        duplicateLines: 0
-      }
+        duplicateLines: 0,
+      },
     };
   }
 
@@ -487,15 +512,15 @@ class CodeReviewService {
     const loc = lines.length;
     if (loc === 0) return 100;
     // 简化计算：100 - (issues / loc * 1000)
-    return Math.max(0, Math.min(100, 100 - (issues / loc * 1000)));
+    return Math.max(0, Math.min(100, 100 - (issues / loc) * 1000));
   }
 
   // 汇总
   private summarize(issues: ReviewIssue[]): ReviewReport['summary'] {
-    const errors = issues.filter(i => i.severity === 'error').length;
-    const warnings = issues.filter(i => i.severity === 'warning').length;
-    const info = issues.filter(i => i.severity === 'info').length;
-    const hints = issues.filter(i => i.severity === 'hint').length;
+    const errors = issues.filter((i) => i.severity === 'error').length;
+    const warnings = issues.filter((i) => i.severity === 'warning').length;
+    const info = issues.filter((i) => i.severity === 'info').length;
+    const hints = issues.filter((i) => i.severity === 'hint').length;
     const total = issues.length;
     // 分数：errors * 10, warnings * 3, info * 1
     const penalty = errors * 10 + warnings * 3 + info;
@@ -547,7 +572,7 @@ class CodeReviewService {
                   after: `// 拆分为多个职责单一的函数\nfunction ${functionName}Part1() { ... }\nfunction ${functionName}Part2() { ... }`,
                   benefits: ['提高可读性', '便于测试', '复用性增强'],
                   riskLevel: 'medium',
-                  automated: false
+                  automated: false,
                 });
               }
               inFunction = false;
@@ -575,7 +600,7 @@ class CodeReviewService {
           after: line.replace(/\bvar\b/, 'const').trim(),
           benefits: ['块级作用域', '避免变量提升问题'],
           riskLevel: 'low',
-          automated: true
+          automated: true,
         });
       }
     }
@@ -600,12 +625,17 @@ class CodeReviewService {
 
   // 列出规则
   listRules(): { id: string; name: string; severity: IssueSeverity; category: string }[] {
-    return this.rules.map(r => ({ id: r.id, name: r.name, severity: r.severity, category: r.category }));
+    return this.rules.map((r) => ({
+      id: r.id,
+      name: r.name,
+      severity: r.severity,
+      category: r.category,
+    }));
   }
 
   // 启用/禁用规则
   toggleRule(ruleId: string, enabled: boolean): void {
-    const rule = this.rules.find(r => r.id === ruleId);
+    const rule = this.rules.find((r) => r.id === ruleId);
     if (rule) {
       // 通过在 check 函数前加判断实现
       (rule as any)._disabled = !enabled;

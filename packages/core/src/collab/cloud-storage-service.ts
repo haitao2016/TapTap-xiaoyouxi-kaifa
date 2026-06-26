@@ -86,7 +86,10 @@ export class CloudStorageService {
   /**
    * 同步项目（增量）
    */
-  async syncProject(projectId: string, localFiles: { path: string; content: string }[]): Promise<{
+  async syncProject(
+    projectId: string,
+    localFiles: { path: string; content: string }[]
+  ): Promise<{
     uploaded: string[];
     downloaded: string[];
     conflicts: string[];
@@ -124,7 +127,10 @@ export class CloudStorageService {
       project.syncStatus = uploaded.length === localFiles.length ? 'synced' : 'pending-upload';
     }
 
-    globalEventBus.emit({ type: 'cloud:sync-complete', payload: { projectId, uploaded, downloaded, conflicts } });
+    globalEventBus.emit({
+      type: 'cloud:sync-complete',
+      payload: { projectId, uploaded, downloaded, conflicts },
+    });
     return { uploaded, downloaded, conflicts };
   }
 

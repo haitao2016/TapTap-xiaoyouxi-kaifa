@@ -21,15 +21,15 @@ export class VirtualListService {
   private renderItem: (index: number) => HTMLElement;
   private estimateSize?: (index: number) => number;
   private overscanCount: number;
-  
+
   private scrollTop = 0;
   private visibleStartIndex = 0;
   private visibleEndIndex = 0;
   private items = new Map<number, VirtualListItem>();
-  
+
   private scrollContainer!: HTMLElement;
   private contentElement!: HTMLElement;
-  
+
   private rafId?: number;
 
   constructor(options: VirtualListOptions) {
@@ -73,7 +73,7 @@ export class VirtualListService {
 
   private onScroll(): void {
     this.scrollTop = this.container.scrollTop;
-    
+
     if (!this.rafId) {
       this.rafId = requestAnimationFrame(() => {
         this.update();
@@ -110,12 +110,12 @@ export class VirtualListService {
 
   private update(): void {
     const containerHeight = this.container.clientHeight;
-    
+
     this.visibleStartIndex = Math.max(
       0,
       Math.floor(this.scrollTop / this.itemHeight) - this.overscanCount
     );
-    
+
     this.visibleEndIndex = Math.min(
       this.itemCount - 1,
       Math.floor((this.scrollTop + containerHeight) / this.itemHeight) + this.overscanCount
@@ -124,7 +124,7 @@ export class VirtualListService {
     this.scrollContainer.style.height = this.getTotalHeight().toString() + 'px';
 
     const newItems = new Set<number>();
-    
+
     for (let i = this.visibleStartIndex; i <= this.visibleEndIndex; i++) {
       newItems.add(i);
     }
@@ -146,9 +146,9 @@ export class VirtualListService {
         element.style.top = this.getItemTop(i) - contentTop + 'px';
         element.style.left = '0';
         element.style.width = '100%';
-        
+
         this.contentElement.appendChild(element);
-        
+
         this.items.set(i, {
           index: i,
           element,
@@ -177,15 +177,15 @@ export class VirtualListService {
     const itemTop = this.getItemTop(index);
     const containerHeight = this.container.clientHeight;
     const itemHeight = this.getItemHeight(index);
-    
+
     let scrollPosition = itemTop;
-    
+
     if (align === 'center') {
       scrollPosition = itemTop - (containerHeight - itemHeight) / 2;
     } else if (align === 'end') {
       scrollPosition = itemTop - containerHeight + itemHeight;
     }
-    
+
     this.container.scrollTo({
       top: Math.max(0, scrollPosition),
       behavior: 'smooth',

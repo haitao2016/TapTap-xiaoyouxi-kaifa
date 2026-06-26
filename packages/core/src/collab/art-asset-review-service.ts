@@ -97,7 +97,12 @@ class ArtAssetReviewService {
   private currentUser = 'user-1';
 
   // 上传资源
-  uploadAsset(config: Omit<ArtAsset, 'id' | 'version' | 'uploadedAt' | 'annotations' | 'reviews' | 'specViolations' | 'status'>): ArtAsset {
+  uploadAsset(
+    config: Omit<
+      ArtAsset,
+      'id' | 'version' | 'uploadedAt' | 'annotations' | 'reviews' | 'specViolations' | 'status'
+    >
+  ): ArtAsset {
     const violations = this.checkSpec(config);
 
     const asset: ArtAsset = {
@@ -108,34 +113,41 @@ class ArtAssetReviewService {
       annotations: [],
       reviews: [],
       specViolations: violations,
-      status: violations.some(v => v.severity === 'error') ? 'rejected' : 'pending'
+      status: violations.some((v) => v.severity === 'error') ? 'rejected' : 'pending',
     };
 
     this.assets.set(asset.id, asset);
-    this.versions.set(asset.id, [{
-      id: `ver-${Date.now()}`,
-      assetId: asset.id,
-      versionNumber: 1,
-      url: asset.url,
-      uploader: this.currentUser,
-      uploadedAt: Date.now(),
-      changeNote: '初始版本',
-      size: asset.size
-    }]);
+    this.versions.set(asset.id, [
+      {
+        id: `ver-${Date.now()}`,
+        assetId: asset.id,
+        versionNumber: 1,
+        url: asset.url,
+        uploader: this.currentUser,
+        uploadedAt: Date.now(),
+        changeNote: '初始版本',
+        size: asset.size,
+      },
+    ]);
 
     this.notify('asset:uploaded', asset);
     return asset;
   }
 
   // 检查资源规范
-  private checkSpec(asset: Omit<ArtAsset, 'id' | 'version' | 'uploadedAt' | 'annotations' | 'reviews' | 'specViolations' | 'status'>): ArtAsset['specViolations'] {
+  private checkSpec(
+    asset: Omit<
+      ArtAsset,
+      'id' | 'version' | 'uploadedAt' | 'annotations' | 'reviews' | 'specViolations' | 'status'
+    >
+  ): ArtAsset['specViolations'] {
     const violations: ArtAsset['specViolations'] = [];
 
     if (asset.spec.maxSize && asset.size > asset.spec.maxSize) {
       violations.push({
         rule: 'max-size',
         message: `资源大小 ${(asset.size / 1024).toFixed(1)}KB 超过最大限制 ${(asset.spec.maxSize / 1024).toFixed(1)}KB`,
-        severity: 'error'
+        severity: 'error',
       });
     }
 
@@ -143,7 +155,7 @@ class ArtAssetReviewService {
       violations.push({
         rule: 'format',
         message: `格式 ${asset.format} 不符合要求，应为 ${asset.spec.requiredFormat.join(', ')}`,
-        severity: 'error'
+        severity: 'error',
       });
     }
 
@@ -151,7 +163,7 @@ class ArtAssetReviewService {
       violations.push({
         rule: 'min-width',
         message: `宽度 ${asset.width}px 小于最小要求 ${asset.spec.minWidth}px`,
-        severity: 'error'
+        severity: 'error',
       });
     }
 
@@ -159,7 +171,7 @@ class ArtAssetReviewService {
       violations.push({
         rule: 'max-width',
         message: `宽度 ${asset.width}px 超过最大限制 ${asset.spec.maxWidth}px`,
-        severity: 'warning'
+        severity: 'warning',
       });
     }
 
@@ -167,7 +179,7 @@ class ArtAssetReviewService {
       violations.push({
         rule: 'min-height',
         message: `高度 ${asset.height}px 小于最小要求 ${asset.spec.minHeight}px`,
-        severity: 'error'
+        severity: 'error',
       });
     }
 
@@ -175,7 +187,11 @@ class ArtAssetReviewService {
   }
 
   // 上传新版本
-  uploadNewVersion(assetId: string, file: { url: string; size: number; width?: number; height?: number }, changeNote: string): AssetVersion {
+  uploadNewVersion(
+    assetId: string,
+    file: { url: string; size: number; width?: number; height?: number },
+    changeNote: string
+  ): AssetVersion {
     const asset = this.assets.get(assetId);
     if (!asset) throw new Error('资源不存在');
 
@@ -189,7 +205,7 @@ class ArtAssetReviewService {
       uploadedAt: Date.now(),
       changeNote,
       size: file.size,
-      diff: this.calculateDiff(oldVersions[oldVersions.length - 1], file)
+      diff: this.calculateDiff(oldVersions[oldVersions.length - 1], file),
     };
 
     oldVersions.push(newVersion);
@@ -207,7 +223,10 @@ class ArtAssetReviewService {
   }
 
   // 计算差异
-  private calculateDiff(oldVersion: AssetVersion | undefined, newFile: { size: number }): AssetVersion['diff'] {
+  private calculateDiff(
+    oldVersion: AssetVersion | undefined,
+    newFile: { size: number }
+  ): AssetVersion['diff'] {
     if (!oldVersion) {
       return { addedPixels: 0, removedPixels: 0, modifiedPixels: 0, similarity: 0 };
     }
@@ -217,12 +236,15 @@ class ArtAssetReviewService {
       addedPixels: Math.floor(sizeDelta * 0.5),
       removedPixels: Math.floor(sizeDelta * 0.3),
       modifiedPixels: Math.floor(sizeDelta * 0.2),
-      similarity: 0.8 + Math.random() * 0.2
+      similarity: 0.8 + Math.random() * 0.2,
     };
   }
 
   // 添加批注
-  addAnnotation(assetId: string, annotation: Omit<Annotation, 'id' | 'author' | 'timestamp' | 'resolved' | 'replies'>): Annotation {
+  addAnnotation(
+    assetId: string,
+    annotation: Omit<Annotation, 'id' | 'author' | 'timestamp' | 'resolved' | 'replies'>
+  ): Annotation {
     const asset = this.assets.get(assetId);
     if (!asset) throw new Error('资源不存在');
     const newAnnotation: Annotation = {
@@ -231,7 +253,7 @@ class ArtAssetReviewService {
       author: this.currentUser,
       timestamp: Date.now(),
       resolved: false,
-      replies: []
+      replies: [],
     };
     asset.annotations.push(newAnnotation);
     this.notify('annotation:added', { assetId, annotation: newAnnotation });
@@ -242,7 +264,7 @@ class ArtAssetReviewService {
   replyAnnotation(assetId: string, annotationId: string, content: string): void {
     const asset = this.assets.get(assetId);
     if (!asset) return;
-    const anno = asset.annotations.find(a => a.id === annotationId);
+    const anno = asset.annotations.find((a) => a.id === annotationId);
     if (!anno) return;
     anno.replies.push({ author: this.currentUser, content, timestamp: Date.now() });
     this.notify('annotation:replied', { assetId, annotationId });
@@ -252,21 +274,24 @@ class ArtAssetReviewService {
   resolveAnnotation(assetId: string, annotationId: string): void {
     const asset = this.assets.get(assetId);
     if (!asset) return;
-    const anno = asset.annotations.find(a => a.id === annotationId);
+    const anno = asset.annotations.find((a) => a.id === annotationId);
     if (!anno) return;
     anno.resolved = true;
     this.notify('annotation:resolved', { assetId, annotationId });
   }
 
   // 提交评审
-  submitReview(assetId: string, review: Omit<AssetReview, 'id' | 'reviewer' | 'timestamp'>): AssetReview {
+  submitReview(
+    assetId: string,
+    review: Omit<AssetReview, 'id' | 'reviewer' | 'timestamp'>
+  ): AssetReview {
     const asset = this.assets.get(assetId);
     if (!asset) throw new Error('资源不存在');
     const newReview: AssetReview = {
       ...review,
       id: `review-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       reviewer: this.currentUser,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
     asset.reviews.push(newReview);
 
@@ -280,13 +305,17 @@ class ArtAssetReviewService {
   }
 
   // 对比两个版本
-  compareVersions(assetId: string, versionA: number, versionB: number): {
+  compareVersions(
+    assetId: string,
+    versionA: number,
+    versionB: number
+  ): {
     similarity: number;
     differences: { region: string; type: string; severity: 'low' | 'medium' | 'high' }[];
   } {
     const versions = this.versions.get(assetId) || [];
-    const vA = versions.find(v => v.versionNumber === versionA);
-    const vB = versions.find(v => v.versionNumber === versionB);
+    const vA = versions.find((v) => v.versionNumber === versionA);
+    const vB = versions.find((v) => v.versionNumber === versionB);
     if (!vA || !vB) throw new Error('版本不存在');
 
     return {
@@ -294,8 +323,8 @@ class ArtAssetReviewService {
       differences: [
         { region: '左上区域', type: '颜色变化', severity: 'low' },
         { region: '中心区域', type: '细节调整', severity: 'medium' },
-        { region: '边缘', type: '尺寸变化', severity: 'low' }
-      ]
+        { region: '边缘', type: '尺寸变化', severity: 'low' },
+      ],
     };
   }
 
@@ -314,15 +343,17 @@ class ArtAssetReviewService {
   }
 
   // 搜索资源
-  searchAssets(query: string, filter?: { type?: AssetType; status?: ArtAsset['status']; projectId?: string }): ArtAsset[] {
+  searchAssets(
+    query: string,
+    filter?: { type?: AssetType; status?: ArtAsset['status']; projectId?: string }
+  ): ArtAsset[] {
     const q = query.toLowerCase();
     let assets = Array.from(this.assets.values());
-    if (filter?.type) assets = assets.filter(a => a.type === filter.type);
-    if (filter?.status) assets = assets.filter(a => a.status === filter.status);
-    if (filter?.projectId) assets = assets.filter(a => a.projectId === filter.projectId);
-    return assets.filter(a =>
-      a.name.toLowerCase().includes(q) ||
-      a.tags.some(t => t.toLowerCase().includes(q))
+    if (filter?.type) assets = assets.filter((a) => a.type === filter.type);
+    if (filter?.status) assets = assets.filter((a) => a.status === filter.status);
+    if (filter?.projectId) assets = assets.filter((a) => a.projectId === filter.projectId);
+    return assets.filter(
+      (a) => a.name.toLowerCase().includes(q) || a.tags.some((t) => t.toLowerCase().includes(q))
     );
   }
 
@@ -332,11 +363,15 @@ class ArtAssetReviewService {
   }
 
   // 列出资源
-  listAssets(filter?: { type?: AssetType; status?: ArtAsset['status']; projectId?: string }): ArtAsset[] {
+  listAssets(filter?: {
+    type?: AssetType;
+    status?: ArtAsset['status'];
+    projectId?: string;
+  }): ArtAsset[] {
     let assets = Array.from(this.assets.values());
-    if (filter?.type) assets = assets.filter(a => a.type === filter.type);
-    if (filter?.status) assets = assets.filter(a => a.status === filter.status);
-    if (filter?.projectId) assets = assets.filter(a => a.projectId === filter.projectId);
+    if (filter?.type) assets = assets.filter((a) => a.type === filter.type);
+    if (filter?.status) assets = assets.filter((a) => a.status === filter.status);
+    if (filter?.projectId) assets = assets.filter((a) => a.projectId === filter.projectId);
     return assets.sort((a, b) => b.uploadedAt - a.uploadedAt);
   }
 
@@ -348,13 +383,15 @@ class ArtAssetReviewService {
   // 获取指定版本
   getVersion(assetId: string, versionNumber: number): AssetVersion | undefined {
     const versions = this.versions.get(assetId) || [];
-    return versions.find(v => v.versionNumber === versionNumber);
+    return versions.find((v) => v.versionNumber === versionNumber);
   }
 
   // 订阅
   subscribe(listener: (event: string, data: any) => void): () => void {
     this.listeners.add(listener);
-    return () => { this.listeners.delete(listener); };
+    return () => {
+      this.listeners.delete(listener);
+    };
   }
 
   private notify(event: string, data: any): void {

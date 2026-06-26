@@ -1,4 +1,14 @@
-import type { PluginMeta, PluginContext, PluginHook, PanelConfig, CommandConfig, PluginAction, PluginInfo, CommandPaletteItem, ProjectMeta } from '@tapdev/types';
+import type {
+  PluginMeta,
+  PluginContext,
+  PluginHook,
+  PanelConfig,
+  CommandConfig,
+  PluginAction,
+  PluginInfo,
+  CommandPaletteItem,
+  ProjectMeta,
+} from '@tapdev/types';
 import { globalEventBus } from './event-bus';
 
 export type PluginPermission =
@@ -100,7 +110,10 @@ export class PluginManager {
       await this.checkDependencies(pluginId);
     } catch (error) {
       plugin.activationError = error instanceof Error ? error.message : '依赖检查失败';
-      globalEventBus.emit({ type: 'plugin:activation-failed', payload: { pluginId, error: plugin.activationError } });
+      globalEventBus.emit({
+        type: 'plugin:activation-failed',
+        payload: { pluginId, error: plugin.activationError },
+      });
       throw error;
     }
 
@@ -116,7 +129,10 @@ export class PluginManager {
       globalEventBus.emit({ type: 'plugin:activated', payload: plugin.meta });
     } catch (error) {
       plugin.activationError = error instanceof Error ? error.message : '插件激活失败';
-      globalEventBus.emit({ type: 'plugin:activation-failed', payload: { pluginId, error: plugin.activationError } });
+      globalEventBus.emit({
+        type: 'plugin:activation-failed',
+        payload: { pluginId, error: plugin.activationError },
+      });
       throw error;
     }
   }
@@ -134,7 +150,9 @@ export class PluginManager {
     plugin.activated = false;
     plugin.activatedAt = undefined;
     plugin.meta.enabled = false;
-    this.commandPaletteItems = this.commandPaletteItems.filter((item) => item.pluginId !== pluginId);
+    this.commandPaletteItems = this.commandPaletteItems.filter(
+      (item) => item.pluginId !== pluginId
+    );
     this.unregisterPluginHooks(pluginId);
     globalEventBus.emit({ type: 'plugin:deactivated', payload: plugin.meta });
   }
@@ -177,7 +195,9 @@ export class PluginManager {
 
     return {
       meta: plugin.meta,
-      commands: [...plugin.commands.values()].map((c) => c.config).filter((c): c is CommandConfig => !!c),
+      commands: [...plugin.commands.values()]
+        .map((c) => c.config)
+        .filter((c): c is CommandConfig => !!c),
       panels: [...plugin.panels.values()],
       actions: [...plugin.actions.values()],
       activated: plugin.activated,
@@ -185,7 +205,9 @@ export class PluginManager {
   }
 
   getAllPluginInfo(): PluginInfo[] {
-    return [...this.plugins.keys()].map((id) => this.getPluginInfo(id)).filter((info): info is PluginInfo => !!info);
+    return [...this.plugins.keys()]
+      .map((id) => this.getPluginInfo(id))
+      .filter((info): info is PluginInfo => !!info);
   }
 
   getPluginActivationError(pluginId: string): string | undefined {
@@ -205,7 +227,10 @@ export class PluginManager {
     if (plugin) {
       if (permissions.allowed) plugin.permissions.allowed = permissions.allowed;
       if (permissions.denied) plugin.permissions.denied = permissions.denied;
-      globalEventBus.emit({ type: 'plugin:permissions-updated', payload: { pluginId, permissions: plugin.permissions } });
+      globalEventBus.emit({
+        type: 'plugin:permissions-updated',
+        payload: { pluginId, permissions: plugin.permissions },
+      });
     }
   }
 
@@ -441,8 +466,7 @@ export class PluginManager {
     }
   }
 
-  private unregisterPluginHooks(_pluginId: string): void {
-  }
+  private unregisterPluginHooks(_pluginId: string): void {}
 
   loadBuiltinPlugins(): void {
     this.registerPlugin(
@@ -459,27 +483,35 @@ export class PluginManager {
         category: '工具',
       },
       (ctx) => {
-        ctx.registerCommand('optimize-assets', async () => {
-          ctx.showNotification('资源优化已启动', 'info');
-        }, {
-          id: 'optimize-assets',
-          title: '优化资源',
-          description: '优化 Unity 项目中的资源文件',
-          icon: 'compress',
-          shortcut: 'Ctrl+Shift+O',
-          category: 'Unity',
-        });
+        ctx.registerCommand(
+          'optimize-assets',
+          async () => {
+            ctx.showNotification('资源优化已启动', 'info');
+          },
+          {
+            id: 'optimize-assets',
+            title: '优化资源',
+            description: '优化 Unity 项目中的资源文件',
+            icon: 'compress',
+            shortcut: 'Ctrl+Shift+O',
+            category: 'Unity',
+          }
+        );
 
-        ctx.registerCommand('clear-cache', async () => {
-          ctx.showNotification('缓存已清除', 'success');
-        }, {
-          id: 'clear-cache',
-          title: '清除缓存',
-          description: '清除 Unity 缓存和构建缓存',
-          icon: 'trash',
-          shortcut: 'Ctrl+Shift+Delete',
-          category: 'Unity',
-        });
+        ctx.registerCommand(
+          'clear-cache',
+          async () => {
+            ctx.showNotification('缓存已清除', 'success');
+          },
+          {
+            id: 'clear-cache',
+            title: '清除缓存',
+            description: '清除 Unity 缓存和构建缓存',
+            icon: 'trash',
+            shortcut: 'Ctrl+Shift+Delete',
+            category: 'Unity',
+          }
+        );
 
         ctx.registerPanel('unity-optimizer', {
           id: 'unity-optimizer',
@@ -511,25 +543,33 @@ export class PluginManager {
         category: '测试',
       },
       (ctx) => {
-        ctx.registerCommand('test-cdn', async () => {
-          ctx.showNotification('CDN 测试已启动', 'info');
-        }, {
-          id: 'test-cdn',
-          title: '测试 CDN',
-          description: '测试 CDN 连通性和延迟',
-          icon: 'cloud',
-          category: '网络',
-        });
+        ctx.registerCommand(
+          'test-cdn',
+          async () => {
+            ctx.showNotification('CDN 测试已启动', 'info');
+          },
+          {
+            id: 'test-cdn',
+            title: '测试 CDN',
+            description: '测试 CDN 连通性和延迟',
+            icon: 'cloud',
+            category: '网络',
+          }
+        );
 
-        ctx.registerCommand('test-ping', async () => {
-          ctx.showNotification('Ping 测试已启动', 'info');
-        }, {
-          id: 'test-ping',
-          title: 'Ping 测试',
-          description: '测试服务器延迟',
-          icon: 'activity',
-          category: '网络',
-        });
+        ctx.registerCommand(
+          'test-ping',
+          async () => {
+            ctx.showNotification('Ping 测试已启动', 'info');
+          },
+          {
+            id: 'test-ping',
+            title: 'Ping 测试',
+            description: '测试服务器延迟',
+            icon: 'activity',
+            category: '网络',
+          }
+        );
       },
       undefined,
       {
@@ -552,26 +592,34 @@ export class PluginManager {
         category: '调试',
       },
       (ctx) => {
-        ctx.registerCommand('take-snapshot', async () => {
-          ctx.showNotification('性能快照已保存', 'success');
-        }, {
-          id: 'take-snapshot',
-          title: '性能快照',
-          description: '捕获当前性能快照',
-          icon: 'camera',
-          shortcut: 'Ctrl+Shift+P',
-          category: '调试',
-        });
+        ctx.registerCommand(
+          'take-snapshot',
+          async () => {
+            ctx.showNotification('性能快照已保存', 'success');
+          },
+          {
+            id: 'take-snapshot',
+            title: '性能快照',
+            description: '捕获当前性能快照',
+            icon: 'camera',
+            shortcut: 'Ctrl+Shift+P',
+            category: '调试',
+          }
+        );
 
-        ctx.registerCommand('show-callstack', async () => {
-          ctx.showNotification('调用栈面板已打开', 'info');
-        }, {
-          id: 'show-callstack',
-          title: '显示调用栈',
-          description: '查看当前调用栈',
-          icon: 'list',
-          category: '调试',
-        });
+        ctx.registerCommand(
+          'show-callstack',
+          async () => {
+            ctx.showNotification('调用栈面板已打开', 'info');
+          },
+          {
+            id: 'show-callstack',
+            title: '显示调用栈',
+            description: '查看当前调用栈',
+            icon: 'list',
+            category: '调试',
+          }
+        );
       },
       undefined,
       {

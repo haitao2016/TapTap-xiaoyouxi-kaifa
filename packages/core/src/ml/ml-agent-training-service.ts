@@ -120,7 +120,7 @@ class MLAgentTrainingService {
         observationType: 'vector',
         actionType: 'discrete',
         maxSteps: 500,
-        rewardConfig: { goal: 100, step: -1, collision: -50, timeout: -10 }
+        rewardConfig: { goal: 100, step: -1, collision: -50, timeout: -10 },
       },
       {
         id: 'maze-navigation',
@@ -131,7 +131,7 @@ class MLAgentTrainingService {
         observationType: 'vector',
         actionType: 'discrete',
         maxSteps: 200,
-        rewardConfig: { goal: 200, step: -1, collision: -5, timeout: -50 }
+        rewardConfig: { goal: 200, step: -1, collision: -5, timeout: -50 },
       },
       {
         id: 'combat-arena',
@@ -142,7 +142,7 @@ class MLAgentTrainingService {
         observationType: 'vector',
         actionType: 'discrete',
         maxSteps: 1000,
-        rewardConfig: { goal: 500, step: 0, collision: -20, timeout: -10 }
+        rewardConfig: { goal: 500, step: 0, collision: -20, timeout: -10 },
       },
       {
         id: 'racing-track',
@@ -153,7 +153,7 @@ class MLAgentTrainingService {
         observationType: 'vector',
         actionType: 'continuous',
         maxSteps: 2000,
-        rewardConfig: { goal: 1000, step: 1, collision: -100, timeout: -50 }
+        rewardConfig: { goal: 1000, step: 1, collision: -100, timeout: -50 },
       },
       {
         id: 'platformer-jump',
@@ -164,8 +164,8 @@ class MLAgentTrainingService {
         observationType: 'vector',
         actionType: 'discrete',
         maxSteps: 800,
-        rewardConfig: { goal: 300, step: 0, collision: -20, timeout: -30 }
-      }
+        rewardConfig: { goal: 300, step: 0, collision: -20, timeout: -30 },
+      },
     ];
 
     for (const env of envs) {
@@ -182,7 +182,7 @@ class MLAgentTrainingService {
         description: '训练敌人追击玩家',
         category: 'enemy-ai',
         env: { id: 'enemy-patrol', stateSize: 8, actionSize: 5, actionType: 'discrete' },
-        config: { algorithm: 'PPO', learningRate: 0.0003, totalTimesteps: 100000, batchSize: 64 }
+        config: { algorithm: 'PPO', learningRate: 0.0003, totalTimesteps: 100000, batchSize: 64 },
       },
       {
         id: 'nav-template',
@@ -190,7 +190,7 @@ class MLAgentTrainingService {
         description: '训练寻路能力',
         category: 'navigation',
         env: { id: 'maze-navigation', stateSize: 4, actionSize: 4, actionType: 'discrete' },
-        config: { algorithm: 'DQN', learningRate: 0.001, totalTimesteps: 50000 }
+        config: { algorithm: 'DQN', learningRate: 0.001, totalTimesteps: 50000 },
       },
       {
         id: 'combat-template',
@@ -198,8 +198,13 @@ class MLAgentTrainingService {
         description: '训练战斗决策',
         category: 'combat',
         env: { id: 'combat-arena', stateSize: 16, actionSize: 8, actionType: 'discrete' },
-        config: { algorithm: 'PPO', learningRate: 0.0003, totalTimesteps: 200000, hiddenLayers: [256, 256] }
-      }
+        config: {
+          algorithm: 'PPO',
+          learningRate: 0.0003,
+          totalTimesteps: 200000,
+          hiddenLayers: [256, 256],
+        },
+      },
     ];
   }
 
@@ -212,7 +217,7 @@ class MLAgentTrainingService {
       status: 'idle',
       metrics: [],
       checkpoints: [],
-      bestReward: -Infinity
+      bestReward: -Infinity,
     };
     this.tasks.set(task.id, task);
     globalEventBus.emit('ml-agent:task-created', task);
@@ -243,7 +248,7 @@ class MLAgentTrainingService {
   // 准备环境
   private async prepareEnvironment(task: TrainingTask): Promise<void> {
     // 模拟环境初始化
-    await new Promise(r => setTimeout(r, 500));
+    await new Promise((r) => setTimeout(r, 500));
   }
 
   // 训练循环
@@ -259,9 +264,11 @@ class MLAgentTrainingService {
       const reward = this.simulateEpisode(task);
       epsilon = Math.max(task.config.epsilonMin, epsilon * task.config.epsilonDecay);
 
-      const avgReward = task.metrics.length > 0
-        ? task.metrics.slice(-20).reduce((s, m) => s + m.reward, 0) / Math.min(20, task.metrics.length)
-        : reward;
+      const avgReward =
+        task.metrics.length > 0
+          ? task.metrics.slice(-20).reduce((s, m) => s + m.reward, 0) /
+            Math.min(20, task.metrics.length)
+          : reward;
 
       const metrics: TrainingMetrics = {
         episode,
@@ -271,14 +278,17 @@ class MLAgentTrainingService {
         reward,
         avgReward,
         maxReward: Math.max(task.bestReward, reward),
-        minReward: Math.min(task.metrics.length > 0 ? task.metrics[task.metrics.length - 1].minReward : 0, reward),
+        minReward: Math.min(
+          task.metrics.length > 0 ? task.metrics[task.metrics.length - 1].minReward : 0,
+          reward
+        ),
         loss: Math.random() * 0.5,
         policyLoss: Math.random() * 0.2,
         valueLoss: Math.random() * 1.0,
         entropy: Math.random() * 0.1,
         epsilon,
         fps: 60 + Math.random() * 10,
-        duration: Date.now() - (task.startTime || Date.now())
+        duration: Date.now() - (task.startTime || Date.now()),
       };
 
       task.metrics.push(metrics);
@@ -329,7 +339,7 @@ class MLAgentTrainingService {
       avgReward,
       modelData: btoa(JSON.stringify({ weights: [] })),
       config: task.config,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
     task.checkpoints.push(checkpoint);
     this.notify('checkpoint:saved', { taskId: task.id, checkpoint });
@@ -367,7 +377,10 @@ class MLAgentTrainingService {
   }
 
   // 评估模型
-  async evaluateModel(taskId: string, episodes: number = 10): Promise<{ avgReward: number; rewards: number[] }> {
+  async evaluateModel(
+    taskId: string,
+    episodes: number = 10
+  ): Promise<{ avgReward: number; rewards: number[] }> {
     const task = this.tasks.get(taskId);
     if (!task) throw new Error('任务不存在');
 
@@ -393,14 +406,14 @@ class MLAgentTrainingService {
     if (!task) throw new Error('任务不存在');
 
     const cp = checkpointId
-      ? task.checkpoints.find(c => c.id === checkpointId)
+      ? task.checkpoints.find((c) => c.id === checkpointId)
       : task.checkpoints[task.checkpoints.length - 1];
 
     if (!cp) throw new Error('检查点不存在');
 
     return {
       format: 'onnx', // 支持 onnx/tflite/torch
-      data: cp.modelData
+      data: cp.modelData,
     };
   }
 
@@ -426,8 +439,7 @@ class MLAgentTrainingService {
 
   // 列出任务
   listTasks(): TrainingTask[] {
-    return Array.from(this.tasks.values()).sort((a, b) =>
-      (b.startTime || 0) - (a.startTime || 0));
+    return Array.from(this.tasks.values()).sort((a, b) => (b.startTime || 0) - (a.startTime || 0));
   }
 
   // 获取最新指标
@@ -447,7 +459,9 @@ class MLAgentTrainingService {
   // 订阅
   subscribe(listener: (event: string, data: any) => void): () => void {
     this.listeners.add(listener);
-    return () => { this.listeners.delete(listener); };
+    return () => {
+      this.listeners.delete(listener);
+    };
   }
 
   private notify(event: string, data: any): void {
@@ -473,7 +487,7 @@ class MLAgentTrainingService {
         totalTimesteps: 200000,
         hiddenLayers: [64, 64],
         bufferSize: 2048,
-        targetUpdateFreq: 100
+        targetUpdateFreq: 100,
       };
     } else {
       return {
@@ -489,7 +503,7 @@ class MLAgentTrainingService {
         totalTimesteps: 100000,
         hiddenLayers: [64, 64],
         bufferSize: 50000,
-        targetUpdateFreq: 1000
+        targetUpdateFreq: 1000,
       };
     }
   }

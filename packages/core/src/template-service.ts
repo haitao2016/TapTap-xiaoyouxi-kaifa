@@ -91,25 +91,28 @@ export class TemplateService {
 
     if (options?.query) {
       const query = options.query.toLowerCase();
-      result = result.filter(t =>
-        t.name.toLowerCase().includes(query) ||
-        t.description.toLowerCase().includes(query) ||
-        t.tags.some(tag => tag.toLowerCase().includes(query)) ||
-        t.features.some(f => f.toLowerCase().includes(query)) ||
-        t.framework.toLowerCase().includes(query)
+      result = result.filter(
+        (t) =>
+          t.name.toLowerCase().includes(query) ||
+          t.description.toLowerCase().includes(query) ||
+          t.tags.some((tag) => tag.toLowerCase().includes(query)) ||
+          t.features.some((f) => f.toLowerCase().includes(query)) ||
+          t.framework.toLowerCase().includes(query)
       );
     }
 
     if (options?.category) {
-      result = result.filter(t => t.category === options.category);
+      result = result.filter((t) => t.category === options.category);
     }
 
     if (options?.framework) {
-      result = result.filter(t => t.framework.toLowerCase() === options.framework!.toLowerCase());
+      result = result.filter((t) => t.framework.toLowerCase() === options.framework!.toLowerCase());
     }
 
     if (options?.language) {
-      result = result.filter(t => t.languages.some(l => l.toLowerCase() === options.language!.toLowerCase()));
+      result = result.filter((t) =>
+        t.languages.some((l) => l.toLowerCase() === options.language!.toLowerCase())
+      );
     }
 
     const sortBy = options?.sortBy || 'downloads';
@@ -155,22 +158,22 @@ export class TemplateService {
   }
 
   getCategoryById(categoryId: string): TemplateCategory | undefined {
-    return this.categories.find(c => c.id === categoryId);
+    return this.categories.find((c) => c.id === categoryId);
   }
 
   getFrameworks(): string[] {
-    const frameworks = new Set(this.templates.map(t => t.framework));
+    const frameworks = new Set(this.templates.map((t) => t.framework));
     return Array.from(frameworks).sort();
   }
 
   getLanguages(): string[] {
     const languages = new Set<string>();
-    this.templates.forEach(t => t.languages.forEach(l => languages.add(l)));
+    this.templates.forEach((t) => t.languages.forEach((l) => languages.add(l)));
     return Array.from(languages).sort();
   }
 
   getTemplateById(templateId: string): ProjectTemplate | undefined {
-    return this.templates.find(t => t.id === templateId);
+    return this.templates.find((t) => t.id === templateId);
   }
 
   getTemplateDetail(templateId: string): ProjectTemplate | undefined {
@@ -199,9 +202,9 @@ export class TemplateService {
       ...options.variables,
     };
 
-    globalEventBus.emit({ 
-      type: 'template:createProject', 
-      payload: { ...options, projectId } 
+    globalEventBus.emit({
+      type: 'template:createProject',
+      payload: { ...options, projectId },
     });
 
     if (options.onProgress) {
@@ -216,7 +219,7 @@ export class TemplateService {
       options.onProgress(100, '项目创建完成');
     }
 
-    const files = template.fileStructure 
+    const files = template.fileStructure
       ? this.applyTemplateVariables(template.fileStructure, variables)
       : this.generateDefaultFileStructure(template, variables);
 
@@ -230,9 +233,9 @@ export class TemplateService {
 
     this.createdProjects.set(projectId, project);
 
-    globalEventBus.emit({ 
-      type: 'template:projectCreated', 
-      payload: project 
+    globalEventBus.emit({
+      type: 'template:projectCreated',
+      payload: project,
     });
 
     return project;
@@ -256,44 +259,46 @@ export class TemplateService {
     return this.findFileContent(project.files, filePath);
   }
 
-  async searchTemplates(query: string, options?: Omit<TemplateSearchOptions, 'query'>): Promise<TemplateSearchResult> {
+  async searchTemplates(
+    query: string,
+    options?: Omit<TemplateSearchOptions, 'query'>
+  ): Promise<TemplateSearchResult> {
     return this.getTemplates({ ...options, query });
   }
 
   getPopularTemplates(limit = 10): ProjectTemplate[] {
-    return [...this.templates]
-      .sort((a, b) => b.downloads - a.downloads)
-      .slice(0, limit);
+    return [...this.templates].sort((a, b) => b.downloads - a.downloads).slice(0, limit);
   }
 
   getNewestTemplates(limit = 10): ProjectTemplate[] {
-    return [...this.templates]
-      .sort((a, b) => b.createdAt - a.createdAt)
-      .slice(0, limit);
+    return [...this.templates].sort((a, b) => b.createdAt - a.createdAt).slice(0, limit);
   }
 
   getFeaturedTemplates(): ProjectTemplate[] {
-    return this.templates.filter(t => (t as any).featured);
+    return this.templates.filter((t) => (t as any).featured);
   }
 
   getTemplatesByCategory(category: string): ProjectTemplate[] {
-    return this.templates.filter(t => t.category === category);
+    return this.templates.filter((t) => t.category === category);
   }
 
-  private applyTemplateVariables(files: VirtualFile[], variables: Record<string, string>): VirtualFile[] {
-    return files.map(file => {
+  private applyTemplateVariables(
+    files: VirtualFile[],
+    variables: Record<string, string>
+  ): VirtualFile[] {
+    return files.map((file) => {
       const newFile = { ...file };
       newFile.name = this.replaceVariables(file.name, variables);
       newFile.path = this.replaceVariables(file.path, variables);
-      
+
       if (file.type === 'file') {
         newFile.content = this.replaceVariables(file.content || '', variables);
       }
-      
+
       if (file.children) {
         newFile.children = this.applyTemplateVariables(file.children, variables);
       }
-      
+
       return newFile;
     });
   }
@@ -315,7 +320,10 @@ export class TemplateService {
     return undefined;
   }
 
-  private generateDefaultFileStructure(template: ProjectTemplate, variables: Record<string, string>): VirtualFile[] {
+  private generateDefaultFileStructure(
+    template: ProjectTemplate,
+    variables: Record<string, string>
+  ): VirtualFile[] {
     const projectName = variables.projectName || 'my-project';
     const pkg = {
       name: projectName.toLowerCase().replace(/\s+/g, '-'),
@@ -404,22 +412,26 @@ export class TemplateService {
         path: 'tsconfig.json',
         name: 'tsconfig.json',
         type: 'file',
-        content: JSON.stringify({
-          compilerOptions: {
-            target: 'ES2020',
-            module: 'ESNext',
-            moduleResolution: 'bundler',
-            strict: true,
-            jsx: 'preserve',
-            sourceMap: true,
-            resolveJsonModule: true,
-            esModuleInterop: true,
-            lib: ['ES2020', 'DOM', 'DOM.Iterable'],
-            skipLibCheck: true,
-            outDir: 'dist',
+        content: JSON.stringify(
+          {
+            compilerOptions: {
+              target: 'ES2020',
+              module: 'ESNext',
+              moduleResolution: 'bundler',
+              strict: true,
+              jsx: 'preserve',
+              sourceMap: true,
+              resolveJsonModule: true,
+              esModuleInterop: true,
+              lib: ['ES2020', 'DOM', 'DOM.Iterable'],
+              skipLibCheck: true,
+              outDir: 'dist',
+            },
+            include: ['src/**/*.ts', 'src/**/*.d.ts'],
           },
-          include: ['src/**/*.ts', 'src/**/*.d.ts'],
-        }, null, 2),
+          null,
+          2
+        ),
       },
     ];
 
@@ -449,8 +461,8 @@ export class TemplateService {
         compatibleVersions: ['0.2.0', '0.3.0', '0.4.0'],
         dependencies: {},
         devDependencies: {
-          'typescript': '^5.0.0',
-          'vite': '^5.0.0',
+          typescript: '^5.0.0',
+          vite: '^5.0.0',
         },
         scripts: {
           dev: 'vite',
@@ -523,8 +535,8 @@ export class TemplateService {
           phaser: '^3.70.0',
         },
         devDependencies: {
-          'typescript': '^5.0.0',
-          'vite': '^5.0.0',
+          typescript: '^5.0.0',
+          vite: '^5.0.0',
         },
       },
       {
@@ -549,8 +561,8 @@ export class TemplateService {
         },
         devDependencies: {
           '@types/three': '^0.160.0',
-          'typescript': '^5.0.0',
-          'vite': '^5.0.0',
+          typescript: '^5.0.0',
+          vite: '^5.0.0',
         },
       },
       {
@@ -578,8 +590,8 @@ export class TemplateService {
           '@types/react': '^18.0.0',
           '@types/react-dom': '^18.0.0',
           '@vitejs/plugin-react': '^4.0.0',
-          'typescript': '^5.0.0',
-          'vite': '^5.0.0',
+          typescript: '^5.0.0',
+          vite: '^5.0.0',
         },
       },
       {
@@ -660,8 +672,8 @@ export class TemplateService {
         },
         devDependencies: {
           '@vitejs/plugin-vue': '^5.0.0',
-          'typescript': '^5.0.0',
-          'vite': '^5.0.0',
+          typescript: '^5.0.0',
+          vite: '^5.0.0',
         },
       },
       {
@@ -741,7 +753,7 @@ export class TemplateService {
 
   private loadCategories(): void {
     const categoryMap = new Map<string, number>();
-    this.templates.forEach(t => {
+    this.templates.forEach((t) => {
       categoryMap.set(t.category, (categoryMap.get(t.category) || 0) + 1);
     });
 
@@ -762,7 +774,7 @@ export class TemplateService {
   }
 
   private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }
 

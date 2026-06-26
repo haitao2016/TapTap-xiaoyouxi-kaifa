@@ -86,17 +86,20 @@ export interface CompressionOptions {
 }
 
 export class SpriteAtlasService {
-  private atlases = new Map<string, {
-    id: string;
-    name: string;
-    sprites: Map<string, SpriteItem>;
-    packingOptions: AtlasPackingOptions;
-    compressionOptions: CompressionOptions;
-    packedData?: SpriteAtlasData;
-    atlasImage?: string;
-    createdAt: number;
-    updatedAt: number;
-  }>();
+  private atlases = new Map<
+    string,
+    {
+      id: string;
+      name: string;
+      sprites: Map<string, SpriteItem>;
+      packingOptions: AtlasPackingOptions;
+      compressionOptions: CompressionOptions;
+      packedData?: SpriteAtlasData;
+      atlasImage?: string;
+      createdAt: number;
+      updatedAt: number;
+    }
+  >();
 
   private activeAtlasId?: string;
 
@@ -104,8 +107,14 @@ export class SpriteAtlasService {
     this.loadMockAtlases();
   }
 
-  getAtlases(): Array<{ id: string; name: string; spriteCount: number; createdAt: number; updatedAt: number }> {
-    return Array.from(this.atlases.values()).map(a => ({
+  getAtlases(): Array<{
+    id: string;
+    name: string;
+    spriteCount: number;
+    createdAt: number;
+    updatedAt: number;
+  }> {
+    return Array.from(this.atlases.values()).map((a) => ({
       id: a.id,
       name: a.name,
       spriteCount: a.sprites.size,
@@ -241,7 +250,13 @@ export class SpriteAtlasService {
     return atlas?.sprites.get(spriteId);
   }
 
-  addSprite(atlasId: string, name: string, width: number, height: number, imageData?: string): SpriteItem {
+  addSprite(
+    atlasId: string,
+    name: string,
+    width: number,
+    height: number,
+    imageData?: string
+  ): SpriteItem {
     const atlas = this.atlases.get(atlasId);
     if (!atlas) {
       throw new Error(`图集不存在: ${atlasId}`);
@@ -278,9 +293,12 @@ export class SpriteAtlasService {
     return sprite;
   }
 
-  addSprites(atlasId: string, sprites: Array<{ name: string; width: number; height: number; imageData?: string }>): SpriteItem[] {
+  addSprites(
+    atlasId: string,
+    sprites: Array<{ name: string; width: number; height: number; imageData?: string }>
+  ): SpriteItem[] {
     const result: SpriteItem[] = [];
-    sprites.forEach(s => {
+    sprites.forEach((s) => {
       result.push(this.addSprite(atlasId, s.name, s.width, s.height, s.imageData));
     });
     return result;
@@ -394,7 +412,7 @@ export class SpriteAtlasService {
 
     let atlasWidth = 0;
     let atlasHeight = 0;
-    packedSprites.forEach(s => {
+    packedSprites.forEach((s) => {
       if (s.frame) {
         atlasWidth = Math.max(atlasWidth, s.frame.x + s.frame.width);
         atlasHeight = Math.max(atlasHeight, s.frame.y + s.frame.height);
@@ -410,8 +428,8 @@ export class SpriteAtlasService {
     atlasHeight = Math.min(atlasHeight, options.maxHeight);
 
     const frames: SpriteFrame[] = packedSprites
-      .filter(s => s.frame)
-      .map(s => ({
+      .filter((s) => s.frame)
+      .map((s) => ({
         filename: s.name,
         frame: s.frame!,
         rotated: s.rotated,
@@ -443,7 +461,7 @@ export class SpriteAtlasService {
     atlas.packedData = data;
     atlas.updatedAt = Date.now();
 
-    packedSprites.forEach(s => {
+    packedSprites.forEach((s) => {
       const sprite = atlas.sprites.get(s.id);
       if (sprite && s.frame) {
         sprite.frame = s.frame;
@@ -469,7 +487,7 @@ export class SpriteAtlasService {
     const spriteCount = sprites.length;
 
     let originalTotalSize = 0;
-    sprites.forEach(s => {
+    sprites.forEach((s) => {
       originalTotalSize += s.sourceWidth * s.sourceHeight;
     });
 
@@ -480,12 +498,12 @@ export class SpriteAtlasService {
     if (atlas.packedData) {
       width = atlas.packedData.meta.size.width;
       height = atlas.packedData.meta.size.height;
-      atlas.packedData.frames.forEach(f => {
+      atlas.packedData.frames.forEach((f) => {
         usedArea += f.frame.width * f.frame.height;
       });
     } else {
       const packed = this.maxRectsPack(sprites, atlas.packingOptions);
-      packed.forEach(s => {
+      packed.forEach((s) => {
         if (s.frame) {
           width = Math.max(width, s.frame.x + s.frame.width);
           height = Math.max(height, s.frame.y + s.frame.height);
@@ -526,9 +544,7 @@ export class SpriteAtlasService {
 
     switch (options.format) {
       case 'json':
-        return options.pretty 
-          ? JSON.stringify(data, null, 2) 
-          : JSON.stringify(data);
+        return options.pretty ? JSON.stringify(data, null, 2) : JSON.stringify(data);
       case 'xml':
         return this.exportXML(data);
       case 'css':
@@ -545,12 +561,16 @@ export class SpriteAtlasService {
     if (!atlas) return [];
 
     const lowerQuery = query.toLowerCase();
-    return Array.from(atlas.sprites.values()).filter(
-      s => s.name.toLowerCase().includes(lowerQuery)
+    return Array.from(atlas.sprites.values()).filter((s) =>
+      s.name.toLowerCase().includes(lowerQuery)
     );
   }
 
-  sortSprites(atlasId: string, by: 'name' | 'size' | 'date', order: 'asc' | 'desc' = 'asc'): SpriteItem[] {
+  sortSprites(
+    atlasId: string,
+    by: 'name' | 'size' | 'date',
+    order: 'asc' | 'desc' = 'asc'
+  ): SpriteItem[] {
     const sprites = this.getSprites(atlasId);
 
     return sprites.sort((a, b) => {
@@ -560,7 +580,7 @@ export class SpriteAtlasService {
           comparison = a.name.localeCompare(b.name);
           break;
         case 'size':
-          comparison = (a.sourceWidth * a.sourceHeight) - (b.sourceWidth * b.sourceHeight);
+          comparison = a.sourceWidth * a.sourceHeight - b.sourceWidth * b.sourceHeight;
           break;
         case 'date':
           comparison = a.addedAt - b.addedAt;
@@ -583,10 +603,17 @@ export class SpriteAtlasService {
     let atlasWidth = 256;
     let atlasHeight = 256;
 
-    interface FreeRect { x: number; y: number; width: number; height: number; }
-    let freeRects: FreeRect[] = [{ x: 0, y: 0, width: options.maxWidth, height: options.maxHeight }];
+    interface FreeRect {
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+    }
+    let freeRects: FreeRect[] = [
+      { x: 0, y: 0, width: options.maxWidth, height: options.maxHeight },
+    ];
 
-    sorted.forEach(sprite => {
+    sorted.forEach((sprite) => {
       let w = sprite.trimmedWidth + padding * 2;
       let h = sprite.trimmedHeight + padding * 2;
       let rotated = false;
@@ -634,7 +661,10 @@ export class SpriteAtlasService {
     w: number,
     h: number
   ): { rect: { x: number; y: number; width: number; height: number }; area: number } | null {
-    let best: { rect: { x: number; y: number; width: number; height: number }; area: number } | null = null;
+    let best: {
+      rect: { x: number; y: number; width: number; height: number };
+      area: number;
+    } | null = null;
 
     for (const rect of freeRects) {
       if (rect.width >= w && rect.height >= h) {
@@ -648,10 +678,13 @@ export class SpriteAtlasService {
     return best;
   }
 
-  private splitFreeRects(freeRects: Array<{ x: number; y: number; width: number; height: number }>, used: { x: number; y: number; width: number; height: number }) {
+  private splitFreeRects(
+    freeRects: Array<{ x: number; y: number; width: number; height: number }>,
+    used: { x: number; y: number; width: number; height: number }
+  ) {
     const result: Array<{ x: number; y: number; width: number; height: number }> = [];
 
-    freeRects.forEach(rect => {
+    freeRects.forEach((rect) => {
       if (
         used.x >= rect.x + rect.width ||
         used.x + used.width <= rect.x ||
@@ -759,7 +792,7 @@ export class SpriteAtlasService {
     let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
     xml += `<TextureAtlas imagePath="${data.meta.image}" width="${data.meta.size.width}" height="${data.meta.size.height}">\n`;
 
-    data.frames.forEach(frame => {
+    data.frames.forEach((frame) => {
       xml += `  <SubTexture name="${frame.filename}" x="${frame.frame.x}" y="${frame.frame.y}" width="${frame.frame.width}" height="${frame.frame.height}"`;
       if (frame.rotated) xml += ' rotated="true"';
       if (frame.trimmed) {
@@ -780,7 +813,7 @@ export class SpriteAtlasService {
     css += `  display: inline-block;\n`;
     css += `}\n\n`;
 
-    data.frames.forEach(frame => {
+    data.frames.forEach((frame) => {
       const className = frame.filename.replace(/\.[^.]+$/, '').replace(/[^a-zA-Z0-9-_]/g, '-');
       css += `.sprite-${className} {\n`;
       css += `  width: ${frame.frame.width}px;\n`;
@@ -797,13 +830,14 @@ export class SpriteAtlasService {
 
   private exportPlist(data: SpriteAtlasData): string {
     let plist = '<?xml version="1.0" encoding="UTF-8"?>\n';
-    plist += '<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n';
+    plist +=
+      '<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n';
     plist += '<plist version="1.0">\n';
     plist += '<dict>\n';
     plist += '  <key>frames</key>\n';
     plist += '  <dict>\n';
 
-    data.frames.forEach(frame => {
+    data.frames.forEach((frame) => {
       plist += `    <key>${frame.filename}</key>\n`;
       plist += '    <dict>\n';
       plist += `      <key>frame</key><string>{{${frame.frame.x},${frame.frame.y}},{${frame.frame.width},${frame.frame.height}}}</string>\n`;
@@ -833,7 +867,7 @@ export class SpriteAtlasService {
 
   private loadMockAtlases(): void {
     const atlasId = this.createAtlas('game_sprites');
-    
+
     const mockSprites = [
       { name: 'player_idle_01.png', w: 64, h: 64 },
       { name: 'player_idle_02.png', w: 64, h: 64 },
@@ -853,7 +887,7 @@ export class SpriteAtlasService {
       { name: 'effect_explosion.png', w: 128, h: 128 },
     ];
 
-    mockSprites.forEach(s => {
+    mockSprites.forEach((s) => {
       this.addSprite(atlasId, s.name, s.w, s.h);
     });
 

@@ -344,7 +344,7 @@ export class TapTapAuthService {
   }
 
   getActiveAccount(): TapTapAccount | null {
-    return this.activeAccountId ? this.accounts.get(this.activeAccountId) ?? null : null;
+    return this.activeAccountId ? (this.accounts.get(this.activeAccountId) ?? null) : null;
   }
 
   switchAccount(id: string): boolean {
@@ -381,7 +381,7 @@ export class TapTapAuthService {
 
   private async fetchProfile(
     accessToken: string,
-    openId: string,
+    openId: string
   ): Promise<{ nickname: string; avatar: string; email?: string }> {
     try {
       const res = await fetch(`${TAPTAP_PROFILE_URL}?openid=${openId}`, {
@@ -401,7 +401,10 @@ export class TapTapAuthService {
     }
   }
 
-  private cacheProfile(openId: string, profile: { nickname: string; avatar: string; email?: string }): void {
+  private cacheProfile(
+    openId: string,
+    profile: { nickname: string; avatar: string; email?: string }
+  ): void {
     this.profileCache.set(openId, {
       openId,
       ...profile,

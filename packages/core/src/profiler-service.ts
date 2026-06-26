@@ -182,7 +182,7 @@ export class ProfilerService {
   }
 
   getActiveSession(): ProfilingSession | null {
-    return this.activeSessionId ? this.sessions.get(this.activeSessionId) ?? null : null;
+    return this.activeSessionId ? (this.sessions.get(this.activeSessionId) ?? null) : null;
   }
 
   startSession(name: string, types: ProfilerType[]): ProfilingSession {
@@ -320,7 +320,7 @@ export class ProfilerService {
       endTime: Date.now(),
       requests,
       totalRequests: requests.length,
-      failedRequests: requests.filter(r => r.status >= 400).length,
+      failedRequests: requests.filter((r) => r.status >= 400).length,
       totalSize: requests.reduce((sum, r) => sum + r.size, 0),
       averageLatency: requests.reduce((sum, r) => sum + r.duration, 0) / requests.length,
       slowestRequests: [...requests].sort((a, b) => b.duration - a.duration).slice(0, 5),
@@ -450,7 +450,7 @@ export class ProfilerService {
 
     return {
       avgFPS: Math.round(avgFPS * 10) / 10,
-      avgMemory: Math.round(avgMemory / 1024 / 1024 * 10) / 10,
+      avgMemory: Math.round((avgMemory / 1024 / 1024) * 10) / 10,
       avgCPU: Math.round(avgCPU * 10) / 10,
       totalRequests: metrics[metrics.length - 1]?.networkRequests || 0,
       totalAlerts: session.alerts.length,
@@ -513,7 +513,7 @@ export class ProfilerService {
   private checkAlertRules(metrics: PerformanceMetrics, session: ProfilingSession): void {
     const now = Date.now();
 
-    this.alertRules.forEach(rule => {
+    this.alertRules.forEach((rule) => {
       if (!rule.enabled) return;
       if (rule.lastTriggered && now - rule.lastTriggered < rule.cooldown) return;
 
@@ -576,8 +576,14 @@ export class ProfilerService {
 
   private generateMockCPUProfileFrames(): CPUProfileFrame[] {
     const functions = [
-      'update()', 'render()', 'handleInput()', 'physics.step()',
-      'audio.update()', 'ui.render()', 'loadResource()', 'animation.update()',
+      'update()',
+      'render()',
+      'handleInput()',
+      'physics.step()',
+      'audio.update()',
+      'ui.render()',
+      'loadResource()',
+      'animation.update()',
     ];
 
     return functions.map((name, i) => ({
@@ -604,8 +610,22 @@ export class ProfilerService {
         name: 'main',
         value: 100,
         children: [
-          { name: 'update', value: 40, children: [{ name: 'physics', value: 20 }, { name: 'ai', value: 15 }] },
-          { name: 'render', value: 50, children: [{ name: 'draw', value: 30 }, { name: 'upload', value: 15 }] },
+          {
+            name: 'update',
+            value: 40,
+            children: [
+              { name: 'physics', value: 20 },
+              { name: 'ai', value: 15 },
+            ],
+          },
+          {
+            name: 'render',
+            value: 50,
+            children: [
+              { name: 'draw', value: 30 },
+              { name: 'upload', value: 15 },
+            ],
+          },
           { name: 'input', value: 10 },
         ],
       },
@@ -613,8 +633,17 @@ export class ProfilerService {
   }
 
   private generateMockMemoryObjects(): MemoryObject[] {
-    const types = ['Array', 'Object', 'String', 'Function', 'Number', 'Texture', 'Mesh', 'AudioBuffer'];
-    return types.map(type => ({
+    const types = [
+      'Array',
+      'Object',
+      'String',
+      'Function',
+      'Number',
+      'Texture',
+      'Mesh',
+      'AudioBuffer',
+    ];
+    return types.map((type) => ({
       type,
       count: Math.floor(100 + Math.random() * 1000),
       totalSize: Math.floor(10000 + Math.random() * 1000000),
@@ -723,7 +752,7 @@ export class ProfilerService {
   }
 
   private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }
 

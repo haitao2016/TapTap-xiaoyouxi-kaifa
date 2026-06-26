@@ -127,7 +127,10 @@ export class CloudSyncService {
         fs.mkdirSync(this.syncConfig.cloudStoragePath, { recursive: true });
       }
       this.remoteFiles = this.scanDirectory(this.syncConfig.cloudStoragePath);
-      globalEventBus.emit({ type: 'sync:remote-scanned', payload: { count: this.remoteFiles.size } });
+      globalEventBus.emit({
+        type: 'sync:remote-scanned',
+        payload: { count: this.remoteFiles.size },
+      });
     } catch {
       this.remoteFiles = new Map();
     }
@@ -359,7 +362,11 @@ export class CloudSyncService {
     return newConflicts;
   }
 
-  private createConflict(filePath: string, local: SyncFileInfo, remote: SyncFileInfo): SyncConflict {
+  private createConflict(
+    filePath: string,
+    local: SyncFileInfo,
+    remote: SyncFileInfo
+  ): SyncConflict {
     return {
       id: randomUUID(),
       filePath,
@@ -371,7 +378,7 @@ export class CloudSyncService {
   async resolveConflict(
     conflictId: string,
     resolution: 'local' | 'remote' | 'merge',
-    mergedContent?: string,
+    mergedContent?: string
   ): Promise<boolean> {
     const conflict = this.conflicts.find((c) => c.id === conflictId);
     if (!conflict || conflict.resolvedAt) return false;

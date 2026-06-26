@@ -96,7 +96,11 @@ export class CocosAdapter {
       if (!meta) {
         throw new Error('无效的 Cocos Creator 项目');
       }
-      emit({ name: '检测 Cocos 项目', status: 'success', detail: `${meta.name} (${meta.engineVersion})` });
+      emit({
+        name: '检测 Cocos 项目',
+        status: 'success',
+        detail: `${meta.name} (${meta.engineVersion})`,
+      });
 
       emit({ name: '导出 Cocos 构建配置', status: 'running' });
       await this.exportCocosConfig(config.projectPath, outputPath);
@@ -188,7 +192,7 @@ export class CocosAdapter {
     fs.mkdirSync(outputPath, { recursive: true });
     fs.writeFileSync(
       path.join(outputPath, 'tapdev-cocos-config.json'),
-      JSON.stringify(config, null, 2),
+      JSON.stringify(config, null, 2)
     );
   }
 
@@ -215,7 +219,13 @@ export class CocosAdapter {
       for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
         const srcPath = path.join(dir, entry.name);
         if (entry.isDirectory()) {
-          if (entry.name === 'node_modules' || entry.name === '.git' || entry.name === 'library' || entry.name === 'temp') continue;
+          if (
+            entry.name === 'node_modules' ||
+            entry.name === '.git' ||
+            entry.name === 'library' ||
+            entry.name === 'temp'
+          )
+            continue;
           walk(srcPath, path.join(base, entry.name));
         } else {
           const destPath = path.join(dest, base, entry.name);

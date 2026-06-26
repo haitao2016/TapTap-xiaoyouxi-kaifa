@@ -7,7 +7,12 @@ export { MonitorService, monitorService } from './monitor-service';
 export { BuildService, buildService } from './build-service';
 export { DocService, docService } from './doc-service';
 export { PluginManager, pluginManager } from './plugin-manager';
-export type { PluginPermission, PluginPermissions, PluginDependency, PluginLoadOptions } from './plugin-manager';
+export type {
+  PluginPermission,
+  PluginPermissions,
+  PluginDependency,
+  PluginLoadOptions,
+} from './plugin-manager';
 export { PlatformService, platformService } from './platform-service';
 export { SnippetService, snippetService } from './snippet-service';
 export { FormatService, formatService } from './format-service';
@@ -17,13 +22,38 @@ export type { StackFrame, CallStack } from './callstack-service';
 export { ThemeService, themeService } from './theme-service';
 export type { Theme, ThemeType, ThemeColors } from './theme-service';
 export { PluginMarketService, pluginMarketService } from './plugin-market-service';
-export type { Plugin, PluginManifest, PluginInstallation, PluginSearchOptions, PluginVersion, PluginSearchResult, PluginCategory, InstallOptions, UpdateInfo } from './plugin-market-service';
+export type {
+  Plugin,
+  PluginManifest,
+  PluginInstallation,
+  PluginSearchOptions,
+  PluginVersion,
+  PluginSearchResult,
+  PluginCategory,
+  InstallOptions,
+  UpdateInfo,
+} from './plugin-market-service';
 export { PluginSandboxService, pluginSandboxService } from './plugin-sandbox-service';
 export type { PluginSandboxOptions, PluginRuntime } from './plugin-sandbox-service';
 export { PluginSandbox, pluginSandbox } from './plugin-sandbox';
-export type { SandboxType, SandboxPermissions, SandboxOptions, SandboxMessage, SandboxRuntime, SandboxAPIMethod } from './plugin-sandbox';
+export type {
+  SandboxType,
+  SandboxPermissions,
+  SandboxOptions,
+  SandboxMessage,
+  SandboxRuntime,
+  SandboxAPIMethod,
+} from './plugin-sandbox';
 export { TemplateService, templateService } from './template-service';
-export type { ProjectTemplate, TemplateCategory, TemplateSearchOptions, TemplateSearchResult, VirtualFile, CreateProjectOptions, CreatedProject } from './template-service';
+export type {
+  ProjectTemplate,
+  TemplateCategory,
+  TemplateSearchOptions,
+  TemplateSearchResult,
+  VirtualFile,
+  CreateProjectOptions,
+  CreatedProject,
+} from './template-service';
 export { ResponsiveService, responsiveService } from './responsive-service';
 export type { DeviceType, Breakpoints, ViewportInfo } from './responsive-service';
 export { ShortcutService, shortcutService } from './shortcut-service';
@@ -104,7 +134,10 @@ export type {
   TemplateSearchResult,
 } from './game-templates-service';
 
-export { DeveloperIncentivesService, developerIncentivesService } from './developer-incentives-service';
+export {
+  DeveloperIncentivesService,
+  developerIncentivesService,
+} from './developer-incentives-service';
 export type {
   ContributionType,
   PointsReason,

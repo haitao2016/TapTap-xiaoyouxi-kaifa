@@ -473,16 +473,22 @@ export class AICodeGenService {
     lines.push('    }');
     lines.push('  }');
     lines.push('');
-    lines.push('  async pay(productId: string, serverId?: string, extra?: string): Promise<PaymentResult> {');
+    lines.push(
+      '  async pay(productId: string, serverId?: string, extra?: string): Promise<PaymentResult> {'
+    );
     lines.push('    if (!this.isInitialized) {');
     lines.push("      throw new Error('支付模块未初始化');");
     lines.push('    }');
     lines.push('    try {');
     lines.push('      const result = await TapSDK.Payment.pay({ productId, serverId, extra });');
-    lines.push('      return { success: true, orderId: result.orderId, productId, transactionId: result.transactionId };');
+    lines.push(
+      '      return { success: true, orderId: result.orderId, productId, transactionId: result.transactionId };'
+    );
     lines.push('    } catch (error) {');
     lines.push("      console.error('支付失败:', error);");
-    lines.push('      return { success: false, orderId: \'\', productId, errorMessage: error instanceof Error ? error.message : String(error) };');
+    lines.push(
+      "      return { success: false, orderId: '', productId, errorMessage: error instanceof Error ? error.message : String(error) };"
+    );
     lines.push('    }');
     lines.push('  }');
     lines.push('}');
@@ -602,7 +608,9 @@ export class AICodeGenService {
     lines.push('    }');
     lines.push('  }');
     lines.push('');
-    lines.push('  async submitScore(leaderboardId: string, score: number, extra?: string): Promise<void> {');
+    lines.push(
+      '  async submitScore(leaderboardId: string, score: number, extra?: string): Promise<void> {'
+    );
     lines.push('    if (!this.isInitialized) {');
     lines.push("      throw new Error('排行榜模块未初始化');");
     lines.push('    }');
@@ -614,7 +622,9 @@ export class AICodeGenService {
     lines.push('    }');
     lines.push('  }');
     lines.push('');
-    lines.push('  async getScores(leaderboardId: string, limit: number = 20): Promise<LeaderboardEntry[]> {');
+    lines.push(
+      '  async getScores(leaderboardId: string, limit: number = 20): Promise<LeaderboardEntry[]> {'
+    );
     lines.push('    if (!this.isInitialized) {');
     lines.push("      throw new Error('排行榜模块未初始化');");
     lines.push('    }');
@@ -649,9 +659,15 @@ export class AICodeGenService {
     lines.push('  headers: Record<string, string>;');
     lines.push('}');
     lines.push('');
-    lines.push('export type RequestInterceptor = (config: RequestOptions & { url: string }) => RequestOptions & { url: string } | Promise<RequestOptions & { url: string }>;');
-    lines.push('export type ResponseInterceptor = (response: Response) => Response | Promise<Response>;');
-    lines.push('export type ErrorInterceptor = (error: Error & { response?: Response }) => void | Promise<void>;');
+    lines.push(
+      'export type RequestInterceptor = (config: RequestOptions & { url: string }) => RequestOptions & { url: string } | Promise<RequestOptions & { url: string }>;'
+    );
+    lines.push(
+      'export type ResponseInterceptor = (response: Response) => Response | Promise<Response>;'
+    );
+    lines.push(
+      'export type ErrorInterceptor = (error: Error & { response?: Response }) => void | Promise<void>;'
+    );
     lines.push('');
     lines.push('export class HttpClient {');
     lines.push("  private baseURL = '';");
@@ -687,29 +703,43 @@ export class AICodeGenService {
     lines.push('    this.errorInterceptors.push(interceptor);');
     lines.push('  }');
     lines.push('');
-    lines.push('  async get<T = any>(url: string, options?: RequestOptions): Promise<Response<T>> {');
-    lines.push('    return this.request<T>(url, { ...options, method: \'GET\' });');
+    lines.push(
+      '  async get<T = any>(url: string, options?: RequestOptions): Promise<Response<T>> {'
+    );
+    lines.push("    return this.request<T>(url, { ...options, method: 'GET' });");
     lines.push('  }');
     lines.push('');
-    lines.push('  async post<T = any>(url: string, body?: any, options?: RequestOptions): Promise<Response<T>> {');
-    lines.push('    return this.request<T>(url, { ...options, method: \'POST\', body });');
+    lines.push(
+      '  async post<T = any>(url: string, body?: any, options?: RequestOptions): Promise<Response<T>> {'
+    );
+    lines.push("    return this.request<T>(url, { ...options, method: 'POST', body });");
     lines.push('  }');
     lines.push('');
-    lines.push('  async put<T = any>(url: string, body?: any, options?: RequestOptions): Promise<Response<T>> {');
-    lines.push('    return this.request<T>(url, { ...options, method: \'PUT\', body });');
+    lines.push(
+      '  async put<T = any>(url: string, body?: any, options?: RequestOptions): Promise<Response<T>> {'
+    );
+    lines.push("    return this.request<T>(url, { ...options, method: 'PUT', body });");
     lines.push('  }');
     lines.push('');
-    lines.push('  async delete<T = any>(url: string, options?: RequestOptions): Promise<Response<T>> {');
-    lines.push('    return this.request<T>(url, { ...options, method: \'DELETE\' });');
+    lines.push(
+      '  async delete<T = any>(url: string, options?: RequestOptions): Promise<Response<T>> {'
+    );
+    lines.push("    return this.request<T>(url, { ...options, method: 'DELETE' });");
     lines.push('  }');
     lines.push('');
-    lines.push('  private async request<T = any>(url: string, options: RequestOptions = {}): Promise<Response<T>> {');
+    lines.push(
+      '  private async request<T = any>(url: string, options: RequestOptions = {}): Promise<Response<T>> {'
+    );
     lines.push('    const fullUrl = this.buildURL(url, options.params);');
     lines.push('    const controller = new AbortController();');
-    lines.push('    const timeoutId = setTimeout(() => controller.abort(), options.timeout ?? this.defaultTimeout);');
+    lines.push(
+      '    const timeoutId = setTimeout(() => controller.abort(), options.timeout ?? this.defaultTimeout);'
+    );
     lines.push('');
     lines.push('    try {');
-    lines.push('      let config: RequestOptions & { url: string } = { ...options, url: fullUrl };');
+    lines.push(
+      '      let config: RequestOptions & { url: string } = { ...options, url: fullUrl };'
+    );
     lines.push('      for (const interceptor of this.requestInterceptors) {');
     lines.push('        config = await interceptor(config);');
     lines.push('      }');
@@ -718,7 +748,9 @@ export class AICodeGenService {
     lines.push('      const response = await fetch(config.url, {');
     lines.push('        method: config.method,');
     lines.push('        headers,');
-    lines.push('        body: config.body ? (typeof config.body === \'string\' ? config.body : JSON.stringify(config.body)) : undefined,');
+    lines.push(
+      "        body: config.body ? (typeof config.body === 'string' ? config.body : JSON.stringify(config.body)) : undefined,"
+    );
     lines.push('        signal: controller.signal,');
     lines.push('      });');
     lines.push('');
@@ -756,7 +788,7 @@ export class AICodeGenService {
     lines.push('  }');
     lines.push('');
     lines.push('  private buildURL(url: string, params?: Record<string, any>): string {');
-    lines.push('    let fullUrl = url.startsWith(\'http\') ? url : this.baseURL + url;');
+    lines.push("    let fullUrl = url.startsWith('http') ? url : this.baseURL + url;");
     lines.push('    if (params) {');
     lines.push('      const searchParams = new URLSearchParams();');
     lines.push('      for (const [key, value] of Object.entries(params)) {');
@@ -766,13 +798,15 @@ export class AICodeGenService {
     lines.push('      }');
     lines.push('      const queryString = searchParams.toString();');
     lines.push('      if (queryString) {');
-    lines.push('        fullUrl += (fullUrl.includes(\'?\') ? \'&\' : \'?\') + queryString;');
+    lines.push("        fullUrl += (fullUrl.includes('?') ? '&' : '?') + queryString;");
     lines.push('      }');
     lines.push('    }');
     lines.push('    return fullUrl;');
     lines.push('  }');
     lines.push('');
-    lines.push('  private async parseResponse<T>(response: Response, responseType?: string): Promise<T> {');
+    lines.push(
+      '  private async parseResponse<T>(response: Response, responseType?: string): Promise<T> {'
+    );
     lines.push('    switch (responseType) {');
     lines.push("      case 'text':");
     lines.push('        return response.text() as Promise<T>;');
@@ -816,9 +850,11 @@ export class AICodeGenService {
     lines.push('  private namespace: string;');
     lines.push('  private storage: Storage;');
     lines.push('');
-    lines.push('  constructor(namespace: string = \'app\') {');
+    lines.push("  constructor(namespace: string = 'app') {");
     lines.push('    this.namespace = namespace;');
-    lines.push('    this.storage = typeof localStorage !== \'undefined\' ? localStorage : this.createMemoryStorage();');
+    lines.push(
+      "    this.storage = typeof localStorage !== 'undefined' ? localStorage : this.createMemoryStorage();"
+    );
     lines.push('  }');
     lines.push('');
     lines.push('  private createMemoryStorage(): Storage {');
@@ -840,7 +876,9 @@ export class AICodeGenService {
     lines.push('  set<T>(key: string, value: T, options?: StorageOptions): void {');
     lines.push('    const item: StoredItem<T> = { value, storedAt: Date.now() };');
     lines.push('    if (options?.expire) item.expireAt = Date.now() + options.expire;');
-    lines.push('    const storageKey = options?.namespace ? `${options.namespace}:${key}` : this.getKey(key);');
+    lines.push(
+      '    const storageKey = options?.namespace ? `${options.namespace}:${key}` : this.getKey(key);'
+    );
     lines.push('    try {');
     lines.push('      this.storage.setItem(storageKey, JSON.stringify(item));');
     lines.push('    } catch (error) {');
@@ -848,8 +886,12 @@ export class AICodeGenService {
     lines.push('    }');
     lines.push('  }');
     lines.push('');
-    lines.push('  get<T = any>(key: string, defaultValue?: T, options?: StorageOptions): T | undefined {');
-    lines.push('    const storageKey = options?.namespace ? `${options.namespace}:${key}` : this.getKey(key);');
+    lines.push(
+      '  get<T = any>(key: string, defaultValue?: T, options?: StorageOptions): T | undefined {'
+    );
+    lines.push(
+      '    const storageKey = options?.namespace ? `${options.namespace}:${key}` : this.getKey(key);'
+    );
     lines.push('    try {');
     lines.push('      const raw = this.storage.getItem(storageKey);');
     lines.push('      if (!raw) return defaultValue;');
@@ -866,12 +908,14 @@ export class AICodeGenService {
     lines.push('  }');
     lines.push('');
     lines.push('  remove(key: string, options?: StorageOptions): void {');
-    lines.push('    const storageKey = options?.namespace ? `${options.namespace}:${key}` : this.getKey(key);');
+    lines.push(
+      '    const storageKey = options?.namespace ? `${options.namespace}:${key}` : this.getKey(key);'
+    );
     lines.push('    this.storage.removeItem(storageKey);');
     lines.push('  }');
     lines.push('');
     lines.push('  clear(): void {');
-    lines.push('    const prefix = this.namespace + \':\';');
+    lines.push("    const prefix = this.namespace + ':';");
     lines.push('    const keysToRemove: string[] = [];');
     lines.push('    for (let i = 0; i < this.storage.length; i++) {');
     lines.push('      const key = this.storage.key(i);');
@@ -894,7 +938,9 @@ export class AICodeGenService {
     lines.push('export type EventHandler<T = any> = (...args: T[]) => void;');
     lines.push('export type EventKey = string | symbol;');
     lines.push('');
-    lines.push('export class EventEmitter<EventMap extends Record<EventKey, any> = Record<string, any>> {');
+    lines.push(
+      'export class EventEmitter<EventMap extends Record<EventKey, any> = Record<string, any>> {'
+    );
     lines.push('  private events: Map<keyof EventMap, Set<EventHandler>> = new Map();');
     lines.push('  private maxListeners = 100;');
     lines.push('');
@@ -902,19 +948,25 @@ export class AICodeGenService {
     lines.push('    this.maxListeners = count;');
     lines.push('  }');
     lines.push('');
-    lines.push('  on<K extends keyof EventMap>(event: K, handler: EventHandler<EventMap[K]>): this {');
+    lines.push(
+      '  on<K extends keyof EventMap>(event: K, handler: EventHandler<EventMap[K]>): this {'
+    );
     lines.push('    if (!this.events.has(event)) {');
     lines.push('      this.events.set(event, new Set());');
     lines.push('    }');
     lines.push('    const handlers = this.events.get(event)!;');
     lines.push('    handlers.add(handler as EventHandler);');
     lines.push('    if (handlers.size > this.maxListeners) {');
-    lines.push('      console.warn(`EventEmitter 警告: "${String(event)}" 事件监听器数量超过 ${this.maxListeners} 个，可能存在内存泄漏`);');
+    lines.push(
+      '      console.warn(`EventEmitter 警告: "${String(event)}" 事件监听器数量超过 ${this.maxListeners} 个，可能存在内存泄漏`);'
+    );
     lines.push('    }');
     lines.push('    return this;');
     lines.push('  }');
     lines.push('');
-    lines.push('  off<K extends keyof EventMap>(event: K, handler: EventHandler<EventMap[K]>): this {');
+    lines.push(
+      '  off<K extends keyof EventMap>(event: K, handler: EventHandler<EventMap[K]>): this {'
+    );
     lines.push('    const handlers = this.events.get(event);');
     lines.push('    if (handlers) {');
     lines.push('      handlers.delete(handler as EventHandler);');
@@ -922,7 +974,9 @@ export class AICodeGenService {
     lines.push('    return this;');
     lines.push('  }');
     lines.push('');
-    lines.push('  once<K extends keyof EventMap>(event: K, handler: EventHandler<EventMap[K]>): this {');
+    lines.push(
+      '  once<K extends keyof EventMap>(event: K, handler: EventHandler<EventMap[K]>): this {'
+    );
     lines.push('    const onceHandler = (...args: any[]) => {');
     lines.push('      this.off(event, onceHandler as EventHandler<EventMap[K]>);');
     lines.push('      try {');
@@ -969,7 +1023,9 @@ export class AICodeGenService {
 
   private generateDebounceThrottle(): string {
     const lines: string[] = [];
-    lines.push('export function debounce<T extends (...args: any[]) => any>(fn: T, delay: number = 300): T & { cancel: () => void; flush: () => void } {');
+    lines.push(
+      'export function debounce<T extends (...args: any[]) => any>(fn: T, delay: number = 300): T & { cancel: () => void; flush: () => void } {'
+    );
     lines.push('  let timer: ReturnType<typeof setTimeout> | null = null;');
     lines.push('  let lastArgs: Parameters<T> | null = null;');
     lines.push('  let lastThis: any = null;');
@@ -1004,7 +1060,9 @@ export class AICodeGenService {
     lines.push('  return debounced as T & { cancel: () => void; flush: () => void };');
     lines.push('}');
     lines.push('');
-    lines.push('export function throttle<T extends (...args: any[]) => any>(fn: T, interval: number = 300): T & { cancel: () => void } {');
+    lines.push(
+      'export function throttle<T extends (...args: any[]) => any>(fn: T, interval: number = 300): T & { cancel: () => void } {'
+    );
     lines.push('  let lastTime = 0;');
     lines.push('  let timer: ReturnType<typeof setTimeout> | null = null;');
     lines.push('  let lastArgs: Parameters<T> | null = null;');
@@ -1056,12 +1114,14 @@ export class AICodeGenService {
     lines.push('const DAY = 24 * HOUR;');
     lines.push('');
     lines.push('function padZero(n: number, len: number = 2): string {');
-    lines.push('  return String(n).padStart(len, \'0\');');
+    lines.push("  return String(n).padStart(len, '0');");
     lines.push('}');
     lines.push('');
-    lines.push('export function formatDate(date: DateInput, pattern: string = \'YYYY-MM-DD HH:mm:ss\'): string {');
+    lines.push(
+      "export function formatDate(date: DateInput, pattern: string = 'YYYY-MM-DD HH:mm:ss'): string {"
+    );
     lines.push('  const d = new Date(date);');
-    lines.push('  if (isNaN(d.getTime())) return \'\';');
+    lines.push("  if (isNaN(d.getTime())) return '';");
     lines.push('');
     lines.push('  const year = d.getFullYear();');
     lines.push('  const month = d.getMonth() + 1;');
@@ -1070,7 +1130,7 @@ export class AICodeGenService {
     lines.push('  const minutes = d.getMinutes();');
     lines.push('  const seconds = d.getSeconds();');
     lines.push('  const dayOfWeek = d.getDay();');
-    lines.push('  const weekDays = [\'日\', \'一\', \'二\', \'三\', \'四\', \'五\', \'六\'];');
+    lines.push("  const weekDays = ['日', '一', '二', '三', '四', '五', '六'];");
     lines.push('');
     lines.push('  return pattern');
     lines.push('    .replace(/YYYY/g, String(year))');
@@ -1083,7 +1143,9 @@ export class AICodeGenService {
     lines.push('    .replace(/dddd/g, `星期${weekDays[dayOfWeek]}`);');
     lines.push('}');
     lines.push('');
-    lines.push('export function parseDate(dateString: string, pattern: string = \'YYYY-MM-DD\'): Date {');
+    lines.push(
+      "export function parseDate(dateString: string, pattern: string = 'YYYY-MM-DD'): Date {"
+    );
     lines.push('  const yearMatch = pattern.match(/YYYY/);');
     lines.push('  const monthMatch = pattern.match(/MM/);');
     lines.push('  const dayMatch = pattern.match(/DD/);');
@@ -1091,15 +1153,15 @@ export class AICodeGenService {
     lines.push('  let year = 0, month = 1, day = 1;');
     lines.push('');
     lines.push('  if (yearMatch) {');
-    lines.push('    const idx = pattern.indexOf(\'YYYY\');');
+    lines.push("    const idx = pattern.indexOf('YYYY');");
     lines.push('    year = parseInt(dateString.substr(idx, 4), 10);');
     lines.push('  }');
     lines.push('  if (monthMatch) {');
-    lines.push('    const idx = pattern.indexOf(\'MM\');');
+    lines.push("    const idx = pattern.indexOf('MM');");
     lines.push('    month = parseInt(dateString.substr(idx, 2), 10);');
     lines.push('  }');
     lines.push('  if (dayMatch) {');
-    lines.push('    const idx = pattern.indexOf(\'DD\');');
+    lines.push("    const idx = pattern.indexOf('DD');");
     lines.push('    day = parseInt(dateString.substr(idx, 2), 10);');
     lines.push('  }');
     lines.push('');
@@ -1149,7 +1211,7 @@ export class AICodeGenService {
     lines.push('');
     lines.push('export function isValidDate(date: any): boolean {');
     lines.push('  if (date instanceof Date) return !isNaN(date.getTime());');
-    lines.push('  if (typeof date === \'string\' || typeof date === \'number\') {');
+    lines.push("  if (typeof date === 'string' || typeof date === 'number') {");
     lines.push('    return !isNaN(new Date(date).getTime());');
     lines.push('  }');
     lines.push('  return false;');
@@ -1164,8 +1226,10 @@ export class AICodeGenService {
     lines.push('  return reg.test(email);');
     lines.push('}');
     lines.push('');
-    lines.push('export function isPhoneNumber(phone: string, countryCode: string = \'CN\'): boolean {');
-    lines.push('  if (countryCode === \'CN\') {');
+    lines.push(
+      "export function isPhoneNumber(phone: string, countryCode: string = 'CN'): boolean {"
+    );
+    lines.push("  if (countryCode === 'CN') {");
     lines.push('    return /^1[3-9]\\d{9}$/.test(phone);');
     lines.push('  }');
     lines.push('  return /^\\d{6,15}$/.test(phone);');
@@ -1174,7 +1238,7 @@ export class AICodeGenService {
     lines.push('export function isIdCard(idCard: string): boolean {');
     lines.push('  if (!/^\\d{17}[\\dXx]$/.test(idCard)) return false;');
     lines.push('  const weights = [7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2];');
-    lines.push('  const checkCodes = [\'1\', \'0\', \'X\', \'9\', \'8\', \'7\', \'6\', \'5\', \'4\', \'3\', \'2\'];');
+    lines.push("  const checkCodes = ['1', '0', 'X', '9', '8', '7', '6', '5', '4', '3', '2'];");
     lines.push('  let sum = 0;');
     lines.push('  for (let i = 0; i < 17; i++) {');
     lines.push('    sum += parseInt(idCard.charAt(i), 10) * weights[i];');
@@ -1193,7 +1257,9 @@ export class AICodeGenService {
     lines.push('}');
     lines.push('');
     lines.push('export function isIPv4(ip: string): boolean {');
-    lines.push('  const reg = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;');
+    lines.push(
+      '  const reg = /^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;'
+    );
     lines.push('  return reg.test(ip);');
     lines.push('}');
     lines.push('');
@@ -1208,21 +1274,21 @@ export class AICodeGenService {
     lines.push('  const suggestions: string[] = [];');
     lines.push('');
     lines.push('  if (password.length >= 8) score++;');
-    lines.push('  else suggestions.push(\'密码长度至少 8 位\');');
+    lines.push("  else suggestions.push('密码长度至少 8 位');");
     lines.push('');
     lines.push('  if (/[a-z]/.test(password)) score++;');
-    lines.push('  else suggestions.push(\'包含小写字母\');');
+    lines.push("  else suggestions.push('包含小写字母');");
     lines.push('');
     lines.push('  if (/[A-Z]/.test(password)) score++;');
-    lines.push('  else suggestions.push(\'包含大写字母\');');
+    lines.push("  else suggestions.push('包含大写字母');");
     lines.push('');
     lines.push('  if (/\\d/.test(password)) score++;');
-    lines.push('  else suggestions.push(\'包含数字\');');
+    lines.push("  else suggestions.push('包含数字');");
     lines.push('');
     lines.push('  if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) score++;');
-    lines.push('  else suggestions.push(\'包含特殊字符\');');
+    lines.push("  else suggestions.push('包含特殊字符');");
     lines.push('');
-    lines.push('  const labels = [\'极弱\', \'弱\', \'中等\', \'强\', \'极强\'];');
+    lines.push("  const labels = ['极弱', '弱', '中等', '强', '极强'];");
     lines.push('  const level = Math.min(score, 4) as 0 | 1 | 2 | 3 | 4;');
     lines.push('');
     lines.push('  return { level, label: labels[level], suggestions };');
@@ -1230,10 +1296,10 @@ export class AICodeGenService {
     lines.push('');
     lines.push('export function isEmpty(value: any): boolean {');
     lines.push('  if (value == null) return true;');
-    lines.push('  if (typeof value === \'string\') return value.trim().length === 0;');
+    lines.push("  if (typeof value === 'string') return value.trim().length === 0;");
     lines.push('  if (Array.isArray(value)) return value.length === 0;');
     lines.push('  if (value instanceof Set || value instanceof Map) return value.size === 0;');
-    lines.push('  if (typeof value === \'object\') return Object.keys(value).length === 0;');
+    lines.push("  if (typeof value === 'object') return Object.keys(value).length === 0;");
     lines.push('  return false;');
     lines.push('}');
     lines.push('');
@@ -1244,7 +1310,12 @@ export class AICodeGenService {
   }
 
   private generateReactComponent(req: CodeGenRequest): string {
-    const componentName = this.sanitizeName(req.filePath?.split('/').pop()?.replace(/\.(tsx|jsx|ts|js)$/, '') ?? 'MyComponent');
+    const componentName = this.sanitizeName(
+      req.filePath
+        ?.split('/')
+        .pop()
+        ?.replace(/\.(tsx|jsx|ts|js)$/, '') ?? 'MyComponent'
+    );
     const lines: string[] = [];
     lines.push("import React, { useState, useCallback, useMemo, useEffect } from 'react';");
     lines.push('');
@@ -1254,7 +1325,9 @@ export class AICodeGenService {
     lines.push('  children?: React.ReactNode;');
     lines.push('}');
     lines.push('');
-    lines.push(`export const ${componentName}: React.FC<ComponentProps> = ({ className, style, children }) => {`);
+    lines.push(
+      `export const ${componentName}: React.FC<ComponentProps> = ({ className, style, children }) => {`
+    );
     lines.push('  const [isLoading, setIsLoading] = useState(false);');
     lines.push('');
     lines.push('  useEffect(() => {');
@@ -1269,7 +1342,7 @@ export class AICodeGenService {
     lines.push('  }, []);');
     lines.push('');
     lines.push('  const containerClass = useMemo(() => {');
-    lines.push("    return `component ${className}`;");
+    lines.push('    return `component ${className}`;');
     lines.push('  }, [className]);');
     lines.push('');
     lines.push('  return (');
@@ -1284,7 +1357,12 @@ export class AICodeGenService {
   }
 
   private generateVueComponent(req: CodeGenRequest): string {
-    const componentName = this.sanitizeName(req.filePath?.split('/').pop()?.replace(/\.(vue)$/, '') ?? 'MyComponent');
+    const componentName = this.sanitizeName(
+      req.filePath
+        ?.split('/')
+        .pop()
+        ?.replace(/\.(vue)$/, '') ?? 'MyComponent'
+    );
     const lines: string[] = [];
     lines.push('<template>');
     lines.push('  <div :class="containerClass" :style="style" @click="handleClick">');
@@ -1309,7 +1387,7 @@ export class AICodeGenService {
     lines.push('const isLoading = ref(false);');
     lines.push('');
     lines.push('const containerClass = computed(() => {');
-    lines.push("  return `component ${props.className}`;");
+    lines.push('  return `component ${props.className}`;');
     lines.push('});');
     lines.push('');
     lines.push('const handleClick = () => {');
@@ -1329,7 +1407,7 @@ export class AICodeGenService {
 
   private generateGameScene(): string {
     const lines: string[] = [];
-    lines.push('export type SceneState = \'idle\' | \'loading\' | \'running\' | \'paused\' | \'destroyed\';');
+    lines.push("export type SceneState = 'idle' | 'loading' | 'running' | 'paused' | 'destroyed';");
     lines.push('');
     lines.push('export interface SceneEventMap {');
     lines.push("  'scene:enter': string;");
@@ -1426,7 +1504,7 @@ export class AICodeGenService {
     lines.push('      }');
     lines.push('      this.currentScene = targetScene;');
     lines.push('    } catch (error) {');
-    lines.push("      console.error(`场景 \"${name}\" 加载失败:`, error);");
+    lines.push('      console.error(`场景 "${name}" 加载失败:`, error);');
     lines.push('      throw error;');
     lines.push('    }');
     lines.push('  }');
@@ -1577,7 +1655,9 @@ export class AICodeGenService {
     lines.push('    listener:registerScriptHandler(function(touch, event)');
     lines.push('        self:onTouchEnded(touch, event)');
     lines.push('    end, cc.Handler.EVENT_TOUCH_ENDED)');
-    lines.push('    self:getEventDispatcher():addEventListenerWithSceneGraphPriority(listener, self)');
+    lines.push(
+      '    self:getEventDispatcher():addEventListenerWithSceneGraphPriority(listener, self)'
+    );
     lines.push('    self.touchListener = listener');
     lines.push('end');
     lines.push('');
@@ -1602,13 +1682,19 @@ export class AICodeGenService {
     lines.push('    local listener = cc.EventListenerCustom:create(eventName, function(event)');
     lines.push('        handler(event:getData())');
     lines.push('    end)');
-    lines.push('    cc.Director:getInstance():getEventDispatcher():addEventListenerWithFixedPriority(listener, 1)');
-    lines.push('    table.insert(self.eventHandlers, { eventName = eventName, listener = listener })');
+    lines.push(
+      '    cc.Director:getInstance():getEventDispatcher():addEventListenerWithFixedPriority(listener, 1)'
+    );
+    lines.push(
+      '    table.insert(self.eventHandlers, { eventName = eventName, listener = listener })'
+    );
     lines.push('end');
     lines.push('');
     lines.push('function BaseLayer:removeAllEventListeners()');
     lines.push('    for _, handler in ipairs(self.eventHandlers) do');
-    lines.push('        cc.Director:getInstance():getEventDispatcher():removeEventListener(handler.listener)');
+    lines.push(
+      '        cc.Director:getInstance():getEventDispatcher():removeEventListener(handler.listener)'
+    );
     lines.push('    end');
     lines.push('    self.eventHandlers = {}');
     lines.push('end');
@@ -1639,28 +1725,36 @@ export class AICodeGenService {
   private generateCodeFromPrompt(req: CodeGenRequest): string {
     const lang = req.language ?? 'typescript';
     const filename = req.filePath?.split('/').pop() ?? 'generated';
-    
-    if (req.prompt.toLowerCase().includes('单例') || req.prompt.toLowerCase().includes('singleton')) {
+
+    if (
+      req.prompt.toLowerCase().includes('单例') ||
+      req.prompt.toLowerCase().includes('singleton')
+    ) {
       return this.generateSingletonTemplate(req);
     }
-    
+
     if (lang === 'python') {
       return `# ${req.prompt}\n# TODO: 实现\n\n`;
     }
-    
+
     if (lang === 'csharp') {
       return `using UnityEngine;\n\npublic class ${this.sanitizeName(filename)} : MonoBehaviour\n{\n    void Start()\n    {\n        // ${req.prompt}\n    }\n\n    void Update()\n    {\n    }\n}\n`;
     }
-    
+
     if (lang === 'lua') {
       return `-- ${req.prompt}\n-- TODO: 实现\n\nlocal module = {}\n\nreturn module\n`;
     }
-    
+
     return `// ${req.prompt}\n// TODO: 实现\n`;
   }
 
   private generateSingletonTemplate(req: CodeGenRequest): string {
-    const name = this.sanitizeName(req.filePath?.split('/').pop()?.replace(/\.(ts|js)$/, '') ?? 'Manager');
+    const name = this.sanitizeName(
+      req.filePath
+        ?.split('/')
+        .pop()
+        ?.replace(/\.(ts|js)$/, '') ?? 'Manager'
+    );
     return `export class ${name} {
   private static instance: ${name};
 
@@ -1694,10 +1788,15 @@ export const ${name.charAt(0).toLowerCase() + name.slice(1)} = ${name}.getInstan
     const lines = req.fileContent.split('\n');
     const result: string[] = [];
     let indent = '';
-    
+
     for (const line of lines) {
       const trimmed = line.trim();
-      if (trimmed.startsWith('class ') || trimmed.startsWith('export class ') || trimmed.startsWith('function ') || trimmed.startsWith('export function ')) {
+      if (
+        trimmed.startsWith('class ') ||
+        trimmed.startsWith('export class ') ||
+        trimmed.startsWith('function ') ||
+        trimmed.startsWith('export function ')
+      ) {
         indent = line.match(/^\s*/)?.[0] ?? '';
         result.push(`${indent}/**`);
         result.push(`${indent} * TODO: 添加描述`);
@@ -1705,12 +1804,16 @@ export const ${name.charAt(0).toLowerCase() + name.slice(1)} = ${name}.getInstan
       }
       result.push(line);
     }
-    
+
     return result.join('\n');
   }
 
   private generateTests(req: CodeGenRequest): string {
-    const filename = req.filePath?.split('/').pop()?.replace(/\.(ts|tsx|js)$/, '') ?? 'module';
+    const filename =
+      req.filePath
+        ?.split('/')
+        .pop()
+        ?.replace(/\.(ts|tsx|js)$/, '') ?? 'module';
     return `# ${filename} 测试用例\n# TODO: 实现测试\n`;
   }
 
@@ -1719,18 +1822,18 @@ export const ${name.charAt(0).toLowerCase() + name.slice(1)} = ${name}.getInstan
     const filename = req.filePath?.split('/').pop() ?? 'module';
     const lines = req.fileContent.split('\n');
     const functions: { name: string; kind: string }[] = [];
-    
+
     for (const line of lines) {
       const classMatch = line.match(/export\s+class\s+(\w+)/);
       if (classMatch) functions.push({ name: classMatch[1], kind: 'class' });
-      
+
       const funcMatch = line.match(/export\s+function\s+(\w+)/);
       if (funcMatch) functions.push({ name: funcMatch[1], kind: 'function' });
-      
+
       const constMatch = line.match(/export\s+const\s+(\w+)\s*=/);
       if (constMatch) functions.push({ name: constMatch[1], kind: '常量' });
     }
-    
+
     const docLines: string[] = [];
     docLines.push(`# ${filename} 文档`);
     docLines.push('');
@@ -1739,7 +1842,7 @@ export const ${name.charAt(0).toLowerCase() + name.slice(1)} = ${name}.getInstan
     docLines.push('');
     docLines.push('## API');
     docLines.push('');
-    
+
     for (const fn of functions) {
       const kindLabel = fn.kind === 'class' ? '类' : fn.kind === 'function' ? '函数' : fn.kind;
       docLines.push(`### ${fn.name}`);
@@ -1759,7 +1862,7 @@ export const ${name.charAt(0).toLowerCase() + name.slice(1)} = ${name}.getInstan
       docLines.push('```');
       docLines.push('');
     }
-    
+
     return docLines.join('\n');
   }
 
@@ -1795,25 +1898,26 @@ export const ${name.charAt(0).toLowerCase() + name.slice(1)} = ${name}.getInstan
     const lineCount = code.split('\n').length;
     const template = this.getTemplateById(req.templateId ?? '');
     const actionName = this.getActionDisplayName(req.action);
-    
+
     if (template) {
       return `已使用模板「${template.name}」${actionName}（共 ${lineCount} 行）`;
     }
-    
+
     return `已${actionName}（共 ${lineCount} 行）`;
   }
 
   private generateSuggestions(req: CodeGenRequest, code: string): CodeGenSuggestion[] {
     const suggestions: CodeGenSuggestion[] = [];
-    
+
     if (req.language === 'typescript' && !code.includes('import type')) {
       suggestions.push({
         title: '建议使用类型导入',
-        description: '对于仅作为类型使用的导入，建议使用 import type 语法，这样可以在编译时正确地擦除类型导入，减少打包体积。',
+        description:
+          '对于仅作为类型使用的导入，建议使用 import type 语法，这样可以在编译时正确地擦除类型导入，减少打包体积。',
         severity: 'best-practice',
       });
     }
-    
+
     const consoleLogCount = (code.match(/console\.log\(/g) || []).length;
     if (consoleLogCount > 3) {
       suggestions.push({
@@ -1822,7 +1926,7 @@ export const ${name.charAt(0).toLowerCase() + name.slice(1)} = ${name}.getInstan
         severity: 'warning',
       });
     }
-    
+
     if (req.action === 'generate' && !code.includes('try') && !code.includes('catch')) {
       suggestions.push({
         title: '添加错误处理',
@@ -1830,7 +1934,7 @@ export const ${name.charAt(0).toLowerCase() + name.slice(1)} = ${name}.getInstan
         severity: 'info',
       });
     }
-    
+
     return suggestions;
   }
 
@@ -1840,14 +1944,14 @@ export const ${name.charAt(0).toLowerCase() + name.slice(1)} = ${name}.getInstan
 
   private getActionDisplayName(action: CodeGenAction): string {
     const map: Record<CodeGenAction, string> = {
-      'generate': '生成代码',
-      'refactor': '重构代码',
-      'comment': '添加注释',
-      'test': '生成测试',
-      'document': '生成文档',
-      'explain': '解释代码',
-      'optimize': '优化代码',
-      'translate': '转换代码',
+      generate: '生成代码',
+      refactor: '重构代码',
+      comment: '添加注释',
+      test: '生成测试',
+      document: '生成文档',
+      explain: '解释代码',
+      optimize: '优化代码',
+      translate: '转换代码',
       'fix-bug': '修复 Bug',
     };
     return map[action] ?? action;
@@ -1856,14 +1960,14 @@ export const ${name.charAt(0).toLowerCase() + name.slice(1)} = ${name}.getInstan
   private getLanguageDisplayName(lang?: CodeLanguage): string {
     if (!lang) return '自动检测';
     const map: Record<CodeLanguage, string> = {
-      'javascript': 'JavaScript',
-      'typescript': 'TypeScript',
-      'html': 'HTML',
-      'css': 'CSS',
-      'json': 'JSON',
-      'python': 'Python',
-      'csharp': 'C#',
-      'lua': 'Lua',
+      javascript: 'JavaScript',
+      typescript: 'TypeScript',
+      html: 'HTML',
+      css: 'CSS',
+      json: 'JSON',
+      python: 'Python',
+      csharp: 'C#',
+      lua: 'Lua',
     };
     return map[lang] ?? lang;
   }

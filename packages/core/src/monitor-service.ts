@@ -1,4 +1,10 @@
-import type { PerformanceMetrics, MonitorAlert, MonitorStats, MonitorThresholds, NetworkRequestInfo } from '@tapdev/types';
+import type {
+  PerformanceMetrics,
+  MonitorAlert,
+  MonitorStats,
+  MonitorThresholds,
+  NetworkRequestInfo,
+} from '@tapdev/types';
 import { globalEventBus } from './event-bus';
 import { randomUUID } from 'node:crypto';
 
@@ -51,20 +57,21 @@ export class MonitorService {
 
   getStats(): MonitorStats {
     const recent = this.metricsHistory.slice(-60);
-    const avgFps = recent.length > 0 
-      ? recent.reduce((sum, m) => sum + m.fps, 0) / recent.length 
-      : 0;
-    
-    const avgMemoryUsage = recent.length > 0
-      ? recent.reduce((sum, m) => sum + (m.memory / m.memoryLimit), 0) / recent.length
-      : 0;
+    const avgFps =
+      recent.length > 0 ? recent.reduce((sum, m) => sum + m.fps, 0) / recent.length : 0;
+
+    const avgMemoryUsage =
+      recent.length > 0
+        ? recent.reduce((sum, m) => sum + m.memory / m.memoryLimit, 0) / recent.length
+        : 0;
 
     const totalRequests = this.networkRequests.length;
     const failedRequests = this.networkRequests.filter((r) => r.status >= 400).length;
-    
-    const avgLatency = this.networkRequests.length > 0
-      ? this.networkRequests.reduce((sum, r) => sum + r.duration, 0) / this.networkRequests.length
-      : 0;
+
+    const avgLatency =
+      this.networkRequests.length > 0
+        ? this.networkRequests.reduce((sum, r) => sum + r.duration, 0) / this.networkRequests.length
+        : 0;
 
     return {
       avgFps: Math.round(avgFps),
@@ -129,7 +136,7 @@ export class MonitorService {
       id: randomUUID(),
       timestamp: Date.now(),
     };
-    
+
     this.networkRequests.push(info);
     if (this.networkRequests.length > this.maxRequests) {
       this.networkRequests.shift();
@@ -138,7 +145,11 @@ export class MonitorService {
     globalEventBus.emit({ type: 'monitor:network-request', payload: info });
 
     if (request.status >= 400) {
-      this.createAlert('network', 'warning', `请求失败: ${request.method} ${request.url} (${request.status})`);
+      this.createAlert(
+        'network',
+        'warning',
+        `请求失败: ${request.method} ${request.url} (${request.status})`
+      );
     }
 
     if (request.duration > this.thresholds.networkLatency) {
@@ -159,7 +170,7 @@ export class MonitorService {
     const baseFps = 58 + Math.random() * 4;
     const memory = Math.floor(memoryLimit * (0.3 + Math.random() * 0.4));
     const cpuUsage = 20 + Math.random() * 30;
-    const gpuMemory = Math.floor((128 * 1024 * 1024) * (0.2 + Math.random() * 0.4));
+    const gpuMemory = Math.floor(128 * 1024 * 1024 * (0.2 + Math.random() * 0.4));
     const frameTime = 14 + Math.random() * 4;
 
     return {
@@ -185,11 +196,7 @@ export class MonitorService {
 
     const memoryRatio = metrics.memory / metrics.memoryLimit;
     if (memoryRatio > this.thresholds.memoryRatio) {
-      this.createAlert(
-        'memory',
-        'critical',
-        `内存使用率过高: ${(memoryRatio * 100).toFixed(1)}%`
-      );
+      this.createAlert('memory', 'critical', `内存使用率过高: ${(memoryRatio * 100).toFixed(1)}%`);
     }
 
     if (metrics.cpuUsage && metrics.cpuUsage > this.thresholds.cpuUsage) {

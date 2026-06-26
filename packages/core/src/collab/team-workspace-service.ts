@@ -55,13 +55,7 @@ const ROLE_PERMISSIONS: Record<TeamRole, Permission[]> = {
     'workspace.settings',
     'workspace.view',
   ],
-  developer: [
-    'project.create',
-    'project.edit',
-    'project.view',
-    'build.run',
-    'workspace.view',
-  ],
+  developer: ['project.create', 'project.edit', 'project.view', 'build.run', 'workspace.view'],
   viewer: ['project.view', 'workspace.view'],
 };
 
@@ -179,7 +173,7 @@ export class TeamService {
   }
 
   getActiveTeam(): Team | null {
-    return this.activeTeamId ? this.teams.get(this.activeTeamId) ?? null : null;
+    return this.activeTeamId ? (this.teams.get(this.activeTeamId) ?? null) : null;
   }
 
   getActiveTeamId(): string | null {
@@ -263,7 +257,7 @@ export class TeamService {
     teamId: string,
     email: string,
     role: TeamRole,
-    options?: { invitedBy?: string; expiresInHours?: number },
+    options?: { invitedBy?: string; expiresInHours?: number }
   ): { invitationId: string; inviteToken: string; url: string } {
     const team = this.teams.get(teamId);
     if (!team) throw new Error('团队不存在');
@@ -426,7 +420,10 @@ export class TeamService {
     return [...ROLE_PERMISSIONS[role]];
   }
 
-  listMembers(teamId: string, options?: { status?: TeamMember['status']; role?: TeamRole }): TeamMember[] {
+  listMembers(
+    teamId: string,
+    options?: { status?: TeamMember['status']; role?: TeamRole }
+  ): TeamMember[] {
     const team = this.teams.get(teamId);
     if (!team) return [];
     let members = Array.from(team.members.values());
@@ -441,12 +438,12 @@ export class TeamService {
 
   getMember(teamId: string, userId: string): TeamMember | null {
     const team = this.teams.get(teamId);
-    return team ? team.members.get(userId) ?? null : null;
+    return team ? (team.members.get(userId) ?? null) : null;
   }
 
   addProject(
     teamId: string,
-    projectInfo: { projectId?: string; name: string; ownerId?: string; isPublic?: boolean },
+    projectInfo: { projectId?: string; name: string; ownerId?: string; isPublic?: boolean }
   ): TeamProject | null {
     const team = this.teams.get(teamId);
     if (!team) return null;
@@ -485,20 +482,22 @@ export class TeamService {
     if (!team) return [];
     let projects = Array.from(team.projects.values());
     if (userId) {
-      projects = projects.filter((p) => p.isPublic || p.permissions.has(userId) || p.ownerId === userId);
+      projects = projects.filter(
+        (p) => p.isPublic || p.permissions.has(userId) || p.ownerId === userId
+      );
     }
     return projects;
   }
 
   getProject(teamId: string, projectId: string): TeamProject | null {
     const team = this.teams.get(teamId);
-    return team ? team.projects.get(projectId) ?? null : null;
+    return team ? (team.projects.get(projectId) ?? null) : null;
   }
 
   updateProject(
     teamId: string,
     projectId: string,
-    updates: { name?: string; isPublic?: boolean },
+    updates: { name?: string; isPublic?: boolean }
   ): boolean {
     const team = this.teams.get(teamId);
     if (!team) return false;
@@ -514,12 +513,7 @@ export class TeamService {
     return true;
   }
 
-  shareProject(
-    teamId: string,
-    projectId: string,
-    userId: string,
-    role: TeamRole,
-  ): boolean {
+  shareProject(teamId: string, projectId: string, userId: string, role: TeamRole): boolean {
     const team = this.teams.get(teamId);
     if (!team) return false;
     const project = team.projects.get(projectId);
@@ -563,7 +557,7 @@ export class TeamService {
     teamId: string,
     projectId: string,
     userId: string,
-    perm: Permission,
+    perm: Permission
   ): boolean {
     const team = this.teams.get(teamId);
     if (!team) return false;

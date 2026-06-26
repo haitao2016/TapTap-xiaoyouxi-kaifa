@@ -69,11 +69,14 @@ export interface VariantResult {
 
 export interface ExperimentResult {
   experimentId: string;
-  metrics: Record<string, {
-    primary: VariantResult[];
-    secondary: VariantResult[];
-    guardrail: VariantResult[];
-  }>;
+  metrics: Record<
+    string,
+    {
+      primary: VariantResult[];
+      secondary: VariantResult[];
+      guardrail: VariantResult[];
+    }
+  >;
   conclusion: ExperimentConclusion;
   recommendation: string;
   startDate: number;
@@ -121,13 +124,62 @@ const MOCK_EXPERIMENTS: Experiment[] = [
     status: 'running',
     trafficPercentage: 50,
     variants: [
-      { id: 'var-control', name: '对照组', description: '原有引导流程', trafficPercentage: 50, variables: { tutorial_version: { key: 'tutorial_version', type: 'string', value: 'v1', description: '引导版本' } }, isControl: true },
-      { id: 'var-a', name: '实验组A', description: '简化引导流程A', trafficPercentage: 50, variables: { tutorial_version: { key: 'tutorial_version', type: 'string', value: 'v2', description: '引导版本' } }, isControl: false },
+      {
+        id: 'var-control',
+        name: '对照组',
+        description: '原有引导流程',
+        trafficPercentage: 50,
+        variables: {
+          tutorial_version: {
+            key: 'tutorial_version',
+            type: 'string',
+            value: 'v1',
+            description: '引导版本',
+          },
+        },
+        isControl: true,
+      },
+      {
+        id: 'var-a',
+        name: '实验组A',
+        description: '简化引导流程A',
+        trafficPercentage: 50,
+        variables: {
+          tutorial_version: {
+            key: 'tutorial_version',
+            type: 'string',
+            value: 'v2',
+            description: '引导版本',
+          },
+        },
+        isControl: false,
+      },
     ],
     metrics: [
-      { id: 'm1', name: '次日留存', type: 'retention', role: 'primary', description: '用户次日留存率', eventName: 'retention_d1' },
-      { id: 'm2', name: '新手完成率', type: 'conversion', role: 'secondary', description: '新手引导完成率', eventName: 'tutorial_complete' },
-      { id: 'm3', name: '崩溃率', type: 'mean', role: 'guardrail', description: '用户崩溃率', eventName: 'crash_rate' },
+      {
+        id: 'm1',
+        name: '次日留存',
+        type: 'retention',
+        role: 'primary',
+        description: '用户次日留存率',
+        eventName: 'retention_d1',
+      },
+      {
+        id: 'm2',
+        name: '新手完成率',
+        type: 'conversion',
+        role: 'secondary',
+        description: '新手引导完成率',
+        eventName: 'tutorial_complete',
+      },
+      {
+        id: 'm3',
+        name: '崩溃率',
+        type: 'mean',
+        role: 'guardrail',
+        description: '用户崩溃率',
+        eventName: 'crash_rate',
+      },
     ],
     tags: ['新手引导', '留存优化'],
     exclusionGroup: 'onboarding',
@@ -143,13 +195,69 @@ const MOCK_EXPERIMENTS: Experiment[] = [
     status: 'completed',
     trafficPercentage: 30,
     variants: [
-      { id: 'var-control2', name: '对照组', description: '蓝色按钮', trafficPercentage: 34, variables: { button_color: { key: 'button_color', type: 'string', value: 'blue', description: '按钮颜色' } }, isControl: true },
-      { id: 'var-b1', name: '实验组-绿色', description: '绿色按钮', trafficPercentage: 33, variables: { button_color: { key: 'button_color', type: 'string', value: 'green', description: '按钮颜色' } }, isControl: false },
-      { id: 'var-b2', name: '实验组-红色', description: '红色按钮', trafficPercentage: 33, variables: { button_color: { key: 'button_color', type: 'string', value: 'red', description: '按钮颜色' } }, isControl: false },
+      {
+        id: 'var-control2',
+        name: '对照组',
+        description: '蓝色按钮',
+        trafficPercentage: 34,
+        variables: {
+          button_color: {
+            key: 'button_color',
+            type: 'string',
+            value: 'blue',
+            description: '按钮颜色',
+          },
+        },
+        isControl: true,
+      },
+      {
+        id: 'var-b1',
+        name: '实验组-绿色',
+        description: '绿色按钮',
+        trafficPercentage: 33,
+        variables: {
+          button_color: {
+            key: 'button_color',
+            type: 'string',
+            value: 'green',
+            description: '按钮颜色',
+          },
+        },
+        isControl: false,
+      },
+      {
+        id: 'var-b2',
+        name: '实验组-红色',
+        description: '红色按钮',
+        trafficPercentage: 33,
+        variables: {
+          button_color: {
+            key: 'button_color',
+            type: 'string',
+            value: 'red',
+            description: '按钮颜色',
+          },
+        },
+        isControl: false,
+      },
     ],
     metrics: [
-      { id: 'm4', name: '支付转化率', type: 'conversion', role: 'primary', description: '支付按钮转化率', eventName: 'purchase_click' },
-      { id: 'm5', name: '支付金额', type: 'mean', role: 'secondary', description: '平均支付金额', eventName: 'purchase_amount' },
+      {
+        id: 'm4',
+        name: '支付转化率',
+        type: 'conversion',
+        role: 'primary',
+        description: '支付按钮转化率',
+        eventName: 'purchase_click',
+      },
+      {
+        id: 'm5',
+        name: '支付金额',
+        type: 'mean',
+        role: 'secondary',
+        description: '平均支付金额',
+        eventName: 'purchase_amount',
+      },
     ],
     tags: ['支付', '转化率'],
     startDate: Date.now() - 30 * 86400000,
@@ -165,12 +273,36 @@ const MOCK_EXPERIMENTS: Experiment[] = [
     status: 'draft',
     trafficPercentage: 0,
     variants: [
-      { id: 'var-control3', name: '对照组', description: '原有难度', trafficPercentage: 50, variables: { difficulty: { key: 'difficulty', type: 'number', value: 1, description: '难度系数' } }, isControl: true },
-      { id: 'var-c', name: '实验组', description: '降低难度', trafficPercentage: 50, variables: { difficulty: { key: 'difficulty', type: 'number', value: 0.8, description: '难度系数' } }, isControl: false },
+      {
+        id: 'var-control3',
+        name: '对照组',
+        description: '原有难度',
+        trafficPercentage: 50,
+        variables: {
+          difficulty: { key: 'difficulty', type: 'number', value: 1, description: '难度系数' },
+        },
+        isControl: true,
+      },
+      {
+        id: 'var-c',
+        name: '实验组',
+        description: '降低难度',
+        trafficPercentage: 50,
+        variables: {
+          difficulty: { key: 'difficulty', type: 'number', value: 0.8, description: '难度系数' },
+        },
+        isControl: false,
+      },
     ],
     metrics: [
       { id: 'm6', name: '7日留存', type: 'retention', role: 'primary', description: '7日留存率' },
-      { id: 'm7', name: '关卡通过率', type: 'conversion', role: 'secondary', description: '关卡10通过率' },
+      {
+        id: 'm7',
+        name: '关卡通过率',
+        type: 'conversion',
+        role: 'secondary',
+        description: '关卡10通过率',
+      },
     ],
     tags: ['关卡', '难度'],
     createdAt: Date.now() - 2 * 86400000,
@@ -180,8 +312,20 @@ const MOCK_EXPERIMENTS: Experiment[] = [
 ];
 
 const MOCK_MUTEX_GROUPS: MutexGroup[] = [
-  { id: 'mg-001', name: '新手引导组', description: '所有新手引导相关实验', experimentIds: ['exp-001'], maxTraffic: 100 },
-  { id: 'mg-002', name: '支付优化组', description: '所有支付相关实验', experimentIds: ['exp-002'], maxTraffic: 50 },
+  {
+    id: 'mg-001',
+    name: '新手引导组',
+    description: '所有新手引导相关实验',
+    experimentIds: ['exp-001'],
+    maxTraffic: 100,
+  },
+  {
+    id: 'mg-002',
+    name: '支付优化组',
+    description: '所有支付相关实验',
+    experimentIds: ['exp-002'],
+    maxTraffic: 50,
+  },
 ];
 
 export class ABTestService {
@@ -225,7 +369,10 @@ export class ABTestService {
     return experiment;
   }
 
-  async updateExperiment(experimentId: string, updates: Partial<Experiment>): Promise<Experiment | null> {
+  async updateExperiment(
+    experimentId: string,
+    updates: Partial<Experiment>
+  ): Promise<Experiment | null> {
     const exp = this.experiments.get(experimentId);
     if (!exp) return null;
     if (exp.status === 'running') {
@@ -312,7 +459,8 @@ export class ABTestService {
     if (options?.search) {
       const keyword = options.search.toLowerCase();
       experiments = experiments.filter(
-        (e) => e.name.toLowerCase().includes(keyword) || e.description.toLowerCase().includes(keyword),
+        (e) =>
+          e.name.toLowerCase().includes(keyword) || e.description.toLowerCase().includes(keyword)
       );
     }
 
@@ -392,10 +540,14 @@ export class ABTestService {
     }
 
     const primaryResults = metrics.primary;
-    const bestVariant = primaryResults.reduce((best, curr) =>
-      curr.uplift > best.uplift ? curr : best, primaryResults[0]);
-    const worstVariant = primaryResults.reduce((worst, curr) =>
-      curr.uplift < worst.uplift ? curr : worst, primaryResults[0]);
+    const bestVariant = primaryResults.reduce(
+      (best, curr) => (curr.uplift > best.uplift ? curr : best),
+      primaryResults[0]
+    );
+    const worstVariant = primaryResults.reduce(
+      (worst, curr) => (curr.uplift < worst.uplift ? curr : worst),
+      primaryResults[0]
+    );
 
     let conclusion: ExperimentConclusion = 'inconclusive';
     let recommendation = '继续收集数据';
@@ -403,7 +555,11 @@ export class ABTestService {
     if (bestVariant.isStatisticallySignificant && bestVariant.uplift > 0) {
       conclusion = 'positive';
       recommendation = `建议全量发布 ${bestVariant.variantName}`;
-    } else if (worstVariant.isStatisticallySignificant && worstVariant.uplift < 0 && !worstVariant.isControl) {
+    } else if (
+      worstVariant.isStatisticallySignificant &&
+      worstVariant.uplift < 0 &&
+      !worstVariant.isControl
+    ) {
       conclusion = 'negative';
       recommendation = `建议停止 ${worstVariant.variantName}`;
     } else if (exp.status === 'completed') {
@@ -479,7 +635,7 @@ export class ABTestService {
     userId: string,
     experimentId: string,
     variableKey: string,
-    defaultValue: T,
+    defaultValue: T
   ): T {
     const bucket = this.getUserBucket(userId, experimentId);
     if (!bucket) return defaultValue;
@@ -494,7 +650,7 @@ export class ABTestService {
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
       const char = str.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = (hash << 5) - hash + char;
       hash = hash & hash;
     }
     return Math.abs(hash);
@@ -504,7 +660,7 @@ export class ABTestService {
     controlConversions: number,
     controlUsers: number,
     variantConversions: number,
-    variantUsers: number,
+    variantUsers: number
   ): { zScore: number; pValue: number; significant: boolean } {
     const p1 = controlConversions / controlUsers;
     const p2 = variantConversions / variantUsers;
@@ -526,13 +682,15 @@ export class ABTestService {
     controlN: number,
     variantMean: number,
     variantStd: number,
-    variantN: number,
+    variantN: number
   ): { tScore: number; pValue: number; significant: boolean; df: number } {
-    const se = Math.sqrt((controlStd ** 2) / controlN + (variantStd ** 2) / variantN);
+    const se = Math.sqrt(controlStd ** 2 / controlN + variantStd ** 2 / variantN);
     const tScore = se === 0 ? 0 : (variantMean - controlMean) / se;
-    const df = Math.round(((controlStd ** 2 / controlN + variantStd ** 2 / variantN) ** 2) /
-      (((controlStd ** 2 / controlN) ** 2 / (controlN - 1)) +
-      ((variantStd ** 2 / variantN) ** 2 / (variantN - 1))));
+    const df = Math.round(
+      (controlStd ** 2 / controlN + variantStd ** 2 / variantN) ** 2 /
+        ((controlStd ** 2 / controlN) ** 2 / (controlN - 1) +
+          (variantStd ** 2 / variantN) ** 2 / (variantN - 1))
+    );
     const pValue = this.tDistributionCDF(-Math.abs(tScore), df) * 2;
 
     return {
@@ -545,8 +703,9 @@ export class ABTestService {
 
   private normalCDF(x: number): number {
     const t = 1 / (1 + 0.2316419 * Math.abs(x));
-    const d = 0.3989423 * Math.exp(-x * x / 2);
-    const prob = d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))));
+    const d = 0.3989423 * Math.exp((-x * x) / 2);
+    const prob =
+      d * t * (0.3193815 + t * (-0.3565638 + t * (1.781478 + t * (-1.821256 + t * 1.330274))));
     return x > 0 ? 1 - prob : prob;
   }
 
@@ -562,11 +721,20 @@ export class ABTestService {
   }
 
   private betacdf(x: number, a: number, b: number): number {
-    let bt = x === 0 || x === 1 ? 0 : Math.exp(this.gammaln(a + b) - this.gammaln(a) - this.gammaln(b) + a * Math.log(x) + b * Math.log(1 - x));
+    let bt =
+      x === 0 || x === 1
+        ? 0
+        : Math.exp(
+            this.gammaln(a + b) -
+              this.gammaln(a) -
+              this.gammaln(b) +
+              a * Math.log(x) +
+              b * Math.log(1 - x)
+          );
     if (x < (a + 1) / (a + b + 2)) {
-      return bt * this.betacf(a, b, x) / a;
+      return (bt * this.betacf(a, b, x)) / a;
     }
-    return 1 - bt * this.betacf(b, a, 1 - x) / b;
+    return 1 - (bt * this.betacf(b, a, 1 - x)) / b;
   }
 
   private betacf(a: number, b: number, x: number): number {
@@ -576,20 +744,20 @@ export class ABTestService {
     let qap = a + 1;
     let qam = a - 1;
     let c = 1;
-    let d = 1 - qab * x / qap;
+    let d = 1 - (qab * x) / qap;
     if (Math.abs(d) < 1e-30) d = 1e-30;
     d = 1 / d;
     let h = d;
     for (let m = 1; m <= maxIter; m++) {
       let m2 = 2 * m;
-      let aa = m * (b - m) * x / ((qam + m2) * (a + m2));
+      let aa = (m * (b - m) * x) / ((qam + m2) * (a + m2));
       d = 1 + aa * d;
       if (Math.abs(d) < 1e-30) d = 1e-30;
       c = 1 + aa / c;
       if (Math.abs(c) < 1e-30) c = 1e-30;
       d = 1 / d;
       h *= d * c;
-      aa = -(a + m) * (qab + m) * x / ((a + m2) * (qap + m2));
+      aa = (-(a + m) * (qab + m) * x) / ((a + m2) * (qap + m2));
       d = 1 + aa * d;
       if (Math.abs(d) < 1e-30) d = 1e-30;
       c = 1 + aa / c;
@@ -603,19 +771,22 @@ export class ABTestService {
   }
 
   private gammaln(x: number): number {
-    const cof = [76.18009172947146, -86.50532032941677, 24.01409824083091, -1.231739572450155, 0.1208650973866179e-2, -0.5395239384953e-5];
+    const cof = [
+      76.18009172947146, -86.50532032941677, 24.01409824083091, -1.231739572450155,
+      0.1208650973866179e-2, -0.5395239384953e-5,
+    ];
     let y = x;
     let tmp = x + 5.5;
     tmp -= (x + 0.5) * Math.log(tmp);
     let ser = 1.000000000190015;
     for (let j = 0; j <= 5; j++) ser += cof[j] / ++y;
-    return -tmp + Math.log(2.5066282746310005 * ser / x);
+    return -tmp + Math.log((2.5066282746310005 * ser) / x);
   }
 
   calculateConfidenceInterval(
     conversionRate: number,
     users: number,
-    confidence: number = 0.95,
+    confidence: number = 0.95
   ): [number, number] {
     const z = confidence === 0.99 ? 2.576 : confidence === 0.9 ? 1.645 : 1.96;
     const se = Math.sqrt((conversionRate * (1 - conversionRate)) / users);
@@ -627,7 +798,11 @@ export class ABTestService {
     return Array.from(this.mutexGroups.values());
   }
 
-  async createMutexGroup(name: string, description: string, maxTraffic: number): Promise<MutexGroup> {
+  async createMutexGroup(
+    name: string,
+    description: string,
+    maxTraffic: number
+  ): Promise<MutexGroup> {
     const group: MutexGroup = {
       id: `mg-${randomUUID().slice(0, 8)}`,
       name,
@@ -671,8 +846,15 @@ export class ABTestService {
     return Array.from(tags);
   }
 
-  generateChartData(result: ExperimentResult, metricId: string): { labels: string[]; series: { name: string; data: number[] }[] } {
-    const allVariants = [...result.metrics.primary, ...result.metrics.secondary, ...result.metrics.guardrail];
+  generateChartData(
+    result: ExperimentResult,
+    metricId: string
+  ): { labels: string[]; series: { name: string; data: number[] }[] } {
+    const allVariants = [
+      ...result.metrics.primary,
+      ...result.metrics.secondary,
+      ...result.metrics.guardrail,
+    ];
     const metricVariants = allVariants.filter((v) => {
       const exp = this.experiments.get(result.experimentId);
       if (!exp) return false;
@@ -681,9 +863,7 @@ export class ABTestService {
 
     return {
       labels: metricVariants.map((v) => v.variantName),
-      series: [
-        { name: '转化率', data: metricVariants.map((v) => v.data.conversionRate * 100) },
-      ],
+      series: [{ name: '转化率', data: metricVariants.map((v) => v.data.conversionRate * 100) }],
     };
   }
 }

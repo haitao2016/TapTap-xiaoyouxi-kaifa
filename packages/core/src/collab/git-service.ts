@@ -163,7 +163,10 @@ export class GitService {
     return this.parseDiffOutput(stdout);
   }
 
-  async log(max = 50, options?: { since?: number; author?: string; branch?: string }): Promise<GitCommit[]> {
+  async log(
+    max = 50,
+    options?: { since?: number; author?: string; branch?: string }
+  ): Promise<GitCommit[]> {
     const format = '%H%n%h%n%an%n%ae%n%at%n%s%n%b%n%P%n--END--';
     const args = ['log', `--max-count=${max}`, `--format=${format}`];
     if (options?.since) {
@@ -295,7 +298,10 @@ export class GitService {
     return m?.[1] ?? null;
   }
 
-  async pull(remote = 'origin', branch?: string): Promise<{ success: boolean; conflicts: string[] }> {
+  async pull(
+    remote = 'origin',
+    branch?: string
+  ): Promise<{ success: boolean; conflicts: string[] }> {
     const args = branch ? ['pull', '--no-rebase', remote, branch] : ['pull', '--no-rebase'];
     const { code, stdout } = await this.exec(args);
     const conflicts: string[] = [];
@@ -387,7 +393,8 @@ export class GitService {
   }
 
   async tags(): Promise<GitTag[]> {
-    const format = '%(refname:short)%n%(objectname)%n%(taggerdate:unix)%n%(contents:subject)%n--END--';
+    const format =
+      '%(refname:short)%n%(objectname)%n%(taggerdate:unix)%n%(contents:subject)%n--END--';
     const { stdout, code } = await this.exec(['tag', '--format', format, '--sort=-taggerdate']);
     if (code !== 0) return [];
     return this.parseTags(stdout);
@@ -482,14 +489,14 @@ export class GitService {
     filePath: string,
     regions: MergeConflictRegion[],
     strategy: 'ours' | 'theirs' | 'manual',
-    manualContent?: string,
+    manualContent?: string
   ): Promise<boolean> {
     const fs = await import('fs/promises');
     let content = await fs.readFile(filePath, 'utf-8');
     for (const region of regions) {
       const blockRegex = new RegExp(
         `<<<<<<< HEAD\\n([\\s\\S]*?)=======\\n([\\s\\S]*?)>>>>>>> [^\\n]*\\n?`,
-        'g',
+        'g'
       );
       const replacement =
         strategy === 'ours'
@@ -518,7 +525,8 @@ export class GitService {
     body?: string;
     token: string;
   }): Promise<{ url: string; number: number } | null> {
-    const baseUrl = options.platform === 'github' ? 'https://api.github.com' : 'https://gitee.com/api/v5';
+    const baseUrl =
+      options.platform === 'github' ? 'https://api.github.com' : 'https://gitee.com/api/v5';
     const url = `${baseUrl}/repos/${options.owner}/${options.repo}/pulls`;
     const res = await fetch(url, {
       method: 'POST',
@@ -538,7 +546,9 @@ export class GitService {
     return { url: data.html_url, number: data.number };
   }
 
-  async blame(filePath: string): Promise<{ line: number; hash: string; author: string; date: number; content: string }[]> {
+  async blame(
+    filePath: string
+  ): Promise<{ line: number; hash: string; author: string; date: number; content: string }[]> {
     const { stdout, code } = await this.exec(['blame', '--line-porcelain', filePath]);
     if (code !== 0) return [];
     return this.parseBlame(stdout);
@@ -574,12 +584,27 @@ export class GitService {
       const path = line.slice(3);
       if (statusCode === '? ') {
         status.untracked.push(path);
-      } else if (statusCode === 'U ' || statusCode === ' U' || statusCode === 'AA' || statusCode === 'DD') {
+      } else if (
+        statusCode === 'U ' ||
+        statusCode === ' U' ||
+        statusCode === 'AA' ||
+        statusCode === 'DD'
+      ) {
         status.conflicted.push(path);
       } else if (statusCode[0] !== '.' && statusCode[0] !== '?') {
-        status.staged.push({ path, status: this.parseStatusChar(statusCode[0]!), additions: 0, deletions: 0 });
+        status.staged.push({
+          path,
+          status: this.parseStatusChar(statusCode[0]!),
+          additions: 0,
+          deletions: 0,
+        });
       } else if (statusCode[1] !== '.' && statusCode[1] !== '?') {
-        status.unstaged.push({ path, status: this.parseStatusChar(statusCode[1]!), additions: 0, deletions: 0 });
+        status.unstaged.push({
+          path,
+          status: this.parseStatusChar(statusCode[1]!),
+          additions: 0,
+          deletions: 0,
+        });
       }
       i++;
     }
@@ -644,7 +669,11 @@ export class GitService {
           i++;
           let oldLine = hunk.oldStart;
           let newLine = hunk.newStart;
-          while (i < lines.length && !lines[i]!.startsWith('diff ') && !lines[i]!.startsWith('@@')) {
+          while (
+            i < lines.length &&
+            !lines[i]!.startsWith('diff ') &&
+            !lines[i]!.startsWith('@@')
+          ) {
             const l = lines[i]!;
             if (l.startsWith('+')) {
               hunk.lines.push({ type: 'add', content: l.slice(1), newLine: newLine++ });
@@ -653,7 +682,12 @@ export class GitService {
               hunk.lines.push({ type: 'del', content: l.slice(1), oldLine: oldLine++ });
               deletions++;
             } else if (l.startsWith(' ')) {
-              hunk.lines.push({ type: 'context', content: l.slice(1), oldLine: oldLine++, newLine: newLine++ });
+              hunk.lines.push({
+                type: 'context',
+                content: l.slice(1),
+                oldLine: oldLine++,
+                newLine: newLine++,
+              });
             }
             i++;
           }
@@ -676,7 +710,10 @@ export class GitService {
 
   private parseLog(out: string): GitCommit[] {
     const commits: GitCommit[] = [];
-    const blocks = out.split('--END--').map((b) => b.trim()).filter(Boolean);
+    const blocks = out
+      .split('--END--')
+      .map((b) => b.trim())
+      .filter(Boolean);
     for (const b of blocks) {
       const lines = b.split('\n').filter((l, i, arr) => !(i === arr.length - 1 && l === ''));
       if (lines.length < 6) continue;
@@ -748,7 +785,10 @@ export class GitService {
 
   private parseStashList(out: string): GitStashEntry[] {
     const entries: GitStashEntry[] = [];
-    const blocks = out.split('--END--').map((b) => b.trim()).filter(Boolean);
+    const blocks = out
+      .split('--END--')
+      .map((b) => b.trim())
+      .filter(Boolean);
     for (const block of blocks) {
       const lines = block.split('\n');
       if (lines.length < 4) continue;
@@ -769,7 +809,10 @@ export class GitService {
 
   private parseTags(out: string): GitTag[] {
     const tags: GitTag[] = [];
-    const blocks = out.split('--END--').map((b) => b.trim()).filter(Boolean);
+    const blocks = out
+      .split('--END--')
+      .map((b) => b.trim())
+      .filter(Boolean);
     for (const block of blocks) {
       const lines = block.split('\n');
       if (lines.length < 2) continue;
@@ -804,8 +847,11 @@ export class GitService {
     return regions;
   }
 
-  private parseBlame(out: string): { line: number; hash: string; author: string; date: number; content: string }[] {
-    const result: { line: number; hash: string; author: string; date: number; content: string }[] = [];
+  private parseBlame(
+    out: string
+  ): { line: number; hash: string; author: string; date: number; content: string }[] {
+    const result: { line: number; hash: string; author: string; date: number; content: string }[] =
+      [];
     const lines = out.split('\n');
     let i = 0;
     while (i < lines.length) {

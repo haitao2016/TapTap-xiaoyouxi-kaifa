@@ -131,8 +131,8 @@ class VRARPreviewService {
         referenceSpace: 'local-floor',
         requiredFeatures: ['local'],
         optionalFeatures: ['hand-tracking', 'bounded-floor', 'eye-tracking'],
-        ...config
-      }
+        ...config,
+      },
     };
 
     this.currentSession = session;
@@ -144,7 +144,7 @@ class VRARPreviewService {
       if (typeof navigator !== 'undefined' && navigator.xr && this.xrCapabilities.vr) {
         const xrSession = await navigator.xr.requestSession('immersive-vr', {
           requiredFeatures: session.config.requiredFeatures,
-          optionalFeatures: session.config.optionalFeatures
+          optionalFeatures: session.config.optionalFeatures,
         });
         session.status = 'active';
         session.startTime = Date.now();
@@ -176,8 +176,8 @@ class VRARPreviewService {
       config: {
         referenceSpace: 'viewer',
         requiredFeatures: ['local'],
-        optionalFeatures: ['hit-test', 'dom-overlay']
-      }
+        optionalFeatures: ['hit-test', 'dom-overlay'],
+      },
     };
 
     this.currentSession = session;
@@ -187,7 +187,7 @@ class VRARPreviewService {
       try {
         const xrSession = await navigator.xr.requestSession('immersive-ar', {
           requiredFeatures: session.config.requiredFeatures,
-          optionalFeatures: session.config.optionalFeatures
+          optionalFeatures: session.config.optionalFeatures,
         });
         session.status = 'active';
         session.startTime = Date.now();
@@ -215,7 +215,7 @@ class VRARPreviewService {
       hasEyeTracking: false,
       hasControllers: true,
       vendor: 'Unknown',
-      model: 'Generic VR'
+      model: 'Generic VR',
     };
   }
 
@@ -263,11 +263,11 @@ class VRARPreviewService {
       buttons: [
         { name: 'trigger', pressed: false, touched: false, value: 0 },
         { name: 'grip', pressed: false, touched: false, value: 0 },
-        { name: 'menu', pressed: false, touched: false, value: 0 }
+        { name: 'menu', pressed: false, touched: false, value: 0 },
       ],
       axes: { x: 0, y: 0 },
       trigger: 0,
-      grip: 0
+      grip: 0,
     };
     const rightInput: ControllerInput = {
       controllerId: 'right',
@@ -276,11 +276,11 @@ class VRARPreviewService {
       buttons: [
         { name: 'trigger', pressed: false, touched: false, value: 0 },
         { name: 'grip', pressed: false, touched: false, value: 0 },
-        { name: 'a', pressed: false, touched: false, value: 0 }
+        { name: 'a', pressed: false, touched: false, value: 0 },
       ],
       axes: { x: 0, y: 0 },
       trigger: 0,
-      grip: 0
+      grip: 0,
     };
     this.controllerInputs.set('left', leftInput);
     this.controllerInputs.set('right', rightInput);
@@ -300,7 +300,7 @@ class VRARPreviewService {
     const newAnchor: SpatialAnchor = {
       ...anchor,
       id: `anchor-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-      createdAt: Date.now()
+      createdAt: Date.now(),
     };
     this.anchors.set(newAnchor.id, newAnchor);
     this.notify('anchor:created', newAnchor);
@@ -316,7 +316,7 @@ class VRARPreviewService {
       rotation: { x: 0, y: 0, z: 0, w: 1 },
       scale: { x: 1, y: 1, z: 1 },
       label: 'Hit Test Result',
-      persistent: false
+      persistent: false,
     });
   }
 
@@ -324,7 +324,7 @@ class VRARPreviewService {
   loadScene(scene: Omit<VRScene, 'id'>): VRScene {
     const newScene: VRScene = {
       ...scene,
-      id: `scene-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`
+      id: `scene-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
     };
     this.scenes.set(newScene.id, newScene);
     this.notify('scene:loaded', newScene);
@@ -332,10 +332,14 @@ class VRARPreviewService {
   }
 
   // 在 VR 中编辑对象
-  editObjectInVR(sceneId: string, objectId: string, updates: { position?: any; rotation?: any; scale?: any }): void {
+  editObjectInVR(
+    sceneId: string,
+    objectId: string,
+    updates: { position?: any; rotation?: any; scale?: any }
+  ): void {
     const scene = this.scenes.get(sceneId);
     if (!scene) return;
-    const obj = scene.objects.find(o => o.id === objectId);
+    const obj = scene.objects.find((o) => o.id === objectId);
     if (!obj) return;
     Object.assign(obj, updates);
     this.notify('object:edited', { sceneId, objectId, updates });
@@ -377,14 +381,16 @@ class VRARPreviewService {
   isSupported(): { xr: boolean; vr: boolean; ar: boolean } {
     return {
       xr: this.xrSupported,
-      ...this.xrCapabilities
+      ...this.xrCapabilities,
     };
   }
 
   // 订阅
   subscribe(listener: (event: string, data: any) => void): () => void {
     this.listeners.add(listener);
-    return () => { this.listeners.delete(listener); };
+    return () => {
+      this.listeners.delete(listener);
+    };
   }
 
   private notify(event: string, data: any): void {

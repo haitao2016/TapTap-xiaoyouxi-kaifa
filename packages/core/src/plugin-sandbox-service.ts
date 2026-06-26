@@ -38,7 +38,7 @@ export class PluginSandboxService {
 
   async startPlugin(pluginId: string, options?: PluginSandboxOptions): Promise<void> {
     const sandboxOptions = { ...this.defaultOptions, ...options };
-    
+
     const runtime: PluginRuntime = {
       pluginId,
       version: this.getPluginVersion(pluginId),
@@ -59,9 +59,9 @@ export class PluginSandboxService {
     if (runtime) {
       runtime.status = 'paused';
       globalEventBus.emit({ type: 'plugin:stop', payload: { pluginId } });
-      
+
       await this.delay(200);
-      
+
       this.sandboxes.delete(pluginId);
       globalEventBus.emit({ type: 'plugin:stopped', payload: { pluginId } });
     }
@@ -95,7 +95,7 @@ export class PluginSandboxService {
   }
 
   private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }
 

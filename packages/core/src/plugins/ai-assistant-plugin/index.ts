@@ -107,7 +107,10 @@ export class AIAssistantPlugin {
     return this.generateMockCompletion(prefix, suffix, language);
   }
 
-  async reviewCode(code: string, language = 'typescript'): Promise<{ issues: CodeIssue[]; suggestions: string[] }> {
+  async reviewCode(
+    code: string,
+    language = 'typescript'
+  ): Promise<{ issues: CodeIssue[]; suggestions: string[] }> {
     return this.analyzeCode(code, language);
   }
 
@@ -120,7 +123,10 @@ export class AIAssistantPlugin {
     };
   }
 
-  async diagnoseError(errorMessage: string, code?: string): Promise<{ diagnosis: string; solution: string }> {
+  async diagnoseError(
+    errorMessage: string,
+    code?: string
+  ): Promise<{ diagnosis: string; solution: string }> {
     return {
       diagnosis: `分析错误: ${errorMessage}`,
       solution: '建议检查相关代码，确保语法正确且逻辑无误。',
@@ -219,7 +225,10 @@ def generated_function():
     return `${prefix}\n  // AI 补全的代码\n  return result;\n}`;
   }
 
-  private analyzeCode(code: string, _language: string): { issues: CodeIssue[]; suggestions: string[] } {
+  private analyzeCode(
+    code: string,
+    _language: string
+  ): { issues: CodeIssue[]; suggestions: string[] } {
     const issues: CodeIssue[] = [];
     const suggestions: string[] = [];
 
@@ -295,7 +304,7 @@ example();
   }
 
   private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }
 
@@ -312,66 +321,90 @@ export const aiAssistantPlugin = new AIAssistantPlugin();
 export function activate(ctx: PluginContext): void {
   const plugin = aiAssistantPlugin;
 
-  ctx.registerCommand('ai-chat', async () => {
-    ctx.showNotification('AI 助手已打开', 'info');
-  }, {
-    id: 'ai-chat',
-    title: 'AI 助手',
-    description: '打开 AI 编程助手对话面板',
-    icon: 'sparkles',
-    shortcut: 'Ctrl+Shift+A',
-    category: 'AI',
-  });
+  ctx.registerCommand(
+    'ai-chat',
+    async () => {
+      ctx.showNotification('AI 助手已打开', 'info');
+    },
+    {
+      id: 'ai-chat',
+      title: 'AI 助手',
+      description: '打开 AI 编程助手对话面板',
+      icon: 'sparkles',
+      shortcut: 'Ctrl+Shift+A',
+      category: 'AI',
+    }
+  );
 
-  ctx.registerCommand('ai-generate-code', async () => {
-    ctx.showNotification('AI 代码生成已启动', 'info');
-  }, {
-    id: 'ai-generate-code',
-    title: '生成代码',
-    description: '使用 AI 生成代码',
-    icon: 'code',
-    category: 'AI',
-  });
+  ctx.registerCommand(
+    'ai-generate-code',
+    async () => {
+      ctx.showNotification('AI 代码生成已启动', 'info');
+    },
+    {
+      id: 'ai-generate-code',
+      title: '生成代码',
+      description: '使用 AI 生成代码',
+      icon: 'code',
+      category: 'AI',
+    }
+  );
 
-  ctx.registerCommand('ai-explain-code', async () => {
-    ctx.showNotification('正在分析代码...', 'info');
-  }, {
-    id: 'ai-explain-code',
-    title: '解释代码',
-    description: '让 AI 解释当前选中的代码',
-    icon: 'message-circle',
-    category: 'AI',
-  });
+  ctx.registerCommand(
+    'ai-explain-code',
+    async () => {
+      ctx.showNotification('正在分析代码...', 'info');
+    },
+    {
+      id: 'ai-explain-code',
+      title: '解释代码',
+      description: '让 AI 解释当前选中的代码',
+      icon: 'message-circle',
+      category: 'AI',
+    }
+  );
 
-  ctx.registerCommand('ai-refactor-code', async () => {
-    ctx.showNotification('正在重构代码...', 'info');
-  }, {
-    id: 'ai-refactor-code',
-    title: '重构代码',
-    description: '使用 AI 重构代码',
-    icon: 'refresh-cw',
-    category: 'AI',
-  });
+  ctx.registerCommand(
+    'ai-refactor-code',
+    async () => {
+      ctx.showNotification('正在重构代码...', 'info');
+    },
+    {
+      id: 'ai-refactor-code',
+      title: '重构代码',
+      description: '使用 AI 重构代码',
+      icon: 'refresh-cw',
+      category: 'AI',
+    }
+  );
 
-  ctx.registerCommand('ai-generate-tests', async () => {
-    ctx.showNotification('正在生成测试...', 'info');
-  }, {
-    id: 'ai-generate-tests',
-    title: '生成测试',
-    description: '为当前代码生成单元测试',
-    icon: 'check-circle',
-    category: 'AI',
-  });
+  ctx.registerCommand(
+    'ai-generate-tests',
+    async () => {
+      ctx.showNotification('正在生成测试...', 'info');
+    },
+    {
+      id: 'ai-generate-tests',
+      title: '生成测试',
+      description: '为当前代码生成单元测试',
+      icon: 'check-circle',
+      category: 'AI',
+    }
+  );
 
-  ctx.registerCommand('ai-review-code', async () => {
-    ctx.showNotification('正在审查代码...', 'info');
-  }, {
-    id: 'ai-review-code',
-    title: '代码审查',
-    description: '使用 AI 进行代码审查',
-    icon: 'eye',
-    category: 'AI',
-  });
+  ctx.registerCommand(
+    'ai-review-code',
+    async () => {
+      ctx.showNotification('正在审查代码...', 'info');
+    },
+    {
+      id: 'ai-review-code',
+      title: '代码审查',
+      description: '使用 AI 进行代码审查',
+      icon: 'eye',
+      category: 'AI',
+    }
+  );
 
   ctx.registerPanel('ai-assistant', {
     id: 'ai-assistant',

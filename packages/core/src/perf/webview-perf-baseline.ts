@@ -53,13 +53,26 @@ export class WebViewPerfBaseline {
   /**
    * 对比基线
    */
-  compareToBaseline(name: string, metrics: WebViewPerfMetrics): {
+  compareToBaseline(
+    name: string,
+    metrics: WebViewPerfMetrics
+  ): {
     passed: boolean;
-    regressions: { key: keyof WebViewPerfMetrics; baseline: number; current: number; ratio: number }[];
+    regressions: {
+      key: keyof WebViewPerfMetrics;
+      baseline: number;
+      current: number;
+      ratio: number;
+    }[];
   } {
     const baseline = this.baselines.get(name);
     if (!baseline) return { passed: true, regressions: [] };
-    const regressions: { key: keyof WebViewPerfMetrics; baseline: number; current: number; ratio: number }[] = [];
+    const regressions: {
+      key: keyof WebViewPerfMetrics;
+      baseline: number;
+      current: number;
+      ratio: number;
+    }[] = [];
     const keys: (keyof WebViewPerfMetrics)[] = ['fcp', 'lcp', 'fid', 'cls'];
     for (const k of keys) {
       const baseVal = baseline.metrics[k] as number;

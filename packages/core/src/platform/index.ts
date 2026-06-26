@@ -109,7 +109,10 @@ export type {
   CommunityStats,
 } from './community-service';
 
-export { achievementLeaderboardService, AchievementLeaderboardService } from './achievement-leaderboard-service';
+export {
+  achievementLeaderboardService,
+  AchievementLeaderboardService,
+} from './achievement-leaderboard-service';
 export type {
   AchievementRarity,
   LeaderboardOrder,

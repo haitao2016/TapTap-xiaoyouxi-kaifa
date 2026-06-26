@@ -229,7 +229,7 @@ export class TapDBService {
     appId: string,
     funnelId: string,
     startDate: string,
-    endDate: string,
+    endDate: string
   ): Promise<TapDBFunnelResult> {
     const account = tapTapAuthService.getActiveAccount();
     if (!account) {
@@ -240,7 +240,7 @@ export class TapDBService {
         `${TAPDB_API_BASE}/funnels/${funnelId}?app_id=${appId}&start_date=${startDate}&end_date=${endDate}`,
         {
           headers: { Authorization: `Bearer ${account.accessToken}` },
-        },
+        }
       );
       if (!res.ok) return this.mockFunnel(funnelId);
       const data = (await res.json()) as { data: TapDBFunnelResult };
@@ -271,10 +271,7 @@ export class TapDBService {
     }
   }
 
-  startRealtimeMonitor(
-    appId: string,
-    callback: (data: TapDBRealtimeData) => void,
-  ): () => void {
+  startRealtimeMonitor(appId: string, callback: (data: TapDBRealtimeData) => void): () => void {
     if (this.realtimeTimers.has(appId)) {
       return () => this.stopRealtimeMonitor(appId);
     }
@@ -321,7 +318,7 @@ export class TapDBService {
     type: TapDBExportTask['type'],
     startDate: string,
     endDate: string,
-    filters?: TapDBFilter[],
+    filters?: TapDBFilter[]
   ): Promise<TapDBExportTask> {
     const taskId = randomUUID();
     const task: TapDBExportTask = {
@@ -381,9 +378,14 @@ export class TapDBService {
     const cursor = new Date(start);
     let dayIndex = 0;
 
-    const stepMs = q.granularity === 'hour' ? 3600_000 :
-      q.granularity === 'week' ? 7 * 86400_000 :
-      q.granularity === 'month' ? 30 * 86400_000 : 86400_000;
+    const stepMs =
+      q.granularity === 'hour'
+        ? 3600_000
+        : q.granularity === 'week'
+          ? 7 * 86400_000
+          : q.granularity === 'month'
+            ? 30 * 86400_000
+            : 86400_000;
 
     while (cursor <= end) {
       const baseActive = 800 + Math.sin(dayIndex / 4) * 300 + dayIndex * 15;
@@ -432,25 +434,43 @@ export class TapDBService {
   private generateMockMetric(metric: TapDBMetricType, base: number, day: number): number {
     const rand = () => 0.9 + Math.random() * 0.2;
     switch (metric) {
-      case 'active_users': return Math.round(base * rand());
-      case 'new_users': return Math.round(base * 0.15 * rand());
-      case 'sessions': return Math.round(base * 3 * rand());
-      case 'session_duration': return 180 + Math.random() * 120;
-      case 'total_revenue': return Math.round(base * 0.8 * rand());
-      case 'paying_users': return Math.round(base * 0.04 * rand());
-      case 'arpu': return 8 + Math.random() * 4;
-      case 'arppu': return 60 + Math.random() * 30;
-      case 'retention_d1': return 0.4 + Math.random() * 0.1;
-      case 'retention_d7': return 0.18 + Math.random() * 0.06;
-      case 'retention_d30': return 0.08 + Math.random() * 0.03;
-      case 'crash_count': return Math.round(base * 0.005 * rand());
-      case 'crash_rate': return 0.003 + Math.random() * 0.004;
-      case 'custom_event': return Math.round(base * 2 * rand());
-      default: return 0;
+      case 'active_users':
+        return Math.round(base * rand());
+      case 'new_users':
+        return Math.round(base * 0.15 * rand());
+      case 'sessions':
+        return Math.round(base * 3 * rand());
+      case 'session_duration':
+        return 180 + Math.random() * 120;
+      case 'total_revenue':
+        return Math.round(base * 0.8 * rand());
+      case 'paying_users':
+        return Math.round(base * 0.04 * rand());
+      case 'arpu':
+        return 8 + Math.random() * 4;
+      case 'arppu':
+        return 60 + Math.random() * 30;
+      case 'retention_d1':
+        return 0.4 + Math.random() * 0.1;
+      case 'retention_d7':
+        return 0.18 + Math.random() * 0.06;
+      case 'retention_d30':
+        return 0.08 + Math.random() * 0.03;
+      case 'crash_count':
+        return Math.round(base * 0.005 * rand());
+      case 'crash_rate':
+        return 0.003 + Math.random() * 0.004;
+      case 'custom_event':
+        return Math.round(base * 2 * rand());
+      default:
+        return 0;
     }
   }
 
-  private generateMockDimension(dim: TapDBDimension, index: number): Partial<Record<TapDBDimension, string>> {
+  private generateMockDimension(
+    dim: TapDBDimension,
+    index: number
+  ): Partial<Record<TapDBDimension, string>> {
     const dimMap: Record<TapDBDimension, string[]> = {
       platform: ['iOS', 'Android'],
       channel: ['TapTap', 'App Store', 'Google Play', '官网'],
@@ -534,25 +554,71 @@ export class TapDBService {
 
   private mockEvents(): TapDBEvent[] {
     return [
-      { name: 'app_launch', displayName: '应用启动', count: 152340, users: 12500, category: '基础事件' },
+      {
+        name: 'app_launch',
+        displayName: '应用启动',
+        count: 152340,
+        users: 12500,
+        category: '基础事件',
+      },
       { name: 'register', displayName: '注册成功', count: 8520, users: 8520, category: '用户' },
       { name: 'login', displayName: '登录成功', count: 98650, users: 12500, category: '用户' },
       { name: 'level_start', displayName: '开始关卡', count: 65430, users: 9800, category: '游戏' },
-      { name: 'level_complete', displayName: '完成关卡', count: 42310, users: 8200, category: '游戏' },
+      {
+        name: 'level_complete',
+        displayName: '完成关卡',
+        count: 42310,
+        users: 8200,
+        category: '游戏',
+      },
       { name: 'purchase', displayName: '购买成功', count: 3250, users: 1680, category: '付费' },
       { name: 'ad_show', displayName: '广告展示', count: 285600, users: 11200, category: '广告' },
       { name: 'ad_click', displayName: '广告点击', count: 14280, users: 5600, category: '广告' },
       { name: 'share', displayName: '分享', count: 4520, users: 2800, category: '社交' },
-      { name: 'tutorial_complete', displayName: '新手完成', count: 6800, users: 6800, category: '新手引导' },
+      {
+        name: 'tutorial_complete',
+        displayName: '新手完成',
+        count: 6800,
+        users: 6800,
+        category: '新手引导',
+      },
     ];
   }
 
   private mockFunnel(funnelId: string): TapDBFunnelResult {
     const steps: TapDBFunnelStep[] = [
-      { name: '启动应用', event: 'app_launch', count: 10000, users: 10000, conversionRate: 1, dropOffRate: 0 },
-      { name: '完成注册', event: 'register', count: 6500, users: 6500, conversionRate: 0.65, dropOffRate: 0.35 },
-      { name: '完成新手', event: 'tutorial_complete', count: 5200, users: 5200, conversionRate: 0.8, dropOffRate: 0.2 },
-      { name: '首次付费', event: 'purchase', count: 520, users: 520, conversionRate: 0.1, dropOffRate: 0.9 },
+      {
+        name: '启动应用',
+        event: 'app_launch',
+        count: 10000,
+        users: 10000,
+        conversionRate: 1,
+        dropOffRate: 0,
+      },
+      {
+        name: '完成注册',
+        event: 'register',
+        count: 6500,
+        users: 6500,
+        conversionRate: 0.65,
+        dropOffRate: 0.35,
+      },
+      {
+        name: '完成新手',
+        event: 'tutorial_complete',
+        count: 5200,
+        users: 5200,
+        conversionRate: 0.8,
+        dropOffRate: 0.2,
+      },
+      {
+        name: '首次付费',
+        event: 'purchase',
+        count: 520,
+        users: 520,
+        conversionRate: 0.1,
+        dropOffRate: 0.9,
+      },
     ];
     return {
       funnelId,

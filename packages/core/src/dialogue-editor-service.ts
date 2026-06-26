@@ -131,10 +131,34 @@ const PRESET_CHARACTERS: DialogueCharacter[] = [
 ];
 
 const PRESET_VARIABLES: DialogueVariable[] = [
-  { id: 'var-affection-lina', name: '莉娜好感度', type: 'number', defaultValue: 0, description: '与莉娜的好感度' },
-  { id: 'var-quest-progress', name: '任务进度', type: 'number', defaultValue: 0, description: '当前任务的进度' },
-  { id: 'var-has-sword', name: '获得神剑', type: 'boolean', defaultValue: false, description: '是否获得了传说之剑' },
-  { id: 'var-player-name', name: '玩家名字', type: 'string', defaultValue: '', description: '玩家输入的名字' },
+  {
+    id: 'var-affection-lina',
+    name: '莉娜好感度',
+    type: 'number',
+    defaultValue: 0,
+    description: '与莉娜的好感度',
+  },
+  {
+    id: 'var-quest-progress',
+    name: '任务进度',
+    type: 'number',
+    defaultValue: 0,
+    description: '当前任务的进度',
+  },
+  {
+    id: 'var-has-sword',
+    name: '获得神剑',
+    type: 'boolean',
+    defaultValue: false,
+    description: '是否获得了传说之剑',
+  },
+  {
+    id: 'var-player-name',
+    name: '玩家名字',
+    type: 'string',
+    defaultValue: '',
+    description: '玩家输入的名字',
+  },
 ];
 
 export class DialogueEditorService {
@@ -299,7 +323,10 @@ export class DialogueEditorService {
     return true;
   }
 
-  updateTree(id: string, updates: Partial<Omit<DialogueTree, 'id' | 'createdAt'>>): DialogueTree | undefined {
+  updateTree(
+    id: string,
+    updates: Partial<Omit<DialogueTree, 'id' | 'createdAt'>>
+  ): DialogueTree | undefined {
     const tree = this.trees.get(id);
     if (!tree) return undefined;
     const updated: DialogueTree = {
@@ -322,7 +349,11 @@ export class DialogueEditorService {
     return this.trees.get(this.currentTreeId);
   }
 
-  addNode(treeId: string, type: DialogueNodeType, position: { x: number; y: number }): DialogueNode | undefined {
+  addNode(
+    treeId: string,
+    type: DialogueNodeType,
+    position: { x: number; y: number }
+  ): DialogueNode | undefined {
     const tree = this.trees.get(treeId);
     if (!tree) return undefined;
 
@@ -383,7 +414,11 @@ export class DialogueEditorService {
     return true;
   }
 
-  updateNode(treeId: string, nodeId: string, updates: Partial<DialogueNode>): DialogueNode | undefined {
+  updateNode(
+    treeId: string,
+    nodeId: string,
+    updates: Partial<DialogueNode>
+  ): DialogueNode | undefined {
     const tree = this.trees.get(treeId);
     if (!tree) return undefined;
 
@@ -462,7 +497,12 @@ export class DialogueEditorService {
     return true;
   }
 
-  updateChoice(treeId: string, nodeId: string, choiceId: string, updates: Partial<DialogueChoice>): boolean {
+  updateChoice(
+    treeId: string,
+    nodeId: string,
+    choiceId: string,
+    updates: Partial<DialogueChoice>
+  ): boolean {
     const tree = this.trees.get(treeId);
     if (!tree) return false;
 
@@ -478,7 +518,10 @@ export class DialogueEditorService {
     return true;
   }
 
-  addCharacter(treeId: string, character: Omit<DialogueCharacter, 'id'>): DialogueCharacter | undefined {
+  addCharacter(
+    treeId: string,
+    character: Omit<DialogueCharacter, 'id'>
+  ): DialogueCharacter | undefined {
     const tree = this.trees.get(treeId);
     if (!tree) return undefined;
 
@@ -507,7 +550,11 @@ export class DialogueEditorService {
     return true;
   }
 
-  updateCharacter(treeId: string, characterId: string, updates: Partial<DialogueCharacter>): boolean {
+  updateCharacter(
+    treeId: string,
+    characterId: string,
+    updates: Partial<DialogueCharacter>
+  ): boolean {
     const tree = this.trees.get(treeId);
     if (!tree) return false;
 
@@ -526,7 +573,10 @@ export class DialogueEditorService {
     return tree.characters;
   }
 
-  addVariable(treeId: string, variable: Omit<DialogueVariable, 'id'>): DialogueVariable | undefined {
+  addVariable(
+    treeId: string,
+    variable: Omit<DialogueVariable, 'id'>
+  ): DialogueVariable | undefined {
     const tree = this.trees.get(treeId);
     if (!tree) return undefined;
 
@@ -607,9 +657,7 @@ export class DialogueEditorService {
     const tree = this.trees.get(this.runtime.treeId);
     if (!tree) return null;
 
-    const node = this.runtime.currentNodeId
-      ? tree.nodes.get(this.runtime.currentNodeId)
-      : null;
+    const node = this.runtime.currentNodeId ? tree.nodes.get(this.runtime.currentNodeId) : null;
     if (!node) return null;
 
     const character = node.characterId
@@ -752,7 +800,10 @@ export class DialogueEditorService {
       this.runtime.endingType = nextNode.endingType;
     }
 
-    globalEventBus.emit('dialogue-editor:choice-selected', { choiceId, nextNodeId: choice.nextNodeId });
+    globalEventBus.emit('dialogue-editor:choice-selected', {
+      choiceId,
+      nextNodeId: choice.nextNodeId,
+    });
     return true;
   }
 
@@ -841,11 +892,18 @@ export class DialogueEditorService {
     };
   }
 
-  validateTree(treeId: string): { type: string; severity: 'error' | 'warning'; message: string; nodeId?: string }[] {
+  validateTree(
+    treeId: string
+  ): { type: string; severity: 'error' | 'warning'; message: string; nodeId?: string }[] {
     const tree = this.trees.get(treeId);
     if (!tree) return [];
 
-    const warnings: { type: string; severity: 'error' | 'warning'; message: string; nodeId?: string }[] = [];
+    const warnings: {
+      type: string;
+      severity: 'error' | 'warning';
+      message: string;
+      nodeId?: string;
+    }[] = [];
 
     if (!tree.startNodeId) {
       warnings.push({

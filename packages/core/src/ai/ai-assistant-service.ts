@@ -3,7 +3,14 @@ import { randomUUID } from 'node:crypto';
 
 export type ChatRole = 'user' | 'assistant' | 'system' | 'tool';
 
-export type ReferenceType = 'file' | 'function' | 'class' | 'symbol' | 'error' | 'snippet' | 'selection';
+export type ReferenceType =
+  | 'file'
+  | 'function'
+  | 'class'
+  | 'symbol'
+  | 'error'
+  | 'snippet'
+  | 'selection';
 
 export type ChatStatus = 'idle' | 'thinking' | 'streaming' | 'error';
 
@@ -163,7 +170,8 @@ export class AIAssistantService {
         {
           id: randomUUID(),
           role: 'assistant',
-          content: '你好！我是 TapDev Studio AI 助手。我可以帮你：\n\n• 解答 TapTap SDK 用法\n• 代码解释、优化、重构代码\n• 生成测试用例\n• 调试和修复 Bug\n• 添加注释和文档\n\n有什么我可以帮助你的吗？',
+          content:
+            '你好！我是 TapDev Studio AI 助手。我可以帮你：\n\n• 解答 TapTap SDK 用法\n• 代码解释、优化、重构代码\n• 生成测试用例\n• 调试和修复 Bug\n• 添加注释和文档\n\n有什么我可以帮助你的吗？',
           timestamp: Date.now(),
         },
       ],
@@ -212,7 +220,7 @@ export class AIAssistantService {
   }
 
   getActiveSession(): ChatSession | null {
-    return this.activeSessionId ? this.sessions.get(this.activeSessionId) ?? null : null;
+    return this.activeSessionId ? (this.sessions.get(this.activeSessionId) ?? null) : null;
   }
 
   listSessions(): ChatSession[] {
@@ -251,7 +259,7 @@ export class AIAssistantService {
 
   deleteSession(id: string): boolean {
     if (!this.sessions.has(id)) return false;
-    
+
     this.sessions.delete(id);
     if (this.activeSessionId === id) {
       const next = this.listSessions()[0];
@@ -308,7 +316,7 @@ export class AIAssistantService {
 
     for (const f of files) {
       this.fileIndex.set(f.path, f.content);
-      
+
       const symbols = this.extractSymbols(f.content, f.path);
       for (const s of symbols) {
         this.symbolIndex.set(`${f.path}#${s.name}`, {
@@ -319,7 +327,10 @@ export class AIAssistantService {
       }
     }
 
-    globalEventBus.emit({ type: 'ai:file-indexed', payload: { files: files.length, symbols: this.symbolIndex.size } });
+    globalEventBus.emit({
+      type: 'ai:file-indexed',
+      payload: { files: files.length, symbols: this.symbolIndex.size },
+    });
   }
 
   addIndexedFile(path: string, content: string): void {
@@ -350,7 +361,7 @@ export class AIAssistantService {
   searchSymbols(query: string): { path: string; name: string; type: string; line: number }[] {
     const results: { path: string; name: string; type: string; line: number }[] = [];
     const lowerQuery = query.toLowerCase();
-    
+
     for (const [key, info] of this.symbolIndex) {
       const name = key.split('#')[1];
       if (name?.toLowerCase().includes(lowerQuery)) {
@@ -362,7 +373,7 @@ export class AIAssistantService {
         });
       }
     }
-    
+
     return results.slice(0, 20);
   }
 
@@ -428,10 +439,13 @@ export class AIAssistantService {
     return null;
   }
 
-  async sendMessage(content: string, options?: {
-    references?: Reference[];
-    systemPrompt?: string;
-  }): Promise<ChatMessage> {
+  async sendMessage(
+    content: string,
+    options?: {
+      references?: Reference[];
+      systemPrompt?: string;
+    }
+  ): Promise<ChatMessage> {
     const session = this.getActiveSession();
     if (!session) throw new Error('无活动会话');
 
@@ -462,7 +476,7 @@ export class AIAssistantService {
 
     try {
       const reply = await this.generateResponse(clean, session, allRefs, options);
-      
+
       thinkingMsg.content = reply.content;
       thinkingMsg.status = undefined;
       thinkingMsg.references = reply.references;
@@ -477,16 +491,22 @@ export class AIAssistantService {
       thinkingMsg.content = `抱歉，发生了错误：${err instanceof Error ? err.message : String(err)}`;
       thinkingMsg.status = 'error';
       session.updatedAt = Date.now();
-      globalEventBus.emit({ type: 'ai:error', payload: { error: err instanceof Error ? err.message : String(err) } });
+      globalEventBus.emit({
+        type: 'ai:error',
+        payload: { error: err instanceof Error ? err.message : String(err) },
+      });
       throw err;
     }
   }
 
-  async sendQuickAction(actionId: string, context?: {
-    code?: string;
-    language?: string;
-    filePath?: string;
-  }): Promise<ChatMessage> {
+  async sendQuickAction(
+    actionId: string,
+    context?: {
+      code?: string;
+      language?: string;
+      filePath?: string;
+    }
+  ): Promise<ChatMessage> {
     const action = this.quickActions.find((a) => a.id === actionId);
     if (!action) {
       throw new Error(`找不到快捷操作 "${actionId}" 不存在`);
@@ -497,7 +517,7 @@ export class AIAssistantService {
 
     if (context?.code) {
       prompt += `\n\`\`\`${context.language ?? 'typescript'}\n${context.code}\n\`\`\``;
-      
+
       if (context.filePath) {
         references.push({
           id: randomUUID(),
@@ -517,7 +537,7 @@ export class AIAssistantService {
     prompt: string,
     session: ChatSession,
     refs: Reference[],
-    options?: { systemPrompt?: string },
+    options?: { systemPrompt?: string }
   ): Promise<{
     content: string;
     references?: Reference[];
@@ -527,13 +547,19 @@ export class AIAssistantService {
     await new Promise((r) => setTimeout(r, 500 + Math.random() * 500));
 
     const contextSnippet = refs
-      .map((r) => `--- ${r.path}${r.line ? `:${r.line}` : ''} ---\n${r.content?.slice(0, 500) ?? ''}`)
+      .map(
+        (r) => `--- ${r.path}${r.line ? `:${r.line}` : ''} ---\n${r.content?.slice(0, 500) ?? ''}`
+      )
       .join('\n\n')
       .slice(0, 2000);
 
     const lowerPrompt = prompt.toLowerCase();
 
-    if (lowerPrompt.includes('登录') || lowerPrompt.includes('login') || lowerPrompt.includes('taptap sdk')) {
+    if (
+      lowerPrompt.includes('登录') ||
+      lowerPrompt.includes('login') ||
+      lowerPrompt.includes('taptap sdk')
+    ) {
       return {
         content: this.generateTapTapSDKResponse(prompt),
         references: [
@@ -547,7 +573,11 @@ export class AIAssistantService {
       };
     }
 
-    if (lowerPrompt.includes('支付') || lowerPrompt.includes('payment') || lowerPrompt.includes('iap')) {
+    if (
+      lowerPrompt.includes('支付') ||
+      lowerPrompt.includes('payment') ||
+      lowerPrompt.includes('iap')
+    ) {
       return {
         content: this.generatePaymentResponse(),
       };
@@ -584,7 +614,11 @@ export class AIAssistantService {
       };
     }
 
-    if (lowerPrompt.includes('bug') || lowerPrompt.includes('修复') || lowerPrompt.includes('错误')) {
+    if (
+      lowerPrompt.includes('bug') ||
+      lowerPrompt.includes('修复') ||
+      lowerPrompt.includes('错误')
+    ) {
       return {
         content: this.generateBugFixResponse(contextSnippet),
       };
@@ -973,13 +1007,16 @@ describe('测试模块名', () => {
 能提供更具体的错误信息或堆栈吗？这样我可以给出更精准的修复建议。`;
   }
 
-  private extractSymbols(content: string, filePath: string): { name: string; line: number; type: string }[] {
+  private extractSymbols(
+    content: string,
+    filePath: string
+  ): { name: string; line: number; type: string }[] {
     const symbols: { name: string; line: number; type: string }[] = [];
     const lines = content.split('\n');
 
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
-      
+
       const funcMatch = line.match(/(?:export\s+)?(?:function|const|let|var)\s+(\w+)/);
       if (funcMatch && funcMatch[1]) {
         symbols.push({ name: funcMatch[1], line: i + 1, type: 'function' });
@@ -1034,9 +1071,10 @@ describe('测试模块名', () => {
 
   searchSessions(query: string): ChatSession[] {
     const lowerQuery = query.toLowerCase();
-    return this.listSessions().filter((s) =>
-      s.title.toLowerCase().includes(lowerQuery) ||
-      s.messages.some((m) => m.content.toLowerCase().includes(lowerQuery))
+    return this.listSessions().filter(
+      (s) =>
+        s.title.toLowerCase().includes(lowerQuery) ||
+        s.messages.some((m) => m.content.toLowerCase().includes(lowerQuery))
     );
   }
 
@@ -1050,7 +1088,7 @@ describe('测试模块名', () => {
     try {
       const session = JSON.parse(json) as ChatSession;
       if (!session.id || !session.messages) return null;
-      
+
       const newId = randomUUID();
       const newSession: ChatSession = {
         ...session,
@@ -1058,7 +1096,7 @@ describe('测试模块名', () => {
         createdAt: Date.now(),
         updatedAt: Date.now(),
       };
-      
+
       this.sessions.set(newId, newSession);
       return newSession;
     } catch {

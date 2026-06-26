@@ -93,7 +93,13 @@ class TileMapEditorService {
   private redoStack: { map: TileMap; action: string }[] = [];
 
   // 创建地图
-  createMap(config: { name: string; width: number; height: number; tileWidth: number; tileHeight: number }): TileMap {
+  createMap(config: {
+    name: string;
+    width: number;
+    height: number;
+    tileWidth: number;
+    tileHeight: number;
+  }): TileMap {
     const map: TileMap = {
       id: `map-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       name: config.name,
@@ -105,7 +111,7 @@ class TileMapEditorService {
       tilesets: [],
       layers: [],
       objectLayers: [],
-      properties: {}
+      properties: {},
     };
 
     // 默认创建两个层：背景层和地形层
@@ -131,7 +137,7 @@ class TileMapEditorService {
       locked: false,
       opacity: 1.0,
       tiles: this.createEmptyTileGrid(map.width, map.height),
-      offset: { x: 0, y: 0 }
+      offset: { x: 0, y: 0 },
     };
     map.layers.push(layer);
     this.notify('layer:added', { mapId, layer });
@@ -147,7 +153,7 @@ class TileMapEditorService {
       name,
       visible: true,
       locked: false,
-      objects: []
+      objects: [],
     };
     map.objectLayers.push(layer);
     this.notify('object-layer:added', { mapId, layer });
@@ -168,17 +174,20 @@ class TileMapEditorService {
   }
 
   // 添加图块集
-  addTileset(mapId: string, tileset: Omit<Tileset, 'id' | 'columns' | 'rows' | 'tileCount'>): Tileset {
+  addTileset(
+    mapId: string,
+    tileset: Omit<Tileset, 'id' | 'columns' | 'rows' | 'tileCount'>
+  ): Tileset {
     const map = this.maps.get(mapId);
     if (!map) throw new Error('地图不存在');
 
     const columns = Math.floor(
       (tileset.imageWidth - tileset.margin * 2 + tileset.spacing) /
-      (tileset.tileWidth + tileset.spacing)
+        (tileset.tileWidth + tileset.spacing)
     );
     const rows = Math.floor(
       (tileset.imageHeight - tileset.margin * 2 + tileset.spacing) /
-      (tileset.tileHeight + tileset.spacing)
+        (tileset.tileHeight + tileset.spacing)
     );
 
     const newTileset: Tileset = {
@@ -186,7 +195,7 @@ class TileMapEditorService {
       id: `tileset-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       columns,
       rows,
-      tileCount: columns * rows
+      tileCount: columns * rows,
     };
     map.tilesets.push(newTileset);
     this.selectedTileset = newTileset.id;
@@ -198,7 +207,7 @@ class TileMapEditorService {
   placeTile(mapId: string, layerId: string, x: number, y: number, tileId: number | null): void {
     const map = this.maps.get(mapId);
     if (!map) return;
-    const layer = map.layers.find(l => l.id === layerId);
+    const layer = map.layers.find((l) => l.id === layerId);
     if (!layer || layer.locked) return;
 
     if (x < 0 || x >= map.width || y < 0 || y >= map.height) return;
@@ -217,10 +226,18 @@ class TileMapEditorService {
   }
 
   // 批量绘制
-  drawArea(mapId: string, layerId: string, startX: number, startY: number, endX: number, endY: number, tileId: number): void {
+  drawArea(
+    mapId: string,
+    layerId: string,
+    startX: number,
+    startY: number,
+    endX: number,
+    endY: number,
+    tileId: number
+  ): void {
     const map = this.maps.get(mapId);
     if (!map) return;
-    const layer = map.layers.find(l => l.id === layerId);
+    const layer = map.layers.find((l) => l.id === layerId);
     if (!layer || layer.locked) return;
 
     this.saveSnapshot(map, `Draw area (${startX},${startY})-(${endX},${endY})`);
@@ -240,7 +257,7 @@ class TileMapEditorService {
   fillArea(mapId: string, layerId: string, startX: number, startY: number, tileId: number): void {
     const map = this.maps.get(mapId);
     if (!map) return;
-    const layer = map.layers.find(l => l.id === layerId);
+    const layer = map.layers.find((l) => l.id === layerId);
     if (!layer || layer.locked) return;
 
     this.saveSnapshot(map, `Fill area`);
@@ -330,12 +347,12 @@ class TileMapEditorService {
   addObject(mapId: string, objectLayerId: string, obj: Omit<TileMapObject, 'id'>): TileMapObject {
     const map = this.maps.get(mapId);
     if (!map) throw new Error('地图不存在');
-    const layer = map.objectLayers.find(l => l.id === objectLayerId);
+    const layer = map.objectLayers.find((l) => l.id === objectLayerId);
     if (!layer) throw new Error('对象层不存在');
 
     const newObj: TileMapObject = {
       ...obj,
-      id: `obj-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`
+      id: `obj-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
     };
     layer.objects.push(newObj);
     this.notify('object:added', { mapId, objectLayerId, object: newObj });
@@ -346,7 +363,7 @@ class TileMapEditorService {
   generateNavMesh(mapId: string, walkableLayerId: string): NavMesh {
     const map = this.maps.get(mapId);
     if (!map) throw new Error('地图不存在');
-    const layer = map.layers.find(l => l.id === walkableLayerId);
+    const layer = map.layers.find((l) => l.id === walkableLayerId);
     if (!layer) throw new Error('层不存在');
 
     const vertices: { x: number; y: number }[] = [];
@@ -389,18 +406,24 @@ class TileMapEditorService {
 
     // Tilesets
     for (const ts of map.tilesets) {
-      lines.push(`  <tileset firstgid="1" name="${ts.name}" tilewidth="${ts.tileWidth}" tileheight="${ts.tileHeight}"`);
+      lines.push(
+        `  <tileset firstgid="1" name="${ts.name}" tilewidth="${ts.tileWidth}" tileheight="${ts.tileHeight}"`
+      );
       lines.push(`             spacing="${ts.spacing}" margin="${ts.margin}">`);
-      lines.push(`    <image source="${ts.imageUrl}" width="${ts.imageWidth}" height="${ts.imageHeight}"/>`);
+      lines.push(
+        `    <image source="${ts.imageUrl}" width="${ts.imageWidth}" height="${ts.imageHeight}"/>`
+      );
       lines.push('  </tileset>');
     }
 
     // Layers
     for (const layer of map.layers) {
-      lines.push(`  <layer name="${layer.name}" width="${map.width}" height="${map.height}" opacity="${layer.opacity}" ${layer.visible ? '' : 'visible="0"'}>`);
+      lines.push(
+        `  <layer name="${layer.name}" width="${map.width}" height="${map.height}" opacity="${layer.opacity}" ${layer.visible ? '' : 'visible="0"'}>`
+      );
       lines.push('    <data>');
       for (const row of layer.tiles) {
-        const encoded = row.map(t => t === null ? 0 : t + 1).join(',');
+        const encoded = row.map((t) => (t === null ? 0 : t + 1)).join(',');
         lines.push(`      ${encoded}`);
       }
       lines.push('    </data>');
@@ -409,9 +432,13 @@ class TileMapEditorService {
 
     // Object Layers
     for (const objLayer of map.objectLayers) {
-      lines.push(`  <objectgroup name="${objLayer.name}" ${objLayer.visible ? '' : 'visible="0"'}>`);
+      lines.push(
+        `  <objectgroup name="${objLayer.name}" ${objLayer.visible ? '' : 'visible="0"'}>`
+      );
       for (const obj of objLayer.objects) {
-        lines.push(`    <object id="${obj.id}" type="${obj.type}" x="${obj.x}" y="${obj.y}" width="${obj.width}" height="${obj.height}"/>`);
+        lines.push(
+          `    <object id="${obj.id}" type="${obj.type}" x="${obj.x}" y="${obj.y}" width="${obj.width}" height="${obj.height}"/>`
+        );
       }
       lines.push('  </objectgroup>');
     }
@@ -440,7 +467,9 @@ class TileMapEditorService {
   // 订阅
   subscribe(listener: (event: string, data: any) => void): () => void {
     this.listeners.add(listener);
-    return () => { this.listeners.delete(listener); };
+    return () => {
+      this.listeners.delete(listener);
+    };
   }
 
   private notify(event: string, data: any): void {
