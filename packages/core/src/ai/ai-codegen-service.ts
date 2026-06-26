@@ -51,15 +51,16 @@ export interface CodeGenRequest {
   };
 }
 
-export interface CodeDiff {
-  type: 'insert' | 'delete' | 'replace';
-  range?: { start: number; end: number };
-  content: string;
+export interface CodeLineDiff {
+  oldText: string;
+  newText: string;
+  startLine: number;
+  endLine: number;
 }
 
 export interface CodeGenResult {
   code: string;
-  diffs?: CodeDiff[];
+  diffs?: CodeLineDiff[];
   explanation?: string;
   suggestions?: CodeGenSuggestion[];
   language?: CodeLanguage;
@@ -256,7 +257,7 @@ export class AICodeGenService {
       const lineCount = code.split('\n').length;
 
       // refactor action: 计算 diffs
-      let diffs: CodeDiff[] | undefined;
+      let diffs: CodeLineDiff[] | undefined;
       if (req.action === 'refactor' && req.fileContent) {
         const originalLines = req.fileContent.split('\n');
         const newLines = code.split('\n');
@@ -283,7 +284,7 @@ export class AICodeGenService {
         }
       }
 
-      const result: CodeGenResult & { diffs?: CodeDiff[] } = {
+      const result: CodeGenResult = {
         code,
         language: req.language,
         suggestions,
