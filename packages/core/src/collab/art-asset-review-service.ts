@@ -1,7 +1,7 @@
 // 美术资源协作审查
 // 图片/动画在线预览批注、版本对比、评审流程
 
-import { globalEventBus } from '../core/event-bus';
+import { globalEventBus } from '../event-bus';
 
 // 资源类型
 export type AssetType = 'image' | 'animation' | '3d-model' | 'audio' | 'video';

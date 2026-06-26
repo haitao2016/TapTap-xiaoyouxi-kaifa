@@ -1,7 +1,7 @@
 // 代码库理解与索引系统
 // 支持符号解析、依赖关系分析、代码语义检索
 
-import { globalEventBus } from '../core/event-bus';
+import { globalEventBus } from '../event-bus';
 
 // 代码符号
 export interface CodeSymbol {

@@ -1,7 +1,7 @@
 // AI 代码审查与重构建议
 // 自动检测代码异味、性能问题、安全漏洞、最佳实践违规
 
-import { globalEventBus } from '../core/event-bus';
+import { globalEventBus } from '../event-bus';
 import { codeIndexService, CodeSymbol } from './code-index-service';
 
 // 审查问题严重程度

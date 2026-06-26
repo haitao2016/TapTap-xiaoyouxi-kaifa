@@ -1,5 +1,22 @@
 // Platform Service types
 
+import type { Platform } from './project';
+
+/** 平台能力检测 */
+export interface PlatformCapabilities {
+  platform: Platform;
+  hasFileSystem: boolean;
+  hasNativeMenu: boolean;
+  hasNotifications: boolean;
+  hasDevTools: boolean;
+  screenWidth: number;
+  screenHeight: number;
+  pixelRatio?: number;
+  language?: string;
+  isElectron?: boolean;
+  isStandalone?: boolean;
+}
+
 // TapTap Auth types
 export interface TapTapAccount {
   id: string;

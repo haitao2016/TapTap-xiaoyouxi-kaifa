@@ -1,7 +1,7 @@
 // 自动化测试平台
 // 游戏 UI 自动化测试、性能基准、兼容性测试
 
-import { globalEventBus } from '../core/event-bus';
+import { globalEventBus } from '../event-bus';
 
 // 测试类型
 export type TestType =
@@ -236,7 +236,7 @@ class AutoTestService {
   // 录制步骤
   recordStep(step: NonNullable<TestCase['steps']>[0]): void {
     if (!this.recording) return;
-    this.recording.steps.push(step);
+    this.recording.steps?.push(step);
   }
 
   // 停止录制
@@ -297,17 +297,18 @@ class AutoTestService {
           });
         }
       } else if (testCase.type === 'performance') {
-        result.performance = await this.runPerformanceTest(testCase);
+        const perf = (await this.runPerformanceTest(testCase))!;
+        result.performance = perf;
         // 验证
         if (testCase.performanceConfig) {
           const { metric, threshold, target } = testCase.performanceConfig;
           const value =
             metric === 'fps'
-              ? result.performance.fps.avg
+              ? perf.fps.avg
               : metric === 'memory'
-                ? result.performance.memory.peak
+                ? perf.memory.peak
                 : metric === 'cpu'
-                  ? result.performance.cpu
+                  ? perf.cpu
                   : 0;
           if (metric === 'fps' ? value < threshold : value > threshold) {
             result.status = 'fail';
@@ -420,7 +421,7 @@ class AutoTestService {
     let cases = Array.from(this.testCases.values());
     if (filter?.type) cases = cases.filter((c) => c.type === filter.type);
     if (filter?.enabled !== undefined) cases = cases.filter((c) => c.enabled === filter.enabled);
-    if (filter?.tag) cases = cases.filter((c) => c.tags.includes(filter.tag));
+    if (filter?.tag) cases = cases.filter((c) => c.tags.includes(filter.tag!));
     return cases;
   }
 

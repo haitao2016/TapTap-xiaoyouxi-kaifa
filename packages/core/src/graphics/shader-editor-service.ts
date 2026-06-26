@@ -1,7 +1,7 @@
 // 可视化 Shader 编辑器
 // 节点式 Shader 可视化编程，支持 GLSL/HLSL/WGSL
 
-import { globalEventBus } from '../core/event-bus';
+import { globalEventBus } from '../event-bus';
 
 // Shader 节点类型
 export type ShaderNodeType =

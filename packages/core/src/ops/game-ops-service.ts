@@ -1,7 +1,7 @@
 // 游戏运营一站式工作台
 // 发布、数据分析、用户反馈、A/B 测试、活动、客服工单、版本管理
 
-import { globalEventBus } from '../core/event-bus';
+import { globalEventBus } from '../event-bus';
 
 // 游戏
 export interface ManagedGame {

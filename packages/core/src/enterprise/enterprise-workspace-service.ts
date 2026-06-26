@@ -1,7 +1,7 @@
 // 企业版工作空间
 // 组织架构、RBAC、SSO、审计日志、私有化部署
 
-import { globalEventBus } from '../core/event-bus';
+import { globalEventBus } from '../event-bus';
 
 // 组织
 export interface Organization {

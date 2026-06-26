@@ -1,7 +1,7 @@
 // 低代码游戏生成器
 // 通过表单配置快速生成完整游戏
 
-import { globalEventBus } from '../core/event-bus';
+import { globalEventBus } from '../event-bus';
 
 // 游戏类型
 export type GameGenre =
@@ -141,6 +141,7 @@ class LowCodeGameGeneratorService {
         name: '三消游戏',
         genre: 'puzzle',
         description: '经典三消玩法',
+        preview: 'match3.gif',
         defaultConfig: {
           title: '宝石三消',
           genre: 'puzzle',
@@ -173,6 +174,7 @@ class LowCodeGameGeneratorService {
         name: '无尽跑酷',
         genre: 'arcade',
         description: '无尽的跑酷游戏',
+        preview: 'endless-runner.gif',
         defaultConfig: {
           title: '疾风跑酷',
           genre: 'arcade',

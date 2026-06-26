@@ -35,7 +35,7 @@ export interface SDKInstalled {
   previousVersion?: string;
 }
 
-export interface Announcement {
+export interface SDKAnnouncement {
   id: string;
   title: string;
   content: string;
@@ -82,7 +82,7 @@ const KNOWN_PACKAGES = [
 
 export class SDKManagerService {
   private installed = new Map<string, SDKInstalled>();
-  private announcements: Announcement[] = [];
+  private announcements: SDKAnnouncement[] = [];
   private readonly updateListeners = new Set<() => void>();
   private readonly downloadListeners = new Map<
     string,
@@ -368,7 +368,7 @@ export class SDKManagerService {
     return { compatible: warnings.length === 0, warnings, recommendations, versionMatrix };
   }
 
-  async fetchAnnouncements(): Promise<Announcement[]> {
+  async fetchAnnouncements(): Promise<SDKAnnouncement[]> {
     const account = tapTapAuthService.getActiveAccount();
     try {
       const res = await fetch('https://api.taptap.cn/minigame/v1/announcements', {
@@ -378,7 +378,7 @@ export class SDKManagerService {
         this.announcements = this.mockAnnouncements();
         return this.announcements;
       }
-      const data = (await res.json()) as { data: Announcement[] };
+      const data = (await res.json()) as { data: SDKAnnouncement[] };
       this.announcements = data.data.map((a) => ({ ...a, read: false }));
       return this.announcements;
     } catch {
@@ -544,7 +544,7 @@ export class SDKManagerService {
     ];
   }
 
-  private mockAnnouncements(): Announcement[] {
+  private mockAnnouncements(): SDKAnnouncement[] {
     return [
       {
         id: 'a1',

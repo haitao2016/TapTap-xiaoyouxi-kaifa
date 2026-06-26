@@ -38,6 +38,7 @@ export interface RoomSettings {
   gameMode: string;
   map: string;
   rules: Record<string, unknown>;
+  friendlyFire?: boolean;
 }
 
 export interface Room {
@@ -1036,8 +1037,8 @@ export class MultiplayerService {
   }
 
   listGameModeCategories(): string[] {
-    const categories = new Set(this.templates.values().map((t) => t.category));
-    return Array.from(categories);
+    const categories = new Set(Array.from(this.templates.values()).map((t: GameModeTemplate) => t.category));
+    return Array.from(categories) as string[];
   }
 }
 

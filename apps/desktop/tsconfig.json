@@ -6,8 +6,7 @@
     "outDir": "dist",
     "rootDir": "src",
     "noEmit": false,
-    "allowImportingTsExtensions": false,
-    "ignoreDeprecations": "6.0"
+    "allowImportingTsExtensions": false
   },
   "include": ["src"]
 }

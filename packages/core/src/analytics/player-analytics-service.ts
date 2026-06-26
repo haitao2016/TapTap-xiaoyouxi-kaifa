@@ -1,7 +1,7 @@
 // 玩家行为分析
 // 热力图、关卡漏斗、行为路径、调优建议
 
-import { globalEventBus } from '../core/event-bus';
+import { globalEventBus } from '../event-bus';
 
 // 玩家事件
 export interface PlayerEvent {

@@ -1,7 +1,7 @@
 // 动画状态机编辑器
 // 角色动画状态机可视化编辑
 
-import { globalEventBus } from '../core/event-bus';
+import { globalEventBus } from '../event-bus';
 
 // 动画状态
 export interface AnimationState {
