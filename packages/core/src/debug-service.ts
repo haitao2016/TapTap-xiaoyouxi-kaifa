@@ -274,7 +274,8 @@ export class DebugService {
   }
 
   updateBreakpoint(breakpointId: string, updates: Partial<Pick<Breakpoint, 'condition' | 'enabled'>>): void {
-    const bp = this.breakpoints.get(breakpointId);
+    if (!this.session) return;
+    const bp = this.session.breakpoints.find((b) => b.id === breakpointId);
     if (bp) {
       if (updates.condition !== undefined) {
         bp.condition = updates.condition;
@@ -288,19 +289,8 @@ export class DebugService {
       if (updates.enabled !== undefined) {
         bp.enabled = updates.enabled;
       }
+      debugWebSocketClient.updateBreakpoint(breakpointId, updates);
     }
-    if (this.session) {
-      const sessionBp = this.session.breakpoints.find((b) => b.id === breakpointId);
-      if (sessionBp) {
-        if (updates.condition !== undefined) {
-          sessionBp.condition = updates.condition;
-        }
-        if (updates.enabled !== undefined) {
-          sessionBp.enabled = updates.enabled;
-        }
-      }
-    }
-    debugWebSocketClient.updateBreakpoint(breakpointId, updates);
   }
 
   removeBreakpoint(breakpointId: string): void;
@@ -389,42 +379,6 @@ export class DebugService {
     if (this.session) this.session.status = 'running';
     debugWebSocketClient.sendCommand('resume');
     this.log('info', '调试已继续');
-  }
-
-  async evaluate(expression: string, _frameId?: string): Promise<unknown> {
-    if (!this.session) {
-      throw new Error('调试会话未连接');
-    }
-    try {
-      const result = new Function(`return ${expression}`)();
-      return result;
-    } catch (error) {
-      throw new Error(`表达式求值失败: ${error instanceof Error ? error.message : String(error)}`);
-    }
-  }
-
-  async stepOver(): Promise<void> {
-    if (!this.session) {
-      throw new Error('调试会话未连接');
-    }
-    debugWebSocketClient.sendCommand('step');
-    this.log('info', '单步跳过');
-  }
-
-  async stepInto(): Promise<void> {
-    if (!this.session) {
-      throw new Error('调试会话未连接');
-    }
-    debugWebSocketClient.sendCommand('step');
-    this.log('info', '单步进入');
-  }
-
-  async stepOut(): Promise<void> {
-    if (!this.session) {
-      throw new Error('调试会话未连接');
-    }
-    debugWebSocketClient.sendCommand('step');
-    this.log('info', '单步退出');
   }
 
   /**
