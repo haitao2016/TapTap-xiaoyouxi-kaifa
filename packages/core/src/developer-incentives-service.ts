@@ -251,7 +251,10 @@ export class DeveloperIncentivesService {
     return this.levels;
   }
 
-  getPointsHistory(page = 1, pageSize = 20): { records: PointsRecord[]; total: number; totalPages: number } {
+  getPointsHistory(
+    page = 1,
+    pageSize = 20
+  ): { records: PointsRecord[]; total: number; totalPages: number } {
     const records = this.pointsRecords.get(this.currentUserId) || [];
     const total = records.length;
     const totalPages = Math.ceil(total / pageSize);
@@ -266,12 +269,17 @@ export class DeveloperIncentivesService {
   getMyContributions(status?: string): Contribution[] {
     let contributions = this.contributions.get(this.currentUserId) || [];
     if (status) {
-      contributions = contributions.filter(c => c.status === status);
+      contributions = contributions.filter((c) => c.status === status);
     }
     return contributions.sort((a, b) => b.createdAt - a.createdAt);
   }
 
-  async submitContribution(type: ContributionType, title: string, description: string, relatedUrl?: string): Promise<Contribution> {
+  async submitContribution(
+    type: ContributionType,
+    title: string,
+    description: string,
+    relatedUrl?: string
+  ): Promise<Contribution> {
     const contribution: Contribution = {
       id: randomUUID(),
       userId: this.currentUserId,
@@ -302,7 +310,7 @@ export class DeveloperIncentivesService {
   getFeaturedItems(type?: 'plugin' | 'template' | 'asset'): FeaturedItem[] {
     let items = [...this.featuredItems];
     if (type) {
-      items = items.filter(i => i.type === type);
+      items = items.filter((i) => i.type === type);
     }
     return items.sort((a, b) => b.featuredAt - a.featuredAt);
   }
@@ -383,29 +391,29 @@ export class DeveloperIncentivesService {
   getIncentivePrograms(status?: 'upcoming' | 'ongoing' | 'ended'): IncentiveProgram[] {
     let programs = [...this.incentivePrograms];
     if (status) {
-      programs = programs.filter(p => p.status === status);
+      programs = programs.filter((p) => p.status === status);
     }
     return programs.sort((a, b) => b.startDate - a.startDate);
   }
 
   getIncentiveProgram(programId: string): IncentiveProgram | undefined {
-    return this.incentivePrograms.find(p => p.id === programId);
+    return this.incentivePrograms.find((p) => p.id === programId);
   }
 
   getActivities(status?: 'upcoming' | 'ongoing' | 'ended'): Activity[] {
     let activities = [...this.activities];
     if (status) {
-      activities = activities.filter(a => a.status === status);
+      activities = activities.filter((a) => a.status === status);
     }
     return activities.sort((a, b) => a.startTime - b.startTime);
   }
 
   getActivity(activityId: string): Activity | undefined {
-    return this.activities.find(a => a.id === activityId);
+    return this.activities.find((a) => a.id === activityId);
   }
 
   async registerActivity(activityId: string): Promise<boolean> {
-    const activity = this.activities.find(a => a.id === activityId);
+    const activity = this.activities.find((a) => a.id === activityId);
     if (!activity) {
       throw new Error('活动不存在');
     }
@@ -451,10 +459,14 @@ export class DeveloperIncentivesService {
       userId: profile.userId,
       userName: profile.userName,
       userAvatar: profile.avatar,
-      value: type === 'contribution' ? profile.earnedPoints :
-             type === 'downloads' ? profile.totalDownloads :
-             type === 'plugins' ? profile.pluginCount :
-             profile.templateCount,
+      value:
+        type === 'contribution'
+          ? profile.earnedPoints
+          : type === 'downloads'
+            ? profile.totalDownloads
+            : type === 'plugins'
+              ? profile.pluginCount
+              : profile.templateCount,
       rank: index + 1,
       level: profile.level,
       change: index < 3 ? 'up' : index < 10 ? 'same' : 'down',
@@ -463,18 +475,18 @@ export class DeveloperIncentivesService {
 
   getMyRank(type: RankType = 'contribution'): number {
     const leaderboard = this.getLeaderboard(type);
-    const myEntry = leaderboard.find(e => e.userId === this.currentUserId);
+    const myEntry = leaderboard.find((e) => e.userId === this.currentUserId);
     return myEntry?.rank || 0;
   }
 
   private getUserRank(userId: string, type: RankType = 'contribution'): number {
     const leaderboard = this.getLeaderboard(type);
-    const entry = leaderboard.find(e => e.userId === userId);
+    const entry = leaderboard.find((e) => e.userId === userId);
     return entry?.rank || 0;
   }
 
   getMyBadges(): DeveloperBadge[] {
-    return this.badges.filter(b => b.earnedAt > 0);
+    return this.badges.filter((b) => b.earnedAt > 0);
   }
 
   getContributionStats(): {
@@ -486,7 +498,7 @@ export class DeveloperIncentivesService {
     const byType: Record<string, number> = {};
     const byStatus: Record<string, number> = {};
 
-    contributions.forEach(c => {
+    contributions.forEach((c) => {
       byType[c.type] = (byType[c.type] || 0) + 1;
       byStatus[c.status] = (byStatus[c.status] || 0) + 1;
     });
@@ -498,7 +510,13 @@ export class DeveloperIncentivesService {
     };
   }
 
-  private addPoints(userId: string, amount: number, reason: PointsReason, description: string, relatedId?: string): void {
+  private addPoints(
+    userId: string,
+    amount: number,
+    reason: PointsReason,
+    description: string,
+    relatedId?: string
+  ): void {
     const record: PointsRecord = {
       id: randomUUID(),
       userId,
@@ -549,16 +567,96 @@ export class DeveloperIncentivesService {
 
   private loadLevels(): void {
     this.levels = [
-      { level: 1, name: '新手开发者', minPoints: 0, maxPoints: 99, icon: 'seedling', color: '#9E9E9E', benefits: ['基础功能使用', '社区发帖权限'] },
-      { level: 2, name: '初级开发者', minPoints: 100, maxPoints: 299, icon: 'sprout', color: '#66BB6A', benefits: ['资源上传权限', '每日签到奖励'] },
-      { level: 3, name: '中级开发者', minPoints: 300, maxPoints: 699, icon: 'leaf', color: '#4CAF50', benefits: ['上传数量提升', '收藏夹扩容'] },
-      { level: 4, name: '高级开发者', minPoints: 700, maxPoints: 1499, icon: 'tree', color: '#8BC34A', benefits: ['收益分成提升', '优先审核权'] },
-      { level: 5, name: '资深开发者', minPoints: 1500, maxPoints: 2999, icon: 'trophy', color: '#FFC107', benefits: ['专属徽章', '官方推荐位'] },
-      { level: 6, name: '精英开发者', minPoints: 3000, maxPoints: 5999, icon: 'award', color: '#FF9800', benefits: ['定制推广资源', '活动优先邀请'] },
-      { level: 7, name: '专家开发者', minPoints: 6000, maxPoints: 11999, icon: 'crown', color: '#FF5722', benefits: ['一对一技术支持', '内测资格'] },
-      { level: 8, name: '大师开发者', minPoints: 12000, maxPoints: 24999, icon: 'star', color: '#E91E63', benefits: ['大师认证标识', '分成比例最高'] },
-      { level: 9, name: '传奇开发者', minPoints: 25000, maxPoints: 49999, icon: 'flame', color: '#9C27B0', benefits: ['传奇殿堂展示', '独家合作机会'] },
-      { level: 10, name: '创世开发者', minPoints: 50000, maxPoints: 999999, icon: 'zap', color: '#3F51B5', benefits: ['永久会员资格', '顾问委员会席位'] },
+      {
+        level: 1,
+        name: '新手开发者',
+        minPoints: 0,
+        maxPoints: 99,
+        icon: 'seedling',
+        color: '#9E9E9E',
+        benefits: ['基础功能使用', '社区发帖权限'],
+      },
+      {
+        level: 2,
+        name: '初级开发者',
+        minPoints: 100,
+        maxPoints: 299,
+        icon: 'sprout',
+        color: '#66BB6A',
+        benefits: ['资源上传权限', '每日签到奖励'],
+      },
+      {
+        level: 3,
+        name: '中级开发者',
+        minPoints: 300,
+        maxPoints: 699,
+        icon: 'leaf',
+        color: '#4CAF50',
+        benefits: ['上传数量提升', '收藏夹扩容'],
+      },
+      {
+        level: 4,
+        name: '高级开发者',
+        minPoints: 700,
+        maxPoints: 1499,
+        icon: 'tree',
+        color: '#8BC34A',
+        benefits: ['收益分成提升', '优先审核权'],
+      },
+      {
+        level: 5,
+        name: '资深开发者',
+        minPoints: 1500,
+        maxPoints: 2999,
+        icon: 'trophy',
+        color: '#FFC107',
+        benefits: ['专属徽章', '官方推荐位'],
+      },
+      {
+        level: 6,
+        name: '精英开发者',
+        minPoints: 3000,
+        maxPoints: 5999,
+        icon: 'award',
+        color: '#FF9800',
+        benefits: ['定制推广资源', '活动优先邀请'],
+      },
+      {
+        level: 7,
+        name: '专家开发者',
+        minPoints: 6000,
+        maxPoints: 11999,
+        icon: 'crown',
+        color: '#FF5722',
+        benefits: ['一对一技术支持', '内测资格'],
+      },
+      {
+        level: 8,
+        name: '大师开发者',
+        minPoints: 12000,
+        maxPoints: 24999,
+        icon: 'star',
+        color: '#E91E63',
+        benefits: ['大师认证标识', '分成比例最高'],
+      },
+      {
+        level: 9,
+        name: '传奇开发者',
+        minPoints: 25000,
+        maxPoints: 49999,
+        icon: 'flame',
+        color: '#9C27B0',
+        benefits: ['传奇殿堂展示', '独家合作机会'],
+      },
+      {
+        level: 10,
+        name: '创世开发者',
+        minPoints: 50000,
+        maxPoints: 999999,
+        icon: 'zap',
+        color: '#3F51B5',
+        benefits: ['永久会员资格', '顾问委员会席位'],
+      },
     ];
   }
 
@@ -749,7 +847,7 @@ export class DeveloperIncentivesService {
       },
     ];
 
-    mockProfiles.forEach(p => {
+    mockProfiles.forEach((p) => {
       this.profiles.set(p.userId, p);
     });
   }
@@ -1157,10 +1255,7 @@ export class DeveloperIncentivesService {
         startDate: now - 120 * day,
         endDate: now - 30 * day,
         prizePool: 80000,
-        rules: [
-          '活动期间发布的新资源参与排名',
-          '按下载量、评分、收藏数综合计算',
-        ],
+        rules: ['活动期间发布的新资源参与排名', '按下载量、评分、收藏数综合计算'],
         rewards: [
           { rank: 1, name: '一等奖', points: 5000, bonus: '专属推广资源包', icon: 'trophy' },
           { rank: 2, name: '二等奖', points: 3000, bonus: '首页推荐位', icon: 'award' },
@@ -1176,10 +1271,7 @@ export class DeveloperIncentivesService {
         startDate: now - 150 * day,
         endDate: now - 120 * day,
         prizePool: 200000,
-        rules: [
-          '全年贡献综合排名',
-          '社区投票+官方评审',
-        ],
+        rules: ['全年贡献综合排名', '社区投票+官方评审'],
         rewards: [
           { rank: 1, name: '年度开发者', points: 20000, bonus: '永久会员+奖杯', icon: 'crown' },
           { rank: 2, name: '卓越贡献奖', points: 10000, bonus: '年度徽章', icon: 'trophy' },

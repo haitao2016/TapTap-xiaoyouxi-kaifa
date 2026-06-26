@@ -4,7 +4,13 @@
 import { globalEventBus } from '../core/event-bus';
 
 // 测试类型
-export type TestType = 'ui-interaction' | 'performance' | 'compatibility' | 'unit' | 'integration' | 'e2e';
+export type TestType =
+  | 'ui-interaction'
+  | 'performance'
+  | 'compatibility'
+  | 'unit'
+  | 'integration'
+  | 'e2e';
 
 // 测试用例
 export interface TestCase {
@@ -49,7 +55,13 @@ export interface TestResult {
   endTime: number;
   duration: number;
   // 详细信息
-  steps: { name: string; status: 'pass' | 'fail' | 'skip'; message?: string; screenshot?: string; duration: number }[];
+  steps: {
+    name: string;
+    status: 'pass' | 'fail' | 'skip';
+    message?: string;
+    screenshot?: string;
+    duration: number;
+  }[];
   // 错误
   error?: { message: string; stack?: string; screenshot?: string };
   // 性能数据
@@ -130,7 +142,7 @@ class AutoTestService {
         description: '测试应用启动时间',
         performanceConfig: { metric: 'loadTime', target: 3000, threshold: 5000 },
         tags: ['critical', 'smoke'],
-        enabled: true
+        enabled: true,
       },
       {
         id: 'editor-fps',
@@ -139,7 +151,7 @@ class AutoTestService {
         description: '编辑器在打开大文件时保持 60fps',
         performanceConfig: { metric: 'fps', target: 60, threshold: 30 },
         tags: ['performance'],
-        enabled: true
+        enabled: true,
       },
       {
         id: 'memory-leak',
@@ -148,7 +160,7 @@ class AutoTestService {
         description: '长时间运行无内存泄漏',
         performanceConfig: { metric: 'memory', target: 200, threshold: 500 },
         tags: ['performance', 'stability'],
-        enabled: true
+        enabled: true,
       },
       {
         id: 'mobile-compat',
@@ -161,12 +173,12 @@ class AutoTestService {
           resolutions: [
             { width: 375, height: 667 },
             { width: 390, height: 844 },
-            { width: 414, height: 896 }
-          ]
+            { width: 414, height: 896 },
+          ],
         },
         tags: ['compatibility'],
-        enabled: true
-      }
+        enabled: true,
+      },
     ];
     for (const test of builtinTests) {
       this.testCases.set(test.id, test);
@@ -185,9 +197,9 @@ class AutoTestService {
         history: [
           { value: 2400, timestamp: Date.now() - 86400000 * 7, build: 'v1.0.0' },
           { value: 2350, timestamp: Date.now() - 86400000 * 5, build: 'v1.0.1' },
-          { value: 2300, timestamp: Date.now() - 86400000 * 2, build: 'v1.0.2' }
+          { value: 2300, timestamp: Date.now() - 86400000 * 2, build: 'v1.0.2' },
         ],
-        trend: 'improving'
+        trend: 'improving',
       },
       {
         id: 'fps-baseline',
@@ -198,10 +210,10 @@ class AutoTestService {
         history: [
           { value: 58, timestamp: Date.now() - 86400000 * 7, build: 'v1.0.0' },
           { value: 60, timestamp: Date.now() - 86400000 * 3, build: 'v1.0.1' },
-          { value: 60, timestamp: Date.now() - 86400000 * 1, build: 'v1.0.2' }
+          { value: 60, timestamp: Date.now() - 86400000 * 1, build: 'v1.0.2' },
         ],
-        trend: 'stable'
-      }
+        trend: 'stable',
+      },
     ];
   }
 
@@ -209,7 +221,7 @@ class AutoTestService {
   addTestCase(testCase: Omit<TestCase, 'id'>): TestCase {
     const newCase: TestCase = {
       ...testCase,
-      id: `test-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`
+      id: `test-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
     };
     this.testCases.set(newCase.id, newCase);
     return newCase;
@@ -238,7 +250,7 @@ class AutoTestService {
       steps: this.recording.steps,
       tags: ['recorded'],
       enabled: true,
-      recordedAt: Date.now()
+      recordedAt: Date.now(),
     };
     this.testCases.set(testCase.id, testCase);
     this.recording = null;
@@ -258,7 +270,7 @@ class AutoTestService {
         startTime: Date.now(),
         endTime: Date.now(),
         duration: 0,
-        steps: []
+        steps: [],
       };
     }
 
@@ -270,7 +282,7 @@ class AutoTestService {
       startTime,
       endTime: 0,
       duration: 0,
-      steps: []
+      steps: [],
     };
 
     try {
@@ -281,7 +293,7 @@ class AutoTestService {
           result.steps.push({
             name: `${step.type}${step.target ? ` ${step.target}` : ''}`,
             status: 'pass',
-            duration: Date.now() - stepStart
+            duration: Date.now() - stepStart,
           });
         }
       } else if (testCase.type === 'performance') {
@@ -289,10 +301,14 @@ class AutoTestService {
         // 验证
         if (testCase.performanceConfig) {
           const { metric, threshold, target } = testCase.performanceConfig;
-          const value = metric === 'fps' ? result.performance.fps.avg
-            : metric === 'memory' ? result.performance.memory.peak
-            : metric === 'cpu' ? result.performance.cpu
-            : 0;
+          const value =
+            metric === 'fps'
+              ? result.performance.fps.avg
+              : metric === 'memory'
+                ? result.performance.memory.peak
+                : metric === 'cpu'
+                  ? result.performance.cpu
+                  : 0;
           if (metric === 'fps' ? value < threshold : value > threshold) {
             result.status = 'fail';
           }
@@ -311,8 +327,11 @@ class AutoTestService {
   }
 
   // 执行步骤
-  private async executeStep(step: NonNullable<TestCase['steps']>[0], testCase: TestCase): Promise<void> {
-    await new Promise(r => setTimeout(r, 50 + Math.random() * 100));
+  private async executeStep(
+    step: NonNullable<TestCase['steps']>[0],
+    testCase: TestCase
+  ): Promise<void> {
+    await new Promise((r) => setTimeout(r, 50 + Math.random() * 100));
     if (step.timeout && Math.random() < 0.05) {
       throw new Error(`步骤超时: ${step.type}`);
     }
@@ -324,7 +343,7 @@ class AutoTestService {
     return {
       fps: { avg: 58 + Math.random() * 4, min: 45, max: 60 },
       memory: { used: 150 + Math.random() * 50, peak: 250 + Math.random() * 30 },
-      cpu: 20 + Math.random() * 30
+      cpu: 20 + Math.random() * 30,
     };
   }
 
@@ -335,8 +354,8 @@ class AutoTestService {
     for (const device of configs.devices) {
       const step = {
         name: `Device: ${device}`,
-        status: Math.random() < 0.9 ? 'pass' as const : 'fail' as const,
-        duration: 1000 + Math.random() * 2000
+        status: Math.random() < 0.9 ? ('pass' as const) : ('fail' as const),
+        duration: 1000 + Math.random() * 2000,
       };
       result.steps.push(step);
       if (step.status === 'fail') result.status = 'fail';
@@ -345,7 +364,7 @@ class AutoTestService {
 
   // 运行所有测试
   async runAllTests(name: string = 'Test Run'): Promise<TestReport> {
-    const testCases = Array.from(this.testCases.values()).filter(t => t.enabled);
+    const testCases = Array.from(this.testCases.values()).filter((t) => t.enabled);
     const startTime = Date.now();
     const results: TestResult[] = [];
 
@@ -360,12 +379,12 @@ class AutoTestService {
       startTime,
       endTime: Date.now(),
       totalCases: results.length,
-      passed: results.filter(r => r.status === 'pass').length,
-      failed: results.filter(r => r.status === 'fail').length,
-      errors: results.filter(r => r.status === 'error').length,
-      skipped: results.filter(r => r.status === 'skipped').length,
+      passed: results.filter((r) => r.status === 'pass').length,
+      failed: results.filter((r) => r.status === 'fail').length,
+      errors: results.filter((r) => r.status === 'error').length,
+      skipped: results.filter((r) => r.status === 'skipped').length,
       duration: Date.now() - startTime,
-      results
+      results,
     };
 
     this.reports.push(report);
@@ -374,8 +393,11 @@ class AutoTestService {
   }
 
   // 检查性能回归
-  checkPerformanceRegression(baselineId: string, currentValue: number): { regressed: boolean; delta: number; baseline: number } {
-    const baseline = this.baselines.find(b => b.id === baselineId);
+  checkPerformanceRegression(
+    baselineId: string,
+    currentValue: number
+  ): { regressed: boolean; delta: number; baseline: number } {
+    const baseline = this.baselines.find((b) => b.id === baselineId);
     if (!baseline) return { regressed: false, delta: 0, baseline: 0 };
 
     const delta = ((currentValue - baseline.baseline) / baseline.baseline) * 100;
@@ -385,7 +407,7 @@ class AutoTestService {
 
   // 更新基准
   updateBaseline(baselineId: string, newValue: number, build: string): void {
-    const baseline = this.baselines.find(b => b.id === baselineId);
+    const baseline = this.baselines.find((b) => b.id === baselineId);
     if (!baseline) return;
     baseline.baseline = newValue;
     baseline.history.push({ value: newValue, timestamp: Date.now(), build });
@@ -396,15 +418,15 @@ class AutoTestService {
   // 列出测试
   listTestCases(filter?: { type?: TestType; enabled?: boolean; tag?: string }): TestCase[] {
     let cases = Array.from(this.testCases.values());
-    if (filter?.type) cases = cases.filter(c => c.type === filter.type);
-    if (filter?.enabled !== undefined) cases = cases.filter(c => c.enabled === filter.enabled);
-    if (filter?.tag) cases = cases.filter(c => c.tags.includes(filter.tag));
+    if (filter?.type) cases = cases.filter((c) => c.type === filter.type);
+    if (filter?.enabled !== undefined) cases = cases.filter((c) => c.enabled === filter.enabled);
+    if (filter?.tag) cases = cases.filter((c) => c.tags.includes(filter.tag));
     return cases;
   }
 
   // 获取报告
   getReport(reportId: string): TestReport | undefined {
-    return this.reports.find(r => r.id === reportId);
+    return this.reports.find((r) => r.id === reportId);
   }
 
   // 列出报告
@@ -420,7 +442,9 @@ class AutoTestService {
   // 订阅
   subscribe(listener: (event: string, data: any) => void): () => void {
     this.listeners.add(listener);
-    return () => { this.listeners.delete(listener); };
+    return () => {
+      this.listeners.delete(listener);
+    };
   }
 
   private notify(event: string, data: any): void {

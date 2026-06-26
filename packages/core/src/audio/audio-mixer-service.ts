@@ -65,7 +65,10 @@ export interface AudioEvent {
 // 音频监听器（3D 空间）
 export interface AudioListener {
   position: { x: number; y: number; z: number };
-  orientation: { forward: { x: number; y: number; z: number }; up: { x: number; y: number; z: number } };
+  orientation: {
+    forward: { x: number; y: number; z: number };
+    up: { x: number; y: number; z: number };
+  };
   velocity: { x: number; y: number; z: number };
 }
 
@@ -103,21 +106,24 @@ class AudioMixerService {
       masterEffects: [],
       output: 'stereo',
       sampleRate: 44100,
-      bitDepth: 16
+      bitDepth: 16,
     };
 
     this.listener = {
       position: { x: 0, y: 0, z: 0 },
       orientation: {
         forward: { x: 0, y: 0, z: -1 },
-        up: { x: 0, y: 1, z: 0 }
+        up: { x: 0, y: 1, z: 0 },
       },
-      velocity: { x: 0, y: 0, z: 0 }
+      velocity: { x: 0, y: 0, z: 0 },
     };
   }
 
   // 创建音轨
-  createTrack(config: Omit<AudioTrack, 'id' | 'effects' | 'metadata' | 'status' | 'currentTime'> & Partial<Pick<AudioTrack, 'effects' | 'metadata'>>): AudioTrack {
+  createTrack(
+    config: Omit<AudioTrack, 'id' | 'effects' | 'metadata' | 'status' | 'currentTime'> &
+      Partial<Pick<AudioTrack, 'effects' | 'metadata'>>
+  ): AudioTrack {
     const track: AudioTrack = {
       ...config,
       id: `track-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
@@ -125,10 +131,10 @@ class AudioMixerService {
       metadata: config.metadata || {
         sampleRate: 44100,
         channels: 2,
-        bitrate: 128
+        bitrate: 128,
       },
       status: 'stopped',
-      currentTime: 0
+      currentTime: 0,
     };
     this.tracks.set(track.id, track);
     this.notify('track:created', track);
@@ -136,7 +142,10 @@ class AudioMixerService {
   }
 
   // 播放
-  play(trackId: string, options?: { volume?: number; pitch?: number; position?: { x: number; y: number; z: number } }): void {
+  play(
+    trackId: string,
+    options?: { volume?: number; pitch?: number; position?: { x: number; y: number; z: number } }
+  ): void {
     const track = this.tracks.get(trackId);
     if (!track) return;
 
@@ -210,17 +219,23 @@ class AudioMixerService {
   private applyMasterMixer(): void {
     for (const track of this.tracks.values()) {
       const categoryVolume = this.getCategoryVolume(track.category);
-      const effectiveVolume = track.muted ? 0 : track.volume * this.masterMixer.masterVolume * categoryVolume;
+      const effectiveVolume = track.muted
+        ? 0
+        : track.volume * this.masterMixer.masterVolume * categoryVolume;
       this.notify('track:effective-volume', { trackId: track.id, volume: effectiveVolume });
     }
   }
 
   private getCategoryVolume(category: AudioTrackCategory): number {
     switch (category) {
-      case 'bgm': return this.masterMixer.bpmMasterVolume;
-      case 'sfx': return this.masterMixer.sfxMasterVolume;
-      case 'voice': return this.masterMixer.voiceMasterVolume;
-      case 'ambient': return this.masterMixer.ambientMasterVolume;
+      case 'bgm':
+        return this.masterMixer.bpmMasterVolume;
+      case 'sfx':
+        return this.masterMixer.sfxMasterVolume;
+      case 'voice':
+        return this.masterMixer.voiceMasterVolume;
+      case 'ambient':
+        return this.masterMixer.ambientMasterVolume;
     }
   }
 
@@ -309,7 +324,11 @@ class AudioMixerService {
     const angle = Math.atan2(dx, -dz);
     track.pan = Math.max(-1, Math.min(1, Math.sin(angle)));
 
-    this.notify('track:spatial-updated', { trackId: track.id, volume: track.volume, pan: track.pan });
+    this.notify('track:spatial-updated', {
+      trackId: track.id,
+      volume: track.volume,
+      pan: track.pan,
+    });
   }
 
   // 移动监听器
@@ -325,7 +344,7 @@ class AudioMixerService {
   addEvent(event: Omit<AudioEvent, 'id'>): AudioEvent {
     const newEvent: AudioEvent = {
       ...event,
-      id: `event-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`
+      id: `event-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
     };
     this.events.push(newEvent);
     return newEvent;
@@ -333,7 +352,7 @@ class AudioMixerService {
 
   // 触发事件
   triggerEvent(eventName: string, context?: Record<string, any>): void {
-    const event = this.events.find(e => e.name === eventName);
+    const event = this.events.find((e) => e.name === eventName);
     if (!event) return;
 
     // 检查冷却
@@ -343,15 +362,21 @@ class AudioMixerService {
 
     // 检查条件
     if (event.conditions && context) {
-      const allMatch = event.conditions.every(c => {
+      const allMatch = event.conditions.every((c) => {
         const value = context[c.param];
         switch (c.op) {
-          case '==': return value === c.value;
-          case '!=': return value !== c.value;
-          case '>': return value > c.value;
-          case '<': return value < c.value;
-          case '>=': return value >= c.value;
-          case '<=': return value <= c.value;
+          case '==':
+            return value === c.value;
+          case '!=':
+            return value !== c.value;
+          case '>':
+            return value > c.value;
+          case '<':
+            return value < c.value;
+          case '>=':
+            return value >= c.value;
+          case '<=':
+            return value <= c.value;
         }
         return false;
       });
@@ -423,7 +448,7 @@ class AudioMixerService {
   // 列出音轨
   listTracks(filter?: { category?: AudioTrackCategory }): AudioTrack[] {
     const tracks = Array.from(this.tracks.values());
-    if (filter?.category) return tracks.filter(t => t.category === filter.category);
+    if (filter?.category) return tracks.filter((t) => t.category === filter.category);
     return tracks;
   }
 
@@ -435,7 +460,9 @@ class AudioMixerService {
   // 订阅
   subscribe(listener: (event: string, data: any) => void): () => void {
     this.listeners.add(listener);
-    return () => { this.listeners.delete(listener); };
+    return () => {
+      this.listeners.delete(listener);
+    };
   }
 
   private notify(event: string, data: any): void {

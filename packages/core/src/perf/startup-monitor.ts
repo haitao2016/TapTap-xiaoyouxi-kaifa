@@ -72,9 +72,8 @@ export class StartupMonitor {
   record(stage: StartupStage, details?: Record<string, unknown>): void {
     if (!this.isRecording) return;
     const now = performance.now();
-    const start = this.metrics.length === 0
-      ? 0
-      : this.metrics.reduce((s, m) => s + m.durationMs, 0);
+    const start =
+      this.metrics.length === 0 ? 0 : this.metrics.reduce((s, m) => s + m.durationMs, 0);
     this.metrics.push({
       stage,
       startMs: start,

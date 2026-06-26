@@ -74,7 +74,7 @@ export function generateTSConfig(config: Partial<TSProjectConfig> = {}): string 
       exclude: ['node_modules', 'build', 'dist'],
     },
     null,
-    2,
+    2
   );
 }
 
@@ -251,7 +251,7 @@ export function createEnhancedProject(options: { projectPath: string; withShader
     files.push(
       { path: 'shaders/basic.vert', content: generateGLSLTemplate('vertex') },
       { path: 'shaders/basic.frag', content: generateGLSLTemplate('fragment') },
-      { path: 'shaders/compute.wgsl', content: generateWGSLTemplate('compute') },
+      { path: 'shaders/compute.wgsl', content: generateWGSLTemplate('compute') }
     );
   }
   return { files };

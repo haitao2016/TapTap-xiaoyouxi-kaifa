@@ -255,10 +255,42 @@ const PRESET_QUESTS: Quest[] = [
 ];
 
 const PRESET_ENEMIES: EnemyConfig[] = [
-  { name: '哥布林', type: 'humanoid', count: 5, hp: 30, damage: 5, speed: 3, description: '弱小但狡猾的绿皮生物' },
-  { name: '骷髅兵', type: 'undead', count: 3, hp: 50, damage: 8, speed: 2, description: '被黑魔法复活的骷髅战士' },
-  { name: '史莱姆', type: 'creature', count: 8, hp: 20, damage: 3, speed: 1, description: '果冻状的软体生物' },
-  { name: '狼人', type: 'beast', count: 2, hp: 80, damage: 15, speed: 5, description: '月圆之夜会变身的诅咒生物' },
+  {
+    name: '哥布林',
+    type: 'humanoid',
+    count: 5,
+    hp: 30,
+    damage: 5,
+    speed: 3,
+    description: '弱小但狡猾的绿皮生物',
+  },
+  {
+    name: '骷髅兵',
+    type: 'undead',
+    count: 3,
+    hp: 50,
+    damage: 8,
+    speed: 2,
+    description: '被黑魔法复活的骷髅战士',
+  },
+  {
+    name: '史莱姆',
+    type: 'creature',
+    count: 8,
+    hp: 20,
+    damage: 3,
+    speed: 1,
+    description: '果冻状的软体生物',
+  },
+  {
+    name: '狼人',
+    type: 'beast',
+    count: 2,
+    hp: 80,
+    damage: 15,
+    speed: 5,
+    description: '月圆之夜会变身的诅咒生物',
+  },
 ];
 
 export class AIGameDesignService {
@@ -282,19 +314,22 @@ export class AIGameDesignService {
         {
           id: 'section-overview',
           title: '游戏概述',
-          content: '《幻域战记》是一款奇幻风格的回合制RPG游戏。玩家将扮演一位年轻的勇者，在魔法与剑的世界中展开冒险，结识伙伴，击败邪恶势力，最终拯救世界。',
+          content:
+            '《幻域战记》是一款奇幻风格的回合制RPG游戏。玩家将扮演一位年轻的勇者，在魔法与剑的世界中展开冒险，结识伙伴，击败邪恶势力，最终拯救世界。',
           order: 1,
         },
         {
           id: 'section-gameplay',
           title: '核心玩法',
-          content: '1. 回合制战斗系统\n2. 角色成长与技能树\n3. 装备收集与强化\n4. 多结局剧情分支\n5. 探索与解谜元素',
+          content:
+            '1. 回合制战斗系统\n2. 角色成长与技能树\n3. 装备收集与强化\n4. 多结局剧情分支\n5. 探索与解谜元素',
           order: 2,
         },
         {
           id: 'section-story',
           title: '故事背景',
-          content: '千年之前，暗影魔王被七位英雄封印在深渊之中。然而，随着时间的流逝，封印的力量逐渐减弱。一天，天空中出现了不祥的血色月亮，预示着黑暗的回归。年轻的勇者艾伦，在故乡被毁之后，踏上了寻找伙伴、阻止暗影魔王复活的旅程。',
+          content:
+            '千年之前，暗影魔王被七位英雄封印在深渊之中。然而，随着时间的流逝，封印的力量逐渐减弱。一天，天空中出现了不祥的血色月亮，预示着黑暗的回归。年轻的勇者艾伦，在故乡被毁之后，踏上了寻找伙伴、阻止暗影魔王复活的旅程。',
           order: 3,
         },
       ],
@@ -429,8 +464,16 @@ export class AIGameDesignService {
 
   private getLevelName(levelNumber: number): string {
     const names = [
-      '初始森林', '迷雾沼泽', '古老遗迹', '暗影洞穴', 'Boss之塔',
-      '冰雪荒原', '火山熔岩', '沙漠绿洲', '雷霆峡谷', '魔王城堡',
+      '初始森林',
+      '迷雾沼泽',
+      '古老遗迹',
+      '暗影洞穴',
+      'Boss之塔',
+      '冰雪荒原',
+      '火山熔岩',
+      '沙漠绿洲',
+      '雷霆峡谷',
+      '魔王城堡',
     ];
     return names[(levelNumber - 1) % names.length];
   }
@@ -580,16 +623,23 @@ export class AIGameDesignService {
 
     const result: DifficultyCurve = {
       levels: curve,
-      description: '整体难度逐渐上升，每5关有一个难度峰值（Boss战），之后略有回落，符合经典的难度曲线设计。',
+      description:
+        '整体难度逐渐上升，每5关有一个难度峰值（Boss战），之后略有回落，符合经典的难度曲线设计。',
       spikes,
       valleys,
     };
 
-    globalEventBus.emit('ai-game-design:difficulty-curve-generated', { totalLevels, curve: result });
+    globalEventBus.emit('ai-game-design:difficulty-curve-generated', {
+      totalLevels,
+      curve: result,
+    });
     return result;
   }
 
-  generateStory(concept: GameConcept, length: 'short' | 'medium' | 'long' = 'medium'): StoryContent {
+  generateStory(
+    concept: GameConcept,
+    length: 'short' | 'medium' | 'long' = 'medium'
+  ): StoryContent {
     const mainPlot = this.generateMainPlot(concept, length);
     const characters = this.generateCharacters(concept);
     const dialogues = this.generateSampleDialogues(characters);
@@ -738,30 +788,120 @@ export class AIGameDesignService {
 
   private generateSkills(className: string): Skill[] {
     const skillSets: Record<string, Skill[]> = {
-      '战士': [
-        { name: '重击', description: '造成150%攻击力伤害', type: 'active', cooldown: 3, damage: 150 },
-        { name: '防御姿态', description: '减少50%受到的伤害，持续3回合', type: 'active', cooldown: 5, effect: 'defense_up' },
-        { name: '战斗本能', description: '生命值低于30%时，攻击力提升20%', type: 'passive', cooldown: 0, effect: 'berserk' },
+      战士: [
+        {
+          name: '重击',
+          description: '造成150%攻击力伤害',
+          type: 'active',
+          cooldown: 3,
+          damage: 150,
+        },
+        {
+          name: '防御姿态',
+          description: '减少50%受到的伤害，持续3回合',
+          type: 'active',
+          cooldown: 5,
+          effect: 'defense_up',
+        },
+        {
+          name: '战斗本能',
+          description: '生命值低于30%时，攻击力提升20%',
+          type: 'passive',
+          cooldown: 0,
+          effect: 'berserk',
+        },
       ],
-      '法师': [
-        { name: '火球术', description: '造成200%魔法伤害', type: 'active', cooldown: 3, damage: 200 },
-        { name: '治疗术', description: '恢复30%最大生命值', type: 'active', cooldown: 4, healing: 30 },
-        { name: '魔力增幅', description: '魔法伤害提升15%', type: 'passive', cooldown: 0, effect: 'magic_up' },
+      法师: [
+        {
+          name: '火球术',
+          description: '造成200%魔法伤害',
+          type: 'active',
+          cooldown: 3,
+          damage: 200,
+        },
+        {
+          name: '治疗术',
+          description: '恢复30%最大生命值',
+          type: 'active',
+          cooldown: 4,
+          healing: 30,
+        },
+        {
+          name: '魔力增幅',
+          description: '魔法伤害提升15%',
+          type: 'passive',
+          cooldown: 0,
+          effect: 'magic_up',
+        },
       ],
-      '弓箭手': [
-        { name: '精准射击', description: '造成180%攻击力伤害，必定暴击', type: 'active', cooldown: 4, damage: 180 },
-        { name: '闪避', description: '有30%几率闪避攻击', type: 'passive', cooldown: 0, effect: 'dodge' },
-        { name: '多重箭', description: '同时攻击3个敌人', type: 'active', cooldown: 5, damage: 100 },
+      弓箭手: [
+        {
+          name: '精准射击',
+          description: '造成180%攻击力伤害，必定暴击',
+          type: 'active',
+          cooldown: 4,
+          damage: 180,
+        },
+        {
+          name: '闪避',
+          description: '有30%几率闪避攻击',
+          type: 'passive',
+          cooldown: 0,
+          effect: 'dodge',
+        },
+        {
+          name: '多重箭',
+          description: '同时攻击3个敌人',
+          type: 'active',
+          cooldown: 5,
+          damage: 100,
+        },
       ],
-      '盗贼': [
-        { name: '背刺', description: '从背后攻击造成250%伤害', type: 'active', cooldown: 4, damage: 250 },
-        { name: '偷窃', description: '有几率从敌人身上偷取物品', type: 'active', cooldown: 3, effect: 'steal' },
-        { name: '潜行', description: '进入隐身状态，下次攻击必定暴击', type: 'active', cooldown: 6, effect: 'stealth' },
+      盗贼: [
+        {
+          name: '背刺',
+          description: '从背后攻击造成250%伤害',
+          type: 'active',
+          cooldown: 4,
+          damage: 250,
+        },
+        {
+          name: '偷窃',
+          description: '有几率从敌人身上偷取物品',
+          type: 'active',
+          cooldown: 3,
+          effect: 'steal',
+        },
+        {
+          name: '潜行',
+          description: '进入隐身状态，下次攻击必定暴击',
+          type: 'active',
+          cooldown: 6,
+          effect: 'stealth',
+        },
       ],
-      '牧师': [
-        { name: '圣光术', description: '恢复50%最大生命值', type: 'active', cooldown: 5, healing: 50 },
-        { name: '神圣护盾', description: '为队友施加护盾，吸收伤害', type: 'active', cooldown: 6, effect: 'shield' },
-        { name: '祝福', description: '全体队友属性提升10%', type: 'passive', cooldown: 0, effect: 'buff_all' },
+      牧师: [
+        {
+          name: '圣光术',
+          description: '恢复50%最大生命值',
+          type: 'active',
+          cooldown: 5,
+          healing: 50,
+        },
+        {
+          name: '神圣护盾',
+          description: '为队友施加护盾，吸收伤害',
+          type: 'active',
+          cooldown: 6,
+          effect: 'shield',
+        },
+        {
+          name: '祝福',
+          description: '全体队友属性提升10%',
+          type: 'passive',
+          cooldown: 0,
+          effect: 'buff_all',
+        },
       ],
     };
 
@@ -794,7 +934,10 @@ export class AIGameDesignService {
     return economy;
   }
 
-  generateEquipment(rarity: 'common' | 'rare' | 'epic' | 'legendary', type: 'weapon' | 'armor' | 'accessory' | 'consumable'): EquipmentItem {
+  generateEquipment(
+    rarity: 'common' | 'rare' | 'epic' | 'legendary',
+    type: 'weapon' | 'armor' | 'accessory' | 'consumable'
+  ): EquipmentItem {
     const rarityMultiplier = { common: 1, rare: 2, epic: 4, legendary: 8 };
     const mult = rarityMultiplier[rarity];
 

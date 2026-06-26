@@ -7,3 +7,5 @@ export * from './plugin';
 export * from './platform';
 export * from './server';
 export * from './snippet';
+export * from './ai';
+export * from './game-dev';

@@ -408,15 +408,15 @@ export class ParticleEditorService {
   }
 
   getPresetById(presetId: string): ParticlePreset | undefined {
-    return this.presets.find(p => p.id === presetId);
+    return this.presets.find((p) => p.id === presetId);
   }
 
   getPresetsByCategory(category: string): ParticlePreset[] {
-    return this.presets.filter(p => p.category === category);
+    return this.presets.filter((p) => p.category === category);
   }
 
   getPresetCategories(): string[] {
-    return Array.from(new Set(this.presets.map(p => p.category))).sort();
+    return Array.from(new Set(this.presets.map((p) => p.category))).sort();
   }
 
   createSystemFromPreset(presetId: string, name: string): ParticleSystemData {
@@ -441,7 +441,12 @@ export class ParticleEditorService {
     }
 
     this.saveHistory(systemId);
-    Object.assign(system, preset.data, { id: system.id, name: system.name, createdAt: system.createdAt, updatedAt: Date.now() });
+    Object.assign(system, preset.data, {
+      id: system.id,
+      name: system.name,
+      createdAt: system.createdAt,
+      updatedAt: Date.now(),
+    });
 
     globalEventBus.emit({
       type: 'particleEditor:presetApplied',
@@ -449,7 +454,12 @@ export class ParticleEditorService {
     });
   }
 
-  saveAsPreset(systemId: string, presetName: string, category: string, description: string): ParticlePreset {
+  saveAsPreset(
+    systemId: string,
+    presetName: string,
+    category: string,
+    description: string
+  ): ParticlePreset {
     const system = this.systems.get(systemId);
     if (!system) {
       throw new Error(`粒子系统不存在: ${systemId}`);
@@ -480,9 +490,7 @@ export class ParticleEditorService {
       throw new Error(`粒子系统不存在: ${systemId}`);
     }
 
-    return pretty 
-      ? JSON.stringify(system, null, 2) 
-      : JSON.stringify(system);
+    return pretty ? JSON.stringify(system, null, 2) : JSON.stringify(system);
   }
 
   deserializeSystem(data: string): ParticleSystemData {
@@ -592,7 +600,7 @@ export class ParticleEditorService {
   searchSystems(query: string): ParticleSystemData[] {
     const lowerQuery = query.toLowerCase();
     return Array.from(this.systems.values()).filter(
-      s =>
+      (s) =>
         s.name.toLowerCase().includes(lowerQuery) ||
         (s.description && s.description.toLowerCase().includes(lowerQuery))
     );
@@ -601,7 +609,7 @@ export class ParticleEditorService {
   searchPresets(query: string): ParticlePreset[] {
     const lowerQuery = query.toLowerCase();
     return this.presets.filter(
-      p =>
+      (p) =>
         p.name.toLowerCase().includes(lowerQuery) ||
         p.description.toLowerCase().includes(lowerQuery) ||
         p.category.toLowerCase().includes(lowerQuery)

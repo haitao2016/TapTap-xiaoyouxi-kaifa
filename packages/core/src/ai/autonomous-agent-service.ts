@@ -72,7 +72,7 @@ class AutonomousAgentService {
     autoRunTests: true,
     requireApproval: true,
     temperature: 0.2,
-    maxTokens: 4096
+    maxTokens: 4096,
   };
 
   private tasks = new Map<string, AgentTask>();
@@ -114,17 +114,15 @@ class AutonomousAgentService {
     this.registerTool({
       name: 'read_file',
       description: '读取文件内容',
-      parameters: [
-        { name: 'path', type: 'string', required: true, description: '文件路径' }
-      ],
+      parameters: [{ name: 'path', type: 'string', required: true, description: '文件路径' }],
       execute: async (args) => {
         try {
-          const content = await (window as any).electronAPI?.readFile?.(args.path) ?? '';
+          const content = (await (window as any).electronAPI?.readFile?.(args.path)) ?? '';
           return { success: true, content };
         } catch (e: any) {
           return { success: false, error: e.message };
         }
-      }
+      },
     });
 
     this.registerTool({
@@ -132,35 +130,31 @@ class AutonomousAgentService {
       description: '创建或更新文件',
       parameters: [
         { name: 'path', type: 'string', required: true, description: '文件路径' },
-        { name: 'content', type: 'string', required: true, description: '文件内容' }
+        { name: 'content', type: 'string', required: true, description: '文件内容' },
       ],
       execute: async (args, task) => {
         task.result = task.result || { files: [], summary: '' };
         task.result.files.push({ path: args.path, content: args.content, action: 'create' });
         return { success: true };
-      }
+      },
     });
 
     this.registerTool({
       name: 'search_code',
       description: '在代码库中搜索内容',
-      parameters: [
-        { name: 'query', type: 'string', required: true, description: '搜索关键词' }
-      ],
+      parameters: [{ name: 'query', type: 'string', required: true, description: '搜索关键词' }],
       execute: async (args) => {
         return { success: true, matches: [`src/${args.query}.ts`] };
-      }
+      },
     });
 
     this.registerTool({
       name: 'run_test',
       description: '运行测试',
-      parameters: [
-        { name: 'testFile', type: 'string', required: false, description: '测试文件' }
-      ],
+      parameters: [{ name: 'testFile', type: 'string', required: false, description: '测试文件' }],
       execute: async () => {
         return { success: true, passed: 5, failed: 0, total: 5 };
-      }
+      },
     });
 
     this.registerTool({
@@ -168,14 +162,14 @@ class AutonomousAgentService {
       description: '生成代码',
       parameters: [
         { name: 'description', type: 'string', required: true, description: '代码功能描述' },
-        { name: 'language', type: 'string', required: false, description: '编程语言' }
+        { name: 'language', type: 'string', required: false, description: '编程语言' },
       ],
       execute: async (args) => {
         const result = await aiCodeGenService.generate(args.description, {
-          language: args.language || 'typescript'
+          language: args.language || 'typescript',
         });
         return { success: result.success, code: result.code };
-      }
+      },
     });
 
     this.registerTool({
@@ -183,16 +177,16 @@ class AutonomousAgentService {
       description: '诊断错误',
       parameters: [
         { name: 'errorMessage', type: 'string', required: true, description: '错误信息' },
-        { name: 'code', type: 'string', required: false, description: '相关代码' }
+        { name: 'code', type: 'string', required: false, description: '相关代码' },
       ],
       execute: async (args) => {
         const result = await aiErrorDiagnosis.analyze({
           message: args.errorMessage,
           stack: '',
-          code: args.code || ''
+          code: args.code || '',
         });
         return { success: true, diagnosis: result };
-      }
+      },
     });
   }
 
@@ -215,7 +209,7 @@ class AutonomousAgentService {
       steps: [],
       status: 'pending',
       createdAt: Date.now(),
-      needsApproval: this.config.requireApproval
+      needsApproval: this.config.requireApproval,
     };
     this.tasks.set(task.id, task);
     globalEventBus.emit('agent:task-created', task);
@@ -237,7 +231,7 @@ class AutonomousAgentService {
       // 1. 分析需求
       await this.executeStep(task, {
         type: 'analyze',
-        description: '分析用户需求'
+        description: '分析用户需求',
       });
 
       // 2. 制定计划
@@ -264,7 +258,7 @@ class AutonomousAgentService {
       // 5. 验证结果
       await this.executeStep(task, {
         type: 'verify',
-        description: '验证任务完成情况'
+        description: '验证任务完成情况',
       });
 
       task.status = 'completed';
@@ -278,7 +272,7 @@ class AutonomousAgentService {
         type: 'fix',
         description: '任务执行失败',
         status: 'failed',
-        error: e.message
+        error: e.message,
       });
     } finally {
       this.activeTaskId = null;
@@ -298,7 +292,7 @@ class AutonomousAgentService {
         id: `step-${Date.now()}-1`,
         type: 'generate',
         description: '生成代码文件',
-        status: 'pending'
+        status: 'pending',
       });
     }
 
@@ -307,7 +301,7 @@ class AutonomousAgentService {
         id: `step-${Date.now()}-2`,
         type: 'edit',
         description: '修改现有代码',
-        status: 'pending'
+        status: 'pending',
       });
     }
 
@@ -316,7 +310,7 @@ class AutonomousAgentService {
         id: `step-${Date.now()}-3`,
         type: 'fix',
         description: '定位并修复问题',
-        status: 'pending'
+        status: 'pending',
       });
     }
 
@@ -325,7 +319,7 @@ class AutonomousAgentService {
         id: `step-${Date.now()}-4`,
         type: 'test',
         description: '编写并运行测试',
-        status: 'pending'
+        status: 'pending',
       });
     }
 
@@ -335,7 +329,7 @@ class AutonomousAgentService {
         id: `step-${Date.now()}-0`,
         type: 'generate',
         description: '根据需求生成实现',
-        status: 'pending'
+        status: 'pending',
       });
     }
 
@@ -343,11 +337,14 @@ class AutonomousAgentService {
   }
 
   // 执行单个步骤
-  private async executeStep(task: AgentTask, partial: Omit<AgentStep, 'id' | 'status'>): Promise<AgentStep> {
+  private async executeStep(
+    task: AgentTask,
+    partial: Omit<AgentStep, 'id' | 'status'>
+  ): Promise<AgentStep> {
     const step: AgentStep = {
       id: `step-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       status: 'pending',
-      ...partial
+      ...partial,
     };
     task.steps.push(step);
     this.notifyUpdate(task);
@@ -428,8 +425,8 @@ class AutonomousAgentService {
           temperature: this.config.temperature,
           maxTokens: this.config.maxTokens,
           purpose,
-          payload
-        })
+          payload,
+        }),
       });
       const data = await response.json();
       return data.content || '';
@@ -469,7 +466,7 @@ class AutonomousAgentService {
       id: `step-fix-${Date.now()}`,
       type: 'fix',
       description: `自动修复: ${failedStep.description}`,
-      status: 'pending'
+      status: 'pending',
     };
   }
 
@@ -478,13 +475,13 @@ class AutonomousAgentService {
     if (!this.config.autoRunTests) return null;
     return await this.executeStep(task, {
       type: 'test',
-      description: '运行单元测试'
+      description: '运行单元测试',
     });
   }
 
   // 生成任务摘要
   private generateSummary(task: AgentTask): string {
-    const successCount = task.steps.filter(s => s.status === 'success').length;
+    const successCount = task.steps.filter((s) => s.status === 'success').length;
     const totalCount = task.steps.length;
     const filesCount = task.result?.files.length || 0;
     return `任务 "${task.goal}" 完成。\n执行 ${totalCount} 个步骤，成功 ${successCount} 个。\n${filesCount > 0 ? `生成/修改了 ${filesCount} 个文件。` : ''}`;
@@ -517,7 +514,7 @@ class AutonomousAgentService {
   // 列出任务
   listTasks(filter?: { status?: AgentTask['status'] }): AgentTask[] {
     const all = Array.from(this.tasks.values()).sort((a, b) => b.createdAt - a.createdAt);
-    if (filter?.status) return all.filter(t => t.status === filter.status);
+    if (filter?.status) return all.filter((t) => t.status === filter.status);
     return all;
   }
 
@@ -541,22 +538,34 @@ class AutonomousAgentService {
 
   private toCamelCase(str: string): string {
     const cleaned = str.replace(/[^\w\s一-龥]/g, '').trim();
-    return cleaned.split(/[\s]+/).map((w, i) => {
-      const c = this.toEnglish(w);
-      return i === 0 ? c.toLowerCase() : c.charAt(0).toUpperCase() + c.slice(1).toLowerCase();
-    }).join('');
+    return cleaned
+      .split(/[\s]+/)
+      .map((w, i) => {
+        const c = this.toEnglish(w);
+        return i === 0 ? c.toLowerCase() : c.charAt(0).toUpperCase() + c.slice(1).toLowerCase();
+      })
+      .join('');
   }
 
   private toPascalCase(str: string): string {
-    return this.toCamelCase(str).replace(/^./, c => c.toUpperCase());
+    return this.toCamelCase(str).replace(/^./, (c) => c.toUpperCase());
   }
 
   private toEnglish(str: string): string {
     // 简单中文到英文映射（实际应由 LLM 完成）
     const map: Record<string, string> = {
-      '创建': 'create', '删除': 'delete', '修改': 'update', '查询': 'query',
-      '用户': 'user', '数据': 'data', '文件': 'file', '列表': 'list',
-      '组件': 'component', '服务': 'service', '工具': 'util', '游戏': 'game'
+      创建: 'create',
+      删除: 'delete',
+      修改: 'update',
+      查询: 'query',
+      用户: 'user',
+      数据: 'data',
+      文件: 'file',
+      列表: 'list',
+      组件: 'component',
+      服务: 'service',
+      工具: 'util',
+      游戏: 'game',
     };
     for (const [k, v] of Object.entries(map)) {
       if (str.includes(k)) return v;
@@ -565,7 +574,7 @@ class AutonomousAgentService {
   }
 
   private delay(ms: number): Promise<void> {
-    return new Promise(r => setTimeout(r, ms));
+    return new Promise((r) => setTimeout(r, ms));
   }
 
   // 清理已完成任务
@@ -573,8 +582,11 @@ class AutonomousAgentService {
     const now = Date.now();
     let count = 0;
     for (const [id, task] of this.tasks) {
-      if ((task.status === 'completed' || task.status === 'failed') &&
-          task.finishedAt && now - task.finishedAt > olderThanMs) {
+      if (
+        (task.status === 'completed' || task.status === 'failed') &&
+        task.finishedAt &&
+        now - task.finishedAt > olderThanMs
+      ) {
         this.tasks.delete(id);
         this.taskListeners.delete(id);
         count++;

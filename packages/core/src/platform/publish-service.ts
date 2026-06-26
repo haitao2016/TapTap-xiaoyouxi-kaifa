@@ -141,7 +141,7 @@ export class PublishService {
           task.uploadedSize = uploaded;
           task.progress = 45 + (uploaded / total) * 0.35;
           this.emitProgress(task, speed, eta);
-        },
+        }
       );
       task.remoteBuildId = remoteBuildId;
 
@@ -276,7 +276,7 @@ export class PublishService {
   private async createZip(
     buildPath: string,
     taskId: string,
-    onProgress: (progress: number) => void,
+    onProgress: (progress: number) => void
   ): Promise<string> {
     const outPath = path.join(path.dirname(buildPath), `${taskId}.zip`);
     const stat = fs.statSync(buildPath);
@@ -309,7 +309,7 @@ export class PublishService {
   private async zipDirectory(
     dirPath: string,
     outPath: string,
-    onProgress: (progress: number) => void,
+    onProgress: (progress: number) => void
   ): Promise<string> {
     const files = this.collectFiles(dirPath);
     const totalSize = files.reduce((sum, f) => sum + f.size, 0);
@@ -461,7 +461,7 @@ export class PublishService {
     task: PublishTask,
     signature: string,
     accessToken?: string,
-    onProgress?: (uploaded: number, total: number, speed: number, eta: number) => void,
+    onProgress?: (uploaded: number, total: number, speed: number, eta: number) => void
   ): Promise<string> {
     const fileSize = fs.statSync(filePath).size;
 
@@ -518,21 +518,23 @@ export class PublishService {
       await new Promise((r) => setTimeout(r, 50));
     }
 
-    const data = (await (await fetch(TAPTAP_UPLOAD_URL + '/complete', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ app_id: task.appId, signature }),
-    })).json()) as { data: { build_id: string } };
+    const data = (await (
+      await fetch(TAPTAP_UPLOAD_URL + '/complete', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ app_id: task.appId, signature }),
+      })
+    ).json()) as { data: { build_id: string } };
 
     return data.data.build_id;
   }
 
   private mockUpload(
     fileSize: number,
-    onProgress?: (uploaded: number, total: number, speed: number, eta: number) => void,
+    onProgress?: (uploaded: number, total: number, speed: number, eta: number) => void
   ): Promise<string> {
     return new Promise((resolve) => {
       let uploaded = 0;
@@ -576,7 +578,7 @@ export class PublishService {
   private async submitForReview(
     buildId: string,
     config: PublishConfig,
-    accessToken?: string,
+    accessToken?: string
   ): Promise<void> {
     if (!accessToken || tapTapAuthService.isMockMode()) {
       await new Promise((r) => setTimeout(r, 600));

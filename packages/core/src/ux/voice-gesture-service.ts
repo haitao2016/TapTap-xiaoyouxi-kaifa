@@ -4,9 +4,20 @@
 import { globalEventBus } from '../core/event-bus';
 
 // 手势类型
-export type GestureType = 'tap' | 'double-tap' | 'long-press' | 'swipe-left' | 'swipe-right' |
-  'swipe-up' | 'swipe-down' | 'pinch-in' | 'pinch-out' | 'rotate' | 'two-finger-tap' |
-  'three-finger-swipe' | 'edge-swipe';
+export type GestureType =
+  | 'tap'
+  | 'double-tap'
+  | 'long-press'
+  | 'swipe-left'
+  | 'swipe-right'
+  | 'swipe-up'
+  | 'swipe-down'
+  | 'pinch-in'
+  | 'pinch-out'
+  | 'rotate'
+  | 'two-finger-tap'
+  | 'three-finger-swipe'
+  | 'edge-swipe';
 
 // 手势事件
 export interface GestureEvent {
@@ -72,21 +83,21 @@ class VoiceGestureService {
         pattern: /(运行|启动|run|start)\s*(游戏|项目|game|project)?/i,
         action: 'editor:run',
         description: '运行当前游戏',
-        examples: ['运行游戏', '启动', 'run game', 'start project']
+        examples: ['运行游戏', '启动', 'run game', 'start project'],
       },
       {
         id: 'stop-game',
         pattern: /(停止|stop|pause|暂停)/i,
         action: 'editor:stop',
         description: '停止游戏',
-        examples: ['停止', '暂停', 'stop', 'pause']
+        examples: ['停止', '暂停', 'stop', 'pause'],
       },
       {
         id: 'save-file',
         pattern: /(保存|save)/i,
         action: 'file:save',
         description: '保存文件',
-        examples: ['保存', 'save']
+        examples: ['保存', 'save'],
       },
       {
         id: 'open-file',
@@ -94,7 +105,7 @@ class VoiceGestureService {
         action: 'file:open',
         description: '打开文件',
         parameters: [{ name: 'filename', required: true, type: 'string' }],
-        examples: ['打开 main.ts', 'open index.html']
+        examples: ['打开 main.ts', 'open index.html'],
       },
       {
         id: 'find-symbol',
@@ -102,7 +113,7 @@ class VoiceGestureService {
         action: 'search:symbol',
         description: '查找符号',
         parameters: [{ name: 'query', required: true, type: 'string' }],
-        examples: ['查找 UserService', 'find class']
+        examples: ['查找 UserService', 'find class'],
       },
       {
         id: 'goto-line',
@@ -110,43 +121,44 @@ class VoiceGestureService {
         action: 'editor:goto-line',
         description: '跳转到指定行',
         parameters: [{ name: 'line', required: true, type: 'number' }],
-        examples: ['跳转到 100 行', 'goto 50']
+        examples: ['跳转到 100 行', 'goto 50'],
       },
       {
         id: 'new-file',
         pattern: /(新建|创建|new|create)\s*(文件|file)/i,
         action: 'file:new',
         description: '新建文件',
-        examples: ['新建文件', '创建文件', 'new file']
+        examples: ['新建文件', '创建文件', 'new file'],
       },
       {
         id: 'format-code',
         pattern: /(格式化|format)\s*(代码|code)?/i,
         action: 'editor:format',
         description: '格式化代码',
-        examples: ['格式化', 'format']
+        examples: ['格式化', 'format'],
       },
       {
         id: 'toggle-terminal',
         pattern: /(打开|关闭|打开\/关闭|toggle)\s*(终端|terminal|控制台|console)/i,
         action: 'ui:toggle-terminal',
         description: '切换终端显示',
-        examples: ['打开终端', 'toggle terminal']
+        examples: ['打开终端', 'toggle terminal'],
       },
       {
         id: 'build-project',
         pattern: /(构建|编译|build|compile)/i,
         action: 'project:build',
         description: '构建项目',
-        examples: ['构建', '编译', 'build']
-      }
+        examples: ['构建', '编译', 'build'],
+      },
     ];
   }
 
   // 初始化语音识别
   private initSpeechRecognition(): void {
     if (typeof window === 'undefined') return;
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const SpeechRecognition =
+      (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
     if (SpeechRecognition) {
       this.recognition = new SpeechRecognition();
       this.recognition.continuous = true;
@@ -166,10 +178,10 @@ class VoiceGestureService {
             isFinal,
             alternatives: Array.from(result).map((alt: any) => ({
               text: alt.transcript,
-              confidence: alt.confidence
+              confidence: alt.confidence,
             })),
             language: this.recognition.lang,
-            timestamp: Date.now()
+            timestamp: Date.now(),
           };
 
           this.notify('speech:result', recognitionResult);
@@ -228,9 +240,8 @@ class VoiceGestureService {
   // 处理语音命令
   private processVoiceCommand(text: string): VoiceResponse | null {
     for (const cmd of this.voiceCommands) {
-      const match = typeof cmd.pattern === 'string'
-        ? text.includes(cmd.pattern)
-        : text.match(cmd.pattern);
+      const match =
+        typeof cmd.pattern === 'string' ? text.includes(cmd.pattern) : text.match(cmd.pattern);
 
       if (match) {
         const params: any = {};
@@ -247,7 +258,7 @@ class VoiceGestureService {
         const response: VoiceResponse = {
           text: `已执行: ${cmd.description}`,
           duration: 1.5,
-          action: { name: cmd.action, params }
+          action: { name: cmd.action, params },
         };
 
         this.voiceResponses.push(response);
@@ -268,7 +279,7 @@ class VoiceGestureService {
     const response: VoiceResponse = {
       text: `你说的是 "${text}"，这是一个普通对话。我可以帮你完成代码生成、文件操作等任务，请尝试用命令形式。`,
       duration: 3,
-      action: { name: 'ai:dialogue', params: { text } }
+      action: { name: 'ai:dialogue', params: { text } },
     };
     this.voiceResponses.push(response);
     this.speak(response.text);
@@ -347,7 +358,7 @@ class VoiceGestureService {
   addCommand(command: Omit<VoiceCommand, 'id'>): VoiceCommand {
     const newCmd: VoiceCommand = {
       ...command,
-      id: `cmd-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`
+      id: `cmd-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
     };
     this.voiceCommands.push(newCmd);
     return newCmd;
@@ -372,14 +383,16 @@ class VoiceGestureService {
   isSupported(): { recognition: boolean; synthesis: boolean } {
     return {
       recognition: !!this.recognition,
-      synthesis: !!this.synthesis
+      synthesis: !!this.synthesis,
     };
   }
 
   // 订阅
   subscribe(listener: (event: string, data: any) => void): () => void {
     this.listeners.add(listener);
-    return () => { this.listeners.delete(listener); };
+    return () => {
+      this.listeners.delete(listener);
+    };
   }
 
   private notify(event: string, data: any): void {

@@ -48,7 +48,11 @@ export class LazyLoadService {
   }
 
   async loadElement(element: HTMLElement, options: LazyLoadOptions): Promise<void> {
-    const { loadingClass = 'lazy-loading', loadedClass = 'lazy-loaded', errorClass = 'lazy-error' } = options;
+    const {
+      loadingClass = 'lazy-loading',
+      loadedClass = 'lazy-loaded',
+      errorClass = 'lazy-error',
+    } = options;
 
     const src = element.getAttribute('data-src');
     const srcset = element.getAttribute('data-srcset') ?? undefined;
@@ -141,7 +145,7 @@ export class LazyLoadService {
   getModuleLoadTime(moduleId: string): Promise<number | undefined> | undefined {
     const result = this.modules.get(moduleId);
     if (result) {
-      return result.then(r => r.loadTime).catch(() => undefined);
+      return result.then((r) => r.loadTime).catch(() => undefined);
     }
     return undefined;
   }

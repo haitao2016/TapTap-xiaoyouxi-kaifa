@@ -47,7 +47,7 @@ export class TeamService {
 
   async setCurrentTeam(teamId: string): Promise<void> {
     await this.delay(500);
-    
+
     this.currentTeam = {
       id: teamId,
       name: 'TapDev Team',
@@ -87,7 +87,7 @@ export class TeamService {
 
   async createTeam(name: string, description?: string): Promise<Team> {
     await this.delay(500);
-    
+
     const team: Team = {
       id: `team-${Date.now()}`,
       name,
@@ -99,13 +99,13 @@ export class TeamService {
 
     this.currentTeam = team;
     globalEventBus.emit({ type: 'team:created', payload: team });
-    
+
     return team;
   }
 
   async addMember(teamId: string, email: string, role: TeamMember['role']): Promise<TeamMember> {
     await this.delay(300);
-    
+
     const member: TeamMember = {
       id: `user-${Date.now()}`,
       name: email.split('@')[0],
@@ -126,7 +126,7 @@ export class TeamService {
 
   async removeMember(teamId: string, userId: string): Promise<void> {
     if (this.currentTeam && this.currentTeam.id === teamId) {
-      this.currentTeam.members = this.currentTeam.members.filter(m => m.id !== userId);
+      this.currentTeam.members = this.currentTeam.members.filter((m) => m.id !== userId);
       this.currentTeam.updatedAt = Date.now();
     }
 
@@ -135,7 +135,7 @@ export class TeamService {
 
   async updateMemberRole(teamId: string, userId: string, role: TeamMember['role']): Promise<void> {
     if (this.currentTeam && this.currentTeam.id === teamId) {
-      const member = this.currentTeam.members.find(m => m.id === userId);
+      const member = this.currentTeam.members.find((m) => m.id === userId);
       if (member) {
         member.role = role;
         this.currentTeam.updatedAt = Date.now();
@@ -150,12 +150,16 @@ export class TeamService {
   }
 
   getPermissionsByCategory(category: string): Permission[] {
-    return this.permissions.filter(p => p.category === category);
+    return this.permissions.filter((p) => p.category === category);
   }
 
-  async setProjectPermissions(projectId: string, userId: string, permissions: string[]): Promise<void> {
+  async setProjectPermissions(
+    projectId: string,
+    userId: string,
+    permissions: string[]
+  ): Promise<void> {
     const existing = this.projectPermissions.get(projectId) || [];
-    const index = existing.findIndex(p => p.userId === userId);
+    const index = existing.findIndex((p) => p.userId === userId);
 
     if (index >= 0) {
       existing[index].permissions = permissions;
@@ -164,12 +168,15 @@ export class TeamService {
     }
 
     this.projectPermissions.set(projectId, existing);
-    globalEventBus.emit({ type: 'team:permissionsUpdated', payload: { projectId, userId, permissions } });
+    globalEventBus.emit({
+      type: 'team:permissionsUpdated',
+      payload: { projectId, userId, permissions },
+    });
   }
 
   getProjectPermissions(projectId: string, userId: string): string[] {
     const permissions = this.projectPermissions.get(projectId) || [];
-    const userPerm = permissions.find(p => p.userId === userId);
+    const userPerm = permissions.find((p) => p.userId === userId);
     return userPerm?.permissions || [];
   }
 
@@ -199,7 +206,7 @@ export class TeamService {
   }
 
   private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }
 

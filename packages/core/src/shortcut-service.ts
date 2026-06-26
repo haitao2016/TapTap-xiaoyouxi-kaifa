@@ -74,7 +74,7 @@ export class ShortcutService {
   }
 
   getShortcutsByCategory(category: string): Shortcut[] {
-    return Array.from(this.shortcuts.values()).filter(s => s.category === category);
+    return Array.from(this.shortcuts.values()).filter((s) => s.category === category);
   }
 
   getAllShortcuts(): Shortcut[] {

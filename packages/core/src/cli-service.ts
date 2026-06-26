@@ -77,7 +77,7 @@ export class CLIService {
       if (part.startsWith('--')) {
         const optionName = part.slice(2);
         const option = command.options?.find(
-          o => o.name === optionName || o.short === optionName
+          (o) => o.name === optionName || o.short === optionName
         );
 
         if (option) {
@@ -90,7 +90,7 @@ export class CLIService {
         }
       } else if (part.startsWith('-')) {
         const optionShort = part.slice(1);
-        const option = command.options?.find(o => o.short === optionShort);
+        const option = command.options?.find((o) => o.short === optionShort);
 
         if (option) {
           if (option.type === 'boolean' || option.type === undefined) {
@@ -116,9 +116,7 @@ export class CLIService {
     this.registerCommand({
       name: 'init',
       description: 'Initialize a new TapTap mini-game project',
-      arguments: [
-        { name: 'name', description: 'Project name', required: true },
-      ],
+      arguments: [{ name: 'name', description: 'Project name', required: true }],
       options: [
         { name: 'template', short: 't', description: 'Template name', type: 'string' },
         { name: 'path', short: 'p', description: 'Project path', type: 'string' },
@@ -136,7 +134,13 @@ export class CLIService {
       name: 'build',
       description: 'Build the project',
       options: [
-        { name: 'mode', short: 'm', description: 'Build mode: development/production', type: 'string', default: 'production' },
+        {
+          name: 'mode',
+          short: 'm',
+          description: 'Build mode: development/production',
+          type: 'string',
+          default: 'production',
+        },
         { name: 'platform', short: 'p', description: 'Target platform', type: 'string' },
         { name: 'watch', short: 'w', description: 'Watch for changes', type: 'boolean' },
       ],
@@ -154,7 +158,13 @@ export class CLIService {
       description: 'Start development server',
       options: [
         { name: 'port', short: 'p', description: 'Server port', type: 'number', default: 3000 },
-        { name: 'host', short: 'h', description: 'Server host', type: 'string', default: 'localhost' },
+        {
+          name: 'host',
+          short: 'h',
+          description: 'Server host',
+          type: 'string',
+          default: 'localhost',
+        },
       ],
       action: async (args) => {
         const port = args.port || 3000;
@@ -188,7 +198,7 @@ export class CLIService {
       description: 'List available templates',
       action: async () => {
         const result = templateService.getTemplates();
-        return result.templates.map(t => `${t.id} - ${t.name}`).join('\n');
+        return result.templates.map((t) => `${t.id} - ${t.name}`).join('\n');
       },
     });
 
@@ -203,13 +213,13 @@ export class CLIService {
             let help = `${command.name}: ${command.description}\n`;
             if (command.arguments?.length) {
               help += '\nArguments:\n';
-              command.arguments.forEach(arg => {
+              command.arguments.forEach((arg) => {
                 help += `  ${arg.name}${arg.required ? ' (required)' : ''}: ${arg.description}\n`;
               });
             }
             if (command.options?.length) {
               help += '\nOptions:\n';
-              command.options.forEach(opt => {
+              command.options.forEach((opt) => {
                 help += `  --${opt.name}${opt.short ? ` (-${opt.short})` : ''}: ${opt.description}\n`;
               });
             }

@@ -307,7 +307,12 @@ const PRESET_TEMPLATES: BehaviorTreeTemplate[] = [
         ],
       ]),
       blackboard: [
-        { key: 'playerPosition', value: { x: 0, y: 0, z: 0 }, type: 'object', description: '玩家位置' },
+        {
+          key: 'playerPosition',
+          value: { x: 0, y: 0, z: 0 },
+          type: 'object',
+          description: '玩家位置',
+        },
         { key: 'health', value: 100, type: 'number', description: '生命值' },
       ],
     },
@@ -580,9 +585,7 @@ const PRESET_TEMPLATES: BehaviorTreeTemplate[] = [
           },
         ],
       ]),
-      blackboard: [
-        { key: 'isScared', value: false, type: 'boolean', description: '是否受惊' },
-      ],
+      blackboard: [{ key: 'isScared', value: false, type: 'boolean', description: '是否受惊' }],
     },
   },
 ];
@@ -698,7 +701,10 @@ export class BehaviorTreeService {
     return true;
   }
 
-  updateTree(id: string, updates: Partial<Omit<BehaviorTree, 'id' | 'createdAt'>>): BehaviorTree | undefined {
+  updateTree(
+    id: string,
+    updates: Partial<Omit<BehaviorTree, 'id' | 'createdAt'>>
+  ): BehaviorTree | undefined {
     const tree = this.trees.get(id);
     if (!tree) return undefined;
     const updated: BehaviorTree = {
@@ -721,7 +727,11 @@ export class BehaviorTreeService {
     return this.trees.get(this.currentTreeId);
   }
 
-  addNode(treeId: string, type: string, position: { x: number; y: number }): BehaviorTreeNode | undefined {
+  addNode(
+    treeId: string,
+    type: string,
+    position: { x: number; y: number }
+  ): BehaviorTreeNode | undefined {
     const tree = this.trees.get(treeId);
     if (!tree) return undefined;
 
@@ -781,7 +791,11 @@ export class BehaviorTreeService {
     tree.nodes.delete(nodeId);
   }
 
-  updateNode(treeId: string, nodeId: string, updates: Partial<BehaviorTreeNode>): BehaviorTreeNode | undefined {
+  updateNode(
+    treeId: string,
+    nodeId: string,
+    updates: Partial<BehaviorTreeNode>
+  ): BehaviorTreeNode | undefined {
     const tree = this.trees.get(treeId);
     if (!tree) return undefined;
 
@@ -884,7 +898,10 @@ export class BehaviorTreeService {
     return true;
   }
 
-  addBlackboardEntry(treeId: string, entry: Omit<BlackboardEntry, 'key'> & { key: string }): boolean {
+  addBlackboardEntry(
+    treeId: string,
+    entry: Omit<BlackboardEntry, 'key'> & { key: string }
+  ): boolean {
     const tree = this.trees.get(treeId);
     if (!tree) return false;
 
@@ -983,7 +1000,11 @@ export class BehaviorTreeService {
     return runtime.status;
   }
 
-  private executeNode(tree: BehaviorTree, runtime: BehaviorTreeRuntime, nodeId: string): NodeStatus {
+  private executeNode(
+    tree: BehaviorTree,
+    runtime: BehaviorTreeRuntime,
+    nodeId: string
+  ): NodeStatus {
     const node = tree.nodes.get(nodeId);
     if (!node) return 'failure';
 
@@ -1011,7 +1032,11 @@ export class BehaviorTreeService {
     return status;
   }
 
-  private executeComposite(tree: BehaviorTree, runtime: BehaviorTreeRuntime, node: BehaviorTreeNode): NodeStatus {
+  private executeComposite(
+    tree: BehaviorTree,
+    runtime: BehaviorTreeRuntime,
+    node: BehaviorTreeNode
+  ): NodeStatus {
     switch (node.type) {
       case 'selector':
         for (const childId of node.children) {
@@ -1052,7 +1077,11 @@ export class BehaviorTreeService {
     }
   }
 
-  private executeDecorator(tree: BehaviorTree, runtime: BehaviorTreeRuntime, node: BehaviorTreeNode): NodeStatus {
+  private executeDecorator(
+    tree: BehaviorTree,
+    runtime: BehaviorTreeRuntime,
+    node: BehaviorTreeNode
+  ): NodeStatus {
     const childId = node.children[0];
     if (!childId) return 'failure';
 
@@ -1092,7 +1121,11 @@ export class BehaviorTreeService {
     }
   }
 
-  private executeCondition(_tree: BehaviorTree, runtime: BehaviorTreeRuntime, node: BehaviorTreeNode): NodeStatus {
+  private executeCondition(
+    _tree: BehaviorTree,
+    runtime: BehaviorTreeRuntime,
+    node: BehaviorTreeNode
+  ): NodeStatus {
     switch (node.type) {
       case 'check_variable':
         const { key, operator, value } = node.properties;
@@ -1131,7 +1164,11 @@ export class BehaviorTreeService {
     }
   }
 
-  private executeAction(_tree: BehaviorTree, _runtime: BehaviorTreeRuntime, _node: BehaviorTreeNode): NodeStatus {
+  private executeAction(
+    _tree: BehaviorTree,
+    _runtime: BehaviorTreeRuntime,
+    _node: BehaviorTreeNode
+  ): NodeStatus {
     return 'success';
   }
 
@@ -1190,11 +1227,18 @@ export class BehaviorTreeService {
     }
   }
 
-  validateTree(treeId: string): { type: string; severity: 'error' | 'warning'; message: string; nodeId?: string }[] {
+  validateTree(
+    treeId: string
+  ): { type: string; severity: 'error' | 'warning'; message: string; nodeId?: string }[] {
     const tree = this.trees.get(treeId);
     if (!tree) return [];
 
-    const warnings: { type: string; severity: 'error' | 'warning'; message: string; nodeId?: string }[] = [];
+    const warnings: {
+      type: string;
+      severity: 'error' | 'warning';
+      message: string;
+      nodeId?: string;
+    }[] = [];
 
     if (!tree.rootNodeId) {
       warnings.push({
@@ -1225,7 +1269,11 @@ export class BehaviorTreeService {
         });
       }
 
-      if (definition.maxChildren === 1 && node.children.length === 0 && definition.category === 'decorator') {
+      if (
+        definition.maxChildren === 1 &&
+        node.children.length === 0 &&
+        definition.category === 'decorator'
+      ) {
         warnings.push({
           type: 'missing_child',
           severity: 'warning',
