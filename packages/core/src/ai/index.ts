@@ -11,6 +11,10 @@ export type {
   SnippetCompletion,
 } from './ai-completion-service';
 
+export { localModelService, LOCAL_MODEL_EVENTS } from './local-model-service';
+export { transformersBackend } from './transformers-backend';
+export { electronLLMBackend } from './electron-llm-backend';
+
 export { aiErrorDiagnosis, AIErrorDiagnosis } from './ai-error-diagnosis';
 export type {
   ErrorCategory,
