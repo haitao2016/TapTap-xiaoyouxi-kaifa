@@ -134,7 +134,7 @@ class AnimationStateMachineService {
     const sm = this.stateMachines.get(stateMachineId);
     if (!sm) throw new Error('状态机不存在');
     sm.parameters.push(parameter);
-    this.currentValues.set(parameter.name, parameter.defaultValue);
+    this.currentValues.set(`${stateMachineId}.${parameter.name}`, parameter.defaultValue);
     this.notify('parameter:added', { stateMachineId, parameter });
   }
 
@@ -161,9 +161,10 @@ class AnimationStateMachineService {
     const ops = ['>=', '<=', '==', '!=', '>', '<'];
     for (const op of ops) {
       if (condition.includes(op)) {
-        const [left, right] = condition.split(op).map((s) => s.trim());
-        const leftVal = this.getParameter(stateMachineId, left);
-        const rightVal = this.parseValue(right);
+        const [left, ...rest] = condition.split(op);
+        const right = rest.join(op);
+        const leftVal = this.getParameter(stateMachineId, left.trim());
+        const rightVal = this.parseValue(right.trim());
         switch (op) {
           case '>=':
             return leftVal >= rightVal;

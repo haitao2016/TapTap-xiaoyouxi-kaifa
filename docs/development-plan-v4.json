@@ -134,7 +134,7 @@
     "phase3": {
       "name": "测试体系建设",
       "duration": "4周",
-      "status": "in_progress",
+      "status": "completed",
       "priority": "high",
       "description": "建立单元测试、集成测试、E2E 测试体系，提升代码质量",
       "tasks": [
@@ -163,7 +163,7 @@
           "category": "testing",
           "description": "为行为树、动画状态机、瓦片地图、Shader 编辑器等添加测试",
           "expectedResult": "游戏工具测试覆盖率 > 60%",
-          "status": "pending"
+          "status": "completed"
         },
         {
           "id": "P3-4",
@@ -172,7 +172,7 @@
           "category": "testing",
           "description": "为 TapTap 认证、发布、排行榜等添加集成测试（mock API）",
           "expectedResult": "平台服务集成测试覆盖主要流程",
-          "status": "pending"
+          "status": "completed"
         },
         {
           "id": "P3-5",
@@ -190,7 +190,7 @@
           "category": "testing",
           "description": "CI 中添加覆盖率阈值检查，低于阈值阻止合并",
           "expectedResult": "整体覆盖率 > 60%，核心模块 > 80%",
-          "status": "pending"
+          "status": "completed"
         }
       ]
     },
