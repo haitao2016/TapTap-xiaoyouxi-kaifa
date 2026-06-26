@@ -134,7 +134,7 @@
     "phase3": {
       "name": "测试体系建设",
       "duration": "4周",
-      "status": "pending",
+      "status": "in_progress",
       "priority": "high",
       "description": "建立单元测试、集成测试、E2E 测试体系，提升代码质量",
       "tasks": [
@@ -145,7 +145,7 @@
           "category": "testing",
           "description": "为 project-manager、debug-service、build-service、plugin-manager 等核心服务补全测试",
           "expectedResult": "核心服务测试覆盖率 > 80%",
-          "status": "pending"
+          "status": "completed"
         },
         {
           "id": "P3-2",
@@ -154,7 +154,7 @@
           "category": "testing",
           "description": "为 AI 代码生成、代码审查、错误诊断等服务添加 mock 测试",
           "expectedResult": "AI 服务测试覆盖率 > 70%",
-          "status": "pending"
+          "status": "completed"
         },
         {
           "id": "P3-3",
@@ -680,8 +680,8 @@
   "statistics": {
     "totalPhases": 8,
     "totalTasks": 42,
-    "completedTasks": 0,
-    "completedPercentage": 0,
+    "completedTasks": 14,
+    "completedPercentage": 33.3,
     "highPriorityTasks": 18,
     "mediumPriorityTasks": 18,
     "lowPriorityTasks": 6,
