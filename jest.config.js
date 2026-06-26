@@ -20,4 +20,5 @@ export default {
   ],
   coverageDirectory: 'coverage',
   verbose: true,
+  injectGlobals: true,
 };
