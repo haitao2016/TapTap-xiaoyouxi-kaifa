@@ -187,8 +187,8 @@ export class CLIService {
       name: 'templates',
       description: 'List available templates',
       action: async () => {
-        const templates = templateService.getTemplates();
-        return templates.map(t => `${t.id} - ${t.name}`).join('\n');
+        const result = templateService.getTemplates();
+        return result.templates.map(t => `${t.id} - ${t.name}`).join('\n');
       },
     });
 
