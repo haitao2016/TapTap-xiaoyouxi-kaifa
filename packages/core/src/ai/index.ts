@@ -46,3 +46,11 @@ export type {
   QuickAction,
   AIAssistantConfig,
 } from './ai-assistant-service';
+
+export { codeReviewService } from './code-review-service';
+export type {
+  IssueSeverity,
+  ReviewIssue,
+  ReviewReport,
+  RefactorSuggestion,
+} from './code-review-service';

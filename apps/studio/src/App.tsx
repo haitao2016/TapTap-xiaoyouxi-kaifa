@@ -2,6 +2,9 @@ import { Routes, Route } from 'react-router-dom';
 import { AppLayout } from './layouts/AppLayout';
 import { DashboardPage } from './pages/DashboardPage';
 import { EditorPage } from './pages/EditorPage';
+import { AIAssistantPage } from './pages/AIAssistantPage';
+import { CollaborationPage } from './pages/CollaborationPage';
+import { GameDevToolsPage } from './pages/GameDevToolsPage';
 import { DebugPage } from './pages/DebugPage';
 import { MonitorPage } from './pages/MonitorPage';
 import { BuildPage } from './pages/BuildPage';
@@ -15,6 +18,9 @@ export function App() {
       <Route element={<AppLayout />}>
         <Route index element={<DashboardPage />} />
         <Route path="editor" element={<EditorPage />} />
+        <Route path="ai" element={<AIAssistantPage />} />
+        <Route path="collab" element={<CollaborationPage />} />
+        <Route path="game-tools" element={<GameDevToolsPage />} />
         <Route path="debug" element={<DebugPage />} />
         <Route path="monitor" element={<MonitorPage />} />
         <Route path="build" element={<BuildPage />} />
