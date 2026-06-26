@@ -106,6 +106,9 @@ export default {
   itemSelected: '{count} item selected',
   fileSelected: '{count} file selected',
   userOnline: '{count} user online',
-  notification: '{count} notification',
-  message: '{count} message',
+  notification: '{count} notifications',
+  message: '{count} messages',
+  'app.welcome': 'Welcome',
+  'app.goodbye': 'Goodbye',
+  'app.loading': 'Loading',
 } as const;

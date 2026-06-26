@@ -11,6 +11,59 @@ import { globalEventBus } from '../event-bus';
 import type { Namespace } from './i18n/index';
 import { NAMESPACES, defaultTranslations } from './i18n/index';
 
+// 静态加载所有 locales 的所有 namespaces
+import enCommon from './i18n/locales/en-US/common';
+import enEditor from './i18n/locales/en-US/editor';
+import enDebug from './i18n/locales/en-US/debug';
+import enBuild from './i18n/locales/en-US/build';
+import enSettings from './i18n/locales/en-US/settings';
+import enPlugins from './i18n/locales/en-US/plugins';
+import enDashboard from './i18n/locales/en-US/dashboard';
+import enCollab from './i18n/locales/en-US/collab';
+import enAi from './i18n/locales/en-US/ai';
+import enPlatform from './i18n/locales/en-US/platform';
+
+import jaCommon from './i18n/locales/ja-JP/common';
+import jaEditor from './i18n/locales/ja-JP/editor';
+import jaDebug from './i18n/locales/ja-JP/debug';
+import jaBuild from './i18n/locales/ja-JP/build';
+import jaSettings from './i18n/locales/ja-JP/settings';
+import jaPlugins from './i18n/locales/ja-JP/plugins';
+import jaDashboard from './i18n/locales/ja-JP/dashboard';
+import jaCollab from './i18n/locales/ja-JP/collab';
+import jaAi from './i18n/locales/ja-JP/ai';
+import jaPlatform from './i18n/locales/ja-JP/platform';
+
+const STATIC_TRANSLATIONS: Record<Locale, Record<Namespace, TranslationDict>> = {
+  'en-US': {
+    common: enCommon as TranslationDict,
+    editor: enEditor as TranslationDict,
+    debug: enDebug as TranslationDict,
+    build: enBuild as TranslationDict,
+    settings: enSettings as TranslationDict,
+    plugins: enPlugins as TranslationDict,
+    dashboard: enDashboard as TranslationDict,
+    collab: enCollab as TranslationDict,
+    ai: enAi as TranslationDict,
+    platform: enPlatform as TranslationDict,
+  },
+  'ja-JP': {
+    common: jaCommon as TranslationDict,
+    editor: jaEditor as TranslationDict,
+    debug: jaDebug as TranslationDict,
+    build: jaBuild as TranslationDict,
+    settings: jaSettings as TranslationDict,
+    plugins: jaPlugins as TranslationDict,
+    dashboard: jaDashboard as TranslationDict,
+    collab: jaCollab as TranslationDict,
+    ai: jaAi as TranslationDict,
+    platform: jaPlatform as TranslationDict,
+  },
+  'zh-CN': defaultTranslations as unknown as Record<Namespace, TranslationDict>,
+  'zh-TW': {} as Record<Namespace, TranslationDict>,
+  'ko-KR': {} as Record<Namespace, TranslationDict>,
+};
+
 export type Locale = 'zh-CN' | 'en-US' | 'ja-JP' | 'zh-TW' | 'ko-KR';
 
 export type TranslationKey = string;
@@ -117,11 +170,7 @@ const namespaceLoaders: Record<
 function buildInitialTranslations(): Translations {
   const translations: Translations = {} as Translations;
   for (const locale of DEFAULT_CONFIG.available) {
-    translations[locale] = {};
-  }
-  translations['zh-CN'] = defaultTranslations as NamespaceTranslations;
-  for (const ns of NAMESPACES) {
-    loadedNamespaces.add(`zh-CN:${ns}`);
+    translations[locale] = STATIC_TRANSLATIONS[locale] ?? {};
   }
   return translations;
 }
@@ -215,10 +264,11 @@ export class I18nService {
     params?: Record<string, string | number>,
     options?: { ns?: Namespace; locale?: Locale }
   ): string {
-    const ns = options?.ns ?? this.config.defaultNS;
-    const locale = options?.locale ?? this.currentLocale;
-    const resolvedKey = key.includes(':') ? key : `${ns}:${key}`;
+    // 如果 key 已经包含 namespace 前缀（冒号或点），直接使用
+    const hasNamespace = key.includes(':') || this.hasNamespacePrefix(key);
+    const resolvedKey = hasNamespace ? key : `${this.config.defaultNS}:${key}`;
     const [namespace, actualKey] = this.parseKey(resolvedKey);
+    const locale = options?.locale ?? this.currentLocale;
 
     const text =
       this.lookup(locale, namespace, actualKey) ??
@@ -235,10 +285,21 @@ export class I18nService {
     return this.interpolate(text, params);
   }
 
+  private hasNamespacePrefix(key: string): boolean {
+    const firstPart = key.split(/[:.]/)[0];
+    return NAMESPACES.includes(firstPart as Namespace);
+  }
+
   private parseKey(key: string): [Namespace, string] {
-    const parts = key.split(':');
-    if (parts.length >= 2 && NAMESPACES.includes(parts[0] as Namespace)) {
-      return [parts[0] as Namespace, parts.slice(1).join(':')];
+    // 优先尝试冒号分隔: namespace:key
+    const colonParts = key.split(':');
+    if (colonParts.length >= 2 && NAMESPACES.includes(colonParts[0] as Namespace)) {
+      return [colonParts[0] as Namespace, colonParts.slice(1).join(':')];
+    }
+    // 点分隔: namespace.key（namespace 是 NAMESPACES 中的一员）
+    const dotParts = key.split('.');
+    if (dotParts.length >= 2 && NAMESPACES.includes(dotParts[0] as Namespace)) {
+      return [dotParts[0] as Namespace, dotParts.slice(1).join('.')];
     }
     return [this.config.defaultNS, key];
   }

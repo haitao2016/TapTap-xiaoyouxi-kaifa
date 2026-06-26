@@ -90,7 +90,7 @@ describe('Phase 9: Platform Services', () => {
 
     it('should generate compat report', async () => {
       await sdkManagerService.fetchAnnouncements();
-      const report = sdkManagerService.generateCompatReport();
+      const report = await sdkManagerService.generateCompatReport();
       expect(typeof report.compatible).toBe('boolean');
       expect(Array.isArray(report.warnings)).toBe(true);
     });
