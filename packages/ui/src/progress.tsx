@@ -16,9 +16,7 @@ export function Progress({ value, className, showLabel = true }: ProgressProps) 
           style={{ width: `${clamped}%` }}
         />
       </div>
-      {showLabel && (
-        <span className="text-xs text-text-muted">{clamped.toFixed(0)}%</span>
-      )}
+      {showLabel && <span className="text-xs text-text-muted">{clamped.toFixed(0)}%</span>}
     </div>
   );
 }

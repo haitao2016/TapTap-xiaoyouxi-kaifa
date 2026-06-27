@@ -8,7 +8,7 @@
  * - 多 SDK 包管理
  */
 import { globalEventBus } from '../event-bus';
-import { randomUUID } from 'node:crypto';
+import { randomUUID } from '../utils/crypto-utils';
 import { tapTapAuthService } from './taptap-auth-service';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -35,7 +35,7 @@ export interface SDKInstalled {
   previousVersion?: string;
 }
 
-export interface Announcement {
+export interface SDKAnnouncement {
   id: string;
   title: string;
   content: string;
@@ -82,9 +82,12 @@ const KNOWN_PACKAGES = [
 
 export class SDKManagerService {
   private installed = new Map<string, SDKInstalled>();
-  private announcements: Announcement[] = [];
+  private announcements: SDKAnnouncement[] = [];
   private readonly updateListeners = new Set<() => void>();
-  private readonly downloadListeners = new Map<string, Set<(progress: SDKDownloadProgress) => void>>();
+  private readonly downloadListeners = new Map<
+    string,
+    Set<(progress: SDKDownloadProgress) => void>
+  >();
   private downloadTasks = new Map<string, { packageName: string; version: string }>();
   private releaseCache = new Map<string, SDKRelease[]>();
 
@@ -128,7 +131,7 @@ export class SDKManagerService {
         `https://api.taptap.cn/minigame/v1/sdk/versions?package=${packageName}`,
         {
           headers: account ? { Authorization: `Bearer ${account.accessToken}` } : {},
-        },
+        }
       );
       if (!res.ok) {
         const mock = this.mockReleases(packageName);
@@ -154,7 +157,7 @@ export class SDKManagerService {
     projectPath: string,
     packageName: string,
     version: string,
-    onProgress?: (progress: SDKDownloadProgress) => void,
+    onProgress?: (progress: SDKDownloadProgress) => void
   ): Promise<boolean> {
     const taskId = randomUUID();
     this.downloadTasks.set(taskId, { packageName, version });
@@ -173,7 +176,13 @@ export class SDKManagerService {
     }
     this.notifyUpdate();
 
-    const emit = (stage: SDKDownloadProgress['stage'], progress: number, downloaded: number, total: number, speed: number) => {
+    const emit = (
+      stage: SDKDownloadProgress['stage'],
+      progress: number,
+      downloaded: number,
+      total: number,
+      speed: number
+    ) => {
       const p: SDKDownloadProgress = {
         packageName,
         version,
@@ -192,7 +201,12 @@ export class SDKManagerService {
       const release = versions.find((v) => v.version === version) ?? versions[0];
       const totalSize = release?.fileSize ?? 5 * 1024 * 1024;
 
-      const stages: { stage: SDKDownloadProgress['stage']; duration: number; startProgress: number; endProgress: number }[] = [
+      const stages: {
+        stage: SDKDownloadProgress['stage'];
+        duration: number;
+        startProgress: number;
+        endProgress: number;
+      }[] = [
         { stage: 'downloading', duration: 2000, startProgress: 0, endProgress: 60 },
         { stage: 'verifying', duration: 400, startProgress: 60, endProgress: 70 },
         { stage: 'extracting', duration: 800, startProgress: 70, endProgress: 90 },
@@ -205,7 +219,7 @@ export class SDKManagerService {
         for (let i = 0; i <= steps; i++) {
           const progress = s.startProgress + (s.endProgress - s.startProgress) * (i / steps);
           const downloaded = (progress / 100) * totalSize;
-          const speed = i > 0 ? downloaded / (s.duration * (i / steps) / 1000) : 0;
+          const speed = i > 0 ? downloaded / ((s.duration * (i / steps)) / 1000) : 0;
           emit(s.stage, progress, downloaded, totalSize, speed);
           await new Promise((r) => setTimeout(r, stepDuration));
         }
@@ -242,7 +256,7 @@ export class SDKManagerService {
     projectPath: string,
     packageName: string,
     version: string,
-    onProgress?: (progress: SDKDownloadProgress) => void,
+    onProgress?: (progress: SDKDownloadProgress) => void
   ): Promise<boolean> {
     return this.install(projectPath, packageName, version, onProgress);
   }
@@ -253,7 +267,10 @@ export class SDKManagerService {
     installed.version = installed.previousVersion;
     installed.previousVersion = undefined;
     this.notifyUpdate();
-    globalEventBus.emit({ type: 'sdk:rollback', payload: { packageName, version: installed.version } });
+    globalEventBus.emit({
+      type: 'sdk:rollback',
+      payload: { packageName, version: installed.version },
+    });
     return true;
   }
 
@@ -287,7 +304,9 @@ export class SDKManagerService {
         name: dep.name,
         required: dep.version,
         installed: installedDep?.version,
-        satisfied: installedDep ? this.compareVersions(installedDep.version, dep.version) >= 0 : false,
+        satisfied: installedDep
+          ? this.compareVersions(installedDep.version, dep.version) >= 0
+          : false,
       };
     });
 
@@ -310,7 +329,12 @@ export class SDKManagerService {
   async generateCompatReport(): Promise<CompatReport> {
     const warnings: string[] = [];
     const recommendations: string[] = [];
-    const versionMatrix: { packageName: string; installed: string; latest: string; outdated: boolean }[] = [];
+    const versionMatrix: {
+      packageName: string;
+      installed: string;
+      latest: string;
+      outdated: boolean;
+    }[] = [];
 
     for (const sdk of this.installed.values()) {
       const latest = await this.getLatestVersion(sdk.packageName);
@@ -344,7 +368,7 @@ export class SDKManagerService {
     return { compatible: warnings.length === 0, warnings, recommendations, versionMatrix };
   }
 
-  async fetchAnnouncements(): Promise<Announcement[]> {
+  async fetchAnnouncements(): Promise<SDKAnnouncement[]> {
     const account = tapTapAuthService.getActiveAccount();
     try {
       const res = await fetch('https://api.taptap.cn/minigame/v1/announcements', {
@@ -354,7 +378,7 @@ export class SDKManagerService {
         this.announcements = this.mockAnnouncements();
         return this.announcements;
       }
-      const data = (await res.json()) as { data: Announcement[] };
+      const data = (await res.json()) as { data: SDKAnnouncement[] };
       this.announcements = data.data.map((a) => ({ ...a, read: false }));
       return this.announcements;
     } catch {
@@ -383,7 +407,7 @@ export class SDKManagerService {
 
   onDownloadProgress(
     packageName: string,
-    listener: (progress: SDKDownloadProgress) => void,
+    listener: (progress: SDKDownloadProgress) => void
   ): () => void {
     if (!this.downloadListeners.has(packageName)) {
       this.downloadListeners.set(packageName, new Set());
@@ -403,8 +427,10 @@ export class SDKManagerService {
   }
 
   isInstalling(packageName: string): boolean {
-    return this.installed.get(packageName)?.status === 'installing' ||
-      this.installed.get(packageName)?.status === 'upgrading';
+    return (
+      this.installed.get(packageName)?.status === 'installing' ||
+      this.installed.get(packageName)?.status === 'upgrading'
+    );
   }
 
   private compareVersions(a: string, b: string): number {
@@ -425,7 +451,11 @@ export class SDKManagerService {
     for (const l of listeners) l(progress);
   }
 
-  private async updatePackageJson(projectPath: string, packageName: string, version: string): Promise<void> {
+  private async updatePackageJson(
+    projectPath: string,
+    packageName: string,
+    version: string
+  ): Promise<void> {
     const pkgPath = path.join(projectPath, 'package.json');
     try {
       const content = fs.readFileSync(pkgPath, 'utf-8');
@@ -473,9 +503,7 @@ export class SDKManagerService {
         packageName,
         compatNotes: ['需要 TapTap 客户端 2.30+'],
         fileSize: 5242880,
-        dependencies: [
-          { name: '@tapdev/core', version: '2.0.0' },
-        ],
+        dependencies: [{ name: '@tapdev/core', version: '2.0.0' }],
       },
       {
         version: '2.4.0',
@@ -487,9 +515,7 @@ export class SDKManagerService {
         packageName,
         compatNotes: [],
         fileSize: 4980736,
-        dependencies: [
-          { name: '@tapdev/core', version: '2.0.0' },
-        ],
+        dependencies: [{ name: '@tapdev/core', version: '2.0.0' }],
       },
       {
         version: '2.3.1',
@@ -501,9 +527,7 @@ export class SDKManagerService {
         packageName,
         compatNotes: [],
         fileSize: 4718592,
-        dependencies: [
-          { name: '@tapdev/core', version: '2.0.0' },
-        ],
+        dependencies: [{ name: '@tapdev/core', version: '2.0.0' }],
       },
       {
         version: '1.9.0',
@@ -515,14 +539,12 @@ export class SDKManagerService {
         packageName,
         compatNotes: ['废弃 taptap.loginSync()，请使用 taptap.login() async 版本'],
         fileSize: 4194304,
-        dependencies: [
-          { name: '@tapdev/core', version: '1.5.0' },
-        ],
+        dependencies: [{ name: '@tapdev/core', version: '1.5.0' }],
       },
     ];
   }
 
-  private mockAnnouncements(): Announcement[] {
+  private mockAnnouncements(): SDKAnnouncement[] {
     return [
       {
         id: 'a1',

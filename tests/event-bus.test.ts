@@ -1,3 +1,4 @@
+import { jest, describe, it, expect, beforeEach } from '@jest/globals';
 import { globalEventBus, EventBus } from '../packages/core/src/event-bus';
 
 describe('EventBus', () => {

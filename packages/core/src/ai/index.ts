@@ -11,6 +11,10 @@ export type {
   SnippetCompletion,
 } from './ai-completion-service';
 
+export { localModelService, LOCAL_MODEL_EVENTS } from './local-model-service';
+export { transformersBackend } from './transformers-backend';
+export { electronLLMBackend } from './electron-llm-backend';
+
 export { aiErrorDiagnosis, AIErrorDiagnosis } from './ai-error-diagnosis';
 export type {
   ErrorCategory,
@@ -29,7 +33,7 @@ export type {
   CodeLanguage,
   CodeGenTemplate,
   CodeGenRequest,
-  CodeDiff,
+  CodeLineDiff,
   CodeGenResult,
   CodeGenSuggestion,
 } from './ai-codegen-service';
@@ -60,3 +64,10 @@ export {
   flushRaindrop,
 } from './raindrop-integration';
 export type { RaindropConfig, AIInstrumentationOptions } from './raindrop-integration';
+export { codeReviewService } from './code-review-service';
+export type {
+  IssueSeverity,
+  ReviewIssue,
+  ReviewReport,
+  RefactorSuggestion,
+} from './code-review-service';

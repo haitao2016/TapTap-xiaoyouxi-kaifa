@@ -1,3 +1,5 @@
+/// <reference path="./types/webgpu.d.ts" />
+
 export { EventBus, globalEventBus } from './event-bus';
 export { ProjectManager, projectManager } from './project-manager';
 export { DebugService, debugService, setNativeBridge, getNativeBridge } from './debug-service';
@@ -7,7 +9,12 @@ export { MonitorService, monitorService } from './monitor-service';
 export { BuildService, buildService } from './build-service';
 export { DocService, docService } from './doc-service';
 export { PluginManager, pluginManager } from './plugin-manager';
-export type { PluginPermission, PluginPermissions, PluginDependency, PluginLoadOptions } from './plugin-manager';
+export type {
+  PluginPermission,
+  PluginPermissions,
+  PluginDependency,
+  PluginLoadOptions,
+} from './plugin-manager';
 export { PlatformService, platformService } from './platform-service';
 export { SnippetService, snippetService } from './snippet-service';
 export { FormatService, formatService } from './format-service';
@@ -17,13 +24,38 @@ export type { StackFrame, CallStack } from './callstack-service';
 export { ThemeService, themeService } from './theme-service';
 export type { Theme, ThemeType, ThemeColors } from './theme-service';
 export { PluginMarketService, pluginMarketService } from './plugin-market-service';
-export type { Plugin, PluginManifest, PluginInstallation, PluginSearchOptions, PluginVersion, PluginSearchResult, PluginCategory, InstallOptions, UpdateInfo } from './plugin-market-service';
+export type {
+  Plugin,
+  PluginManifest,
+  PluginInstallation,
+  PluginSearchOptions,
+  PluginVersion,
+  PluginSearchResult,
+  PluginCategory,
+  InstallOptions,
+  UpdateInfo,
+} from './plugin-market-service';
 export { PluginSandboxService, pluginSandboxService } from './plugin-sandbox-service';
 export type { PluginSandboxOptions, PluginRuntime } from './plugin-sandbox-service';
 export { PluginSandbox, pluginSandbox } from './plugin-sandbox';
-export type { SandboxType, SandboxPermissions, SandboxOptions, SandboxMessage, SandboxRuntime, SandboxAPIMethod } from './plugin-sandbox';
+export type {
+  SandboxType,
+  SandboxPermissions,
+  SandboxOptions,
+  SandboxMessage,
+  SandboxRuntime,
+  SandboxAPIMethod,
+} from './plugin-sandbox';
 export { TemplateService, templateService } from './template-service';
-export type { ProjectTemplate, TemplateCategory, TemplateSearchOptions, TemplateSearchResult, VirtualFile, CreateProjectOptions, CreatedProject } from './template-service';
+export type {
+  ProjectTemplate,
+  TemplateCategory,
+  TemplateSearchOptions,
+  TemplateSearchResult,
+  VirtualFile,
+  CreateProjectOptions,
+  CreatedProject,
+} from './template-service';
 export { ResponsiveService, responsiveService } from './responsive-service';
 export type { DeviceType, Breakpoints, ViewportInfo } from './responsive-service';
 export { ShortcutService, shortcutService } from './shortcut-service';
@@ -100,15 +132,18 @@ export type {
   LevelInfo,
   CreateTemplateProjectOptions,
   CreatedTemplateProject,
-  TemplateSearchOptions,
-  TemplateSearchResult,
+  GameTemplateSearchOptions,
+  GameTemplateSearchResult,
 } from './game-templates-service';
 
-export { DeveloperIncentivesService, developerIncentivesService } from './developer-incentives-service';
+export {
+  DeveloperIncentivesService,
+  developerIncentivesService,
+} from './developer-incentives-service';
 export type {
   ContributionType,
   PointsReason,
-  PointsRecord,
+  DeveloperPointsRecord,
   DeveloperLevel,
   DeveloperProfile,
   DeveloperBadge,
@@ -306,7 +341,7 @@ export type {
   AtlasInfo,
   ExportFormat,
   ExportOptions as AtlasExportOptions,
-  CompressionOptions,
+  AtlasCompressionOptions,
 } from './sprite-atlas-service';
 
 export { ParticleEditorService, particleEditorService } from './particle-editor-service';
@@ -327,6 +362,18 @@ export type {
   ParticlePreset,
   ParticleInstance,
 } from './particle-editor-service';
+
+// v3.1 新增 - WebGPU 渲染引擎
+export { WebGPURendererService, webgpuRendererService } from './webgpu-renderer-service';
+export type {
+  WebGPUCapabilities,
+  RenderTarget,
+  ShaderModule,
+  PipelineConfig,
+  BufferData,
+  TextureData,
+  RenderStats,
+} from './webgpu-renderer-service';
 
 // 官方插件
 export * from './plugins';

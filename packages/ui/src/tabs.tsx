@@ -37,9 +37,7 @@ export function Tabs({ defaultValue, value, onValueChange, children, className }
 }
 
 export function TabsList({ children, className }: { children: ReactNode; className?: string }) {
-  return (
-    <div className={cn('flex gap-1 border-b border-border pb-px', className)}>{children}</div>
-  );
+  return <div className={cn('flex gap-1 border-b border-border pb-px', className)}>{children}</div>;
 }
 
 export function TabsTrigger({

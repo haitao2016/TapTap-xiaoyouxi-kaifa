@@ -1,7 +1,7 @@
 // 游戏运营一站式工作台
 // 发布、数据分析、用户反馈、A/B 测试、活动、客服工单、版本管理
 
-import { globalEventBus } from '../core/event-bus';
+import { globalEventBus } from '../event-bus';
 
 // 游戏
 export interface ManagedGame {
@@ -138,7 +138,7 @@ class GameOpsService {
       id: `game-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       versions: [],
       metrics: this.initMetrics(),
-      createdAt: Date.now()
+      createdAt: Date.now(),
     };
     this.games.set(newGame.id, newGame);
     return newGame;
@@ -146,20 +146,27 @@ class GameOpsService {
 
   private initMetrics(): GameMetrics {
     return {
-      dau: 0, mau: 0,
+      dau: 0,
+      mau: 0,
       retention: { d1: 0, d7: 0, d30: 0 },
-      arpu: 0, arppu: 0,
+      arpu: 0,
+      arppu: 0,
       conversionRate: 0,
       avgSessionTime: 0,
       crashRate: 0,
       rating: 0,
       totalDownloads: 0,
-      trend: []
+      trend: [],
     };
   }
 
   // 提交反馈
-  submitFeedback(feedback: Omit<PlayerFeedback, 'id' | 'status' | 'replies' | 'createdAt' | 'updatedAt' | 'sentiment'>): PlayerFeedback {
+  submitFeedback(
+    feedback: Omit<
+      PlayerFeedback,
+      'id' | 'status' | 'replies' | 'createdAt' | 'updatedAt' | 'sentiment'
+    >
+  ): PlayerFeedback {
     const newFeedback: PlayerFeedback = {
       ...feedback,
       id: `fb-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
@@ -167,7 +174,7 @@ class GameOpsService {
       replies: [],
       sentiment: this.analyzeSentiment(feedback.content),
       createdAt: Date.now(),
-      updatedAt: Date.now()
+      updatedAt: Date.now(),
     };
     this.feedback.set(newFeedback.id, newFeedback);
     this.notify('feedback:submitted', newFeedback);
@@ -183,7 +190,7 @@ class GameOpsService {
       author: this.currentUser,
       content,
       isOfficial,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
     fb.status = 'in-progress';
     fb.updatedAt = Date.now();
@@ -191,18 +198,22 @@ class GameOpsService {
   }
 
   // 创建工单
-  createTicket(ticket: Omit<SupportTicket, 'id' | 'status' | 'messages' | 'createdAt' | 'updatedAt'>): SupportTicket {
+  createTicket(
+    ticket: Omit<SupportTicket, 'id' | 'status' | 'messages' | 'createdAt' | 'updatedAt'>
+  ): SupportTicket {
     const newTicket: SupportTicket = {
       ...ticket,
       id: `ticket-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       status: 'open',
-      messages: [{
-        author: ticket.playerId,
-        content: ticket.subject,
-        timestamp: Date.now()
-      }],
+      messages: [
+        {
+          author: ticket.playerId,
+          content: ticket.subject,
+          timestamp: Date.now(),
+        },
+      ],
       createdAt: Date.now(),
-      updatedAt: Date.now()
+      updatedAt: Date.now(),
     };
     this.tickets.set(newTicket.id, newTicket);
     this.notify('ticket:created', newTicket);
@@ -216,7 +227,7 @@ class GameOpsService {
     ticket.messages.push({
       author: isAgent ? this.currentUser : ticket.playerId,
       content,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
     ticket.updatedAt = Date.now();
     if (isAgent) ticket.status = 'pending';
@@ -238,7 +249,7 @@ class GameOpsService {
       id: `campaign-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       status: 'draft',
       metrics: { participants: 0, revenue: 0, retention: 0 },
-      createdAt: Date.now()
+      createdAt: Date.now(),
     };
     this.campaigns.set(newCampaign.id, newCampaign);
     return newCampaign;
@@ -257,7 +268,7 @@ class GameOpsService {
     const newRule: AutomationRule = {
       ...rule,
       id: `auto-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-      createdAt: Date.now()
+      createdAt: Date.now(),
     };
     this.automations.push(newRule);
     return newRule;
@@ -267,16 +278,23 @@ class GameOpsService {
   private checkAutomations(event: string, data: any): void {
     for (const rule of this.automations) {
       if (!rule.enabled || rule.trigger.event !== event) continue;
-      const allMatch = rule.trigger.conditions.every(c => {
+      const allMatch = rule.trigger.conditions.every((c) => {
         const value = data[c.field];
         switch (c.op) {
-          case '==': return value === c.value;
-          case '!=': return value !== c.value;
-          case '>': return value > c.value;
-          case '<': return value < c.value;
-          case '>=': return value >= c.value;
-          case '<=': return value <= c.value;
-          case 'contains': return String(value).includes(c.value);
+          case '==':
+            return value === c.value;
+          case '!=':
+            return value !== c.value;
+          case '>':
+            return value > c.value;
+          case '<':
+            return value < c.value;
+          case '>=':
+            return value >= c.value;
+          case '<=':
+            return value <= c.value;
+          case 'contains':
+            return String(value).includes(c.value);
         }
         return false;
       });
@@ -295,11 +313,22 @@ class GameOpsService {
   // 情感分析
   private analyzeSentiment(text: string): PlayerFeedback['sentiment'] {
     const positive = ['好', '棒', '喜欢', '赞', '好游戏', 'good', 'great', 'love', 'amazing'];
-    const negative = ['差', '垃圾', 'bug', '闪退', '卡顿', 'bad', 'terrible', 'awful', 'crash', 'broken'];
+    const negative = [
+      '差',
+      '垃圾',
+      'bug',
+      '闪退',
+      '卡顿',
+      'bad',
+      'terrible',
+      'awful',
+      'crash',
+      'broken',
+    ];
 
     const textLower = text.toLowerCase();
-    const posCount = positive.filter(p => textLower.includes(p)).length;
-    const negCount = negative.filter(n => textLower.includes(n)).length;
+    const posCount = positive.filter((p) => textLower.includes(p)).length;
+    const negCount = negative.filter((n) => textLower.includes(n)).length;
 
     if (posCount > negCount) return 'positive';
     if (negCount > posCount) return 'negative';
@@ -307,28 +336,33 @@ class GameOpsService {
   }
 
   // 列出反馈
-  listFeedback(filter?: { gameId?: string; status?: PlayerFeedback['status']; type?: PlayerFeedback['type']; sentiment?: PlayerFeedback['sentiment'] }): PlayerFeedback[] {
+  listFeedback(filter?: {
+    gameId?: string;
+    status?: PlayerFeedback['status'];
+    type?: PlayerFeedback['type'];
+    sentiment?: PlayerFeedback['sentiment'];
+  }): PlayerFeedback[] {
     let fbs = Array.from(this.feedback.values());
-    if (filter?.gameId) fbs = fbs.filter(f => f.gameId === filter.gameId);
-    if (filter?.status) fbs = fbs.filter(f => f.status === filter.status);
-    if (filter?.type) fbs = fbs.filter(f => f.type === filter.type);
-    if (filter?.sentiment) fbs = fbs.filter(f => f.sentiment === filter.sentiment);
+    if (filter?.gameId) fbs = fbs.filter((f) => f.gameId === filter.gameId);
+    if (filter?.status) fbs = fbs.filter((f) => f.status === filter.status);
+    if (filter?.type) fbs = fbs.filter((f) => f.type === filter.type);
+    if (filter?.sentiment) fbs = fbs.filter((f) => f.sentiment === filter.sentiment);
     return fbs.sort((a, b) => b.createdAt - a.createdAt);
   }
 
   // 列出工单
   listTickets(filter?: { gameId?: string; status?: SupportTicket['status'] }): SupportTicket[] {
     let tks = Array.from(this.tickets.values());
-    if (filter?.gameId) tks = tks.filter(t => t.gameId === filter.gameId);
-    if (filter?.status) tks = tks.filter(t => t.status === filter.status);
+    if (filter?.gameId) tks = tks.filter((t) => t.gameId === filter.gameId);
+    if (filter?.status) tks = tks.filter((t) => t.status === filter.status);
     return tks.sort((a, b) => b.updatedAt - a.updatedAt);
   }
 
   // 列出活动
   listCampaigns(filter?: { gameId?: string; status?: Campaign['status'] }): Campaign[] {
     let cps = Array.from(this.campaigns.values());
-    if (filter?.gameId) cps = cps.filter(c => c.gameId === filter.gameId);
-    if (filter?.status) cps = cps.filter(c => c.status === filter.status);
+    if (filter?.gameId) cps = cps.filter((c) => c.gameId === filter.gameId);
+    if (filter?.status) cps = cps.filter((c) => c.status === filter.status);
     return cps;
   }
 
@@ -354,7 +388,7 @@ class GameOpsService {
   rolloutVersion(gameId: string, versionId: string, percentage: number): void {
     const game = this.games.get(gameId);
     if (!game) return;
-    const version = game.versions.find(v => v.id === versionId);
+    const version = game.versions.find((v) => v.id === versionId);
     if (!version) return;
     version.rolloutPercentage = percentage;
     this.notify('version:rollout', { gameId, versionId, percentage });
@@ -364,7 +398,7 @@ class GameOpsService {
   rollbackVersion(gameId: string, versionId: string, reason: string): void {
     const game = this.games.get(gameId);
     if (!game) return;
-    const version = game.versions.find(v => v.id === versionId);
+    const version = game.versions.find((v) => v.id === versionId);
     if (!version) return;
     version.status = 'rolled-back';
     this.logAudit(gameId, 'version_rollback', { versionId, reason });
@@ -378,7 +412,9 @@ class GameOpsService {
   // 订阅
   subscribe(listener: (event: string, data: any) => void): () => void {
     this.listeners.add(listener);
-    return () => { this.listeners.delete(listener); };
+    return () => {
+      this.listeners.delete(listener);
+    };
   }
 
   private notify(event: string, data: any): void {

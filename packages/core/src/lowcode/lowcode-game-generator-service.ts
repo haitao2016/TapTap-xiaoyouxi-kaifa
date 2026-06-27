@@ -1,10 +1,20 @@
 // 低代码游戏生成器
 // 通过表单配置快速生成完整游戏
 
-import { globalEventBus } from '../core/event-bus';
+import { globalEventBus } from '../event-bus';
 
 // 游戏类型
-export type GameGenre = 'platformer' | 'puzzle' | 'racing' | 'shooter' | 'rpg' | 'strategy' | 'casual' | 'arcade' | 'simulation' | 'fighting';
+export type GameGenre =
+  | 'platformer'
+  | 'puzzle'
+  | 'racing'
+  | 'shooter'
+  | 'rpg'
+  | 'strategy'
+  | 'casual'
+  | 'arcade'
+  | 'simulation'
+  | 'fighting';
 
 // 游戏配置
 export interface GameConfig {
@@ -64,7 +74,12 @@ export interface GameTemplate {
   preview: string;
   defaultConfig: Partial<GameConfig>;
   // 模板变量
-  variables: { name: string; type: 'string' | 'number' | 'boolean' | 'color'; defaultValue: any; description: string }[];
+  variables: {
+    name: string;
+    type: 'string' | 'number' | 'boolean' | 'color';
+    defaultValue: any;
+    description: string;
+  }[];
 }
 
 class LowCodeGameGeneratorService {
@@ -90,75 +105,102 @@ class LowCodeGameGeneratorService {
           genre: 'platformer',
           artStyle: 'pixel',
           viewport: { width: 800, height: 600 },
-          gameplay: { playerSpeed: 5, difficulty: 'normal', lives: 3, scoreSystem: true, levels: 5 },
+          gameplay: {
+            playerSpeed: 5,
+            difficulty: 'normal',
+            lives: 3,
+            scoreSystem: true,
+            levels: 5,
+          },
           elements: {
             player: { type: 'hero', abilities: ['jump', 'double-jump'] },
             enemies: [
               { type: 'slime', count: 10, behavior: 'patrol' },
-              { type: 'bird', count: 5, behavior: 'fly' }
+              { type: 'bird', count: 5, behavior: 'fly' },
             ],
-            collectibles: [{ type: 'coin', value: 10 }, { type: 'gem', value: 50 }],
-            obstacles: [{ type: 'spike', count: 20 }, { type: 'pit', count: 5 }]
+            collectibles: [
+              { type: 'coin', value: 10 },
+              { type: 'gem', value: 50 },
+            ],
+            obstacles: [
+              { type: 'spike', count: 20 },
+              { type: 'pit', count: 5 },
+            ],
           },
           controls: 'both',
-          platforms: ['web', 'taptap']
+          platforms: ['web', 'taptap'],
         },
         variables: [
           { name: 'gravity', type: 'number', defaultValue: 0.8, description: '重力大小' },
           { name: 'jumpForce', type: 'number', defaultValue: -15, description: '跳跃力度' },
-          { name: 'playerColor', type: 'color', defaultValue: '#FF6B6B', description: '主角颜色' }
-        ]
+          { name: 'playerColor', type: 'color', defaultValue: '#FF6B6B', description: '主角颜色' },
+        ],
       },
       {
         id: 'match3',
         name: '三消游戏',
         genre: 'puzzle',
         description: '经典三消玩法',
+        preview: 'match3.gif',
         defaultConfig: {
           title: '宝石三消',
           genre: 'puzzle',
           artStyle: 'cartoon',
           viewport: { width: 600, height: 800 },
-          gameplay: { playerSpeed: 0, difficulty: 'normal', lives: 0, scoreSystem: true, levels: 50, timeLimit: 60 },
+          gameplay: {
+            playerSpeed: 0,
+            difficulty: 'normal',
+            lives: 0,
+            scoreSystem: true,
+            levels: 50,
+            timeLimit: 60,
+          },
           elements: {
             player: { type: 'cursor', abilities: ['swap'] },
             enemies: [],
             collectibles: [{ type: 'gem', value: 10 }],
-            obstacles: []
+            obstacles: [],
           },
           controls: 'touch',
-          platforms: ['web', 'ios', 'android', 'taptap']
+          platforms: ['web', 'ios', 'android', 'taptap'],
         },
         variables: [
           { name: 'gridSize', type: 'number', defaultValue: 8, description: '网格大小' },
-          { name: 'gemTypes', type: 'number', defaultValue: 6, description: '宝石种类' }
-        ]
+          { name: 'gemTypes', type: 'number', defaultValue: 6, description: '宝石种类' },
+        ],
       },
       {
         id: 'endless-runner',
         name: '无尽跑酷',
         genre: 'arcade',
         description: '无尽的跑酷游戏',
+        preview: 'endless-runner.gif',
         defaultConfig: {
           title: '疾风跑酷',
           genre: 'arcade',
           artStyle: 'flat',
           viewport: { width: 480, height: 800 },
-          gameplay: { playerSpeed: 8, difficulty: 'normal', lives: 1, scoreSystem: true, levels: 0 },
+          gameplay: {
+            playerSpeed: 8,
+            difficulty: 'normal',
+            lives: 1,
+            scoreSystem: true,
+            levels: 0,
+          },
           elements: {
             player: { type: 'runner', abilities: ['jump', 'slide'] },
             enemies: [{ type: 'obstacle', count: 100, behavior: 'static' }],
             collectibles: [{ type: 'coin', value: 1 }],
-            obstacles: [{ type: 'barrier', count: 100 }]
+            obstacles: [{ type: 'barrier', count: 100 }],
           },
           controls: 'touch',
-          platforms: ['web', 'ios', 'android', 'taptap']
+          platforms: ['web', 'ios', 'android', 'taptap'],
         },
         variables: [
           { name: 'baseSpeed', type: 'number', defaultValue: 8, description: '基础速度' },
-          { name: 'speedIncrease', type: 'number', defaultValue: 0.01, description: '速度增加' }
-        ]
-      }
+          { name: 'speedIncrease', type: 'number', defaultValue: 0.01, description: '速度增加' },
+        ],
+      },
     ];
 
     for (const t of templates) {
@@ -167,7 +209,11 @@ class LowCodeGameGeneratorService {
   }
 
   // 从模板生成
-  async generateFromTemplate(templateId: string, config: Partial<GameConfig>, onProgress?: (progress: number) => void): Promise<GeneratedProject> {
+  async generateFromTemplate(
+    templateId: string,
+    config: Partial<GameConfig>,
+    onProgress?: (progress: number) => void
+  ): Promise<GeneratedProject> {
     const template = this.templates.get(templateId);
     if (!template) throw new Error('模板不存在');
 
@@ -177,12 +223,21 @@ class LowCodeGameGeneratorService {
       genre: template.genre,
       artStyle: config.artStyle || template.defaultConfig.artStyle || 'pixel',
       viewport: config.viewport || template.defaultConfig.viewport || { width: 800, height: 600 },
-      gameplay: { ...(template.defaultConfig.gameplay || {}), ...(config.gameplay || {}) } as GameConfig['gameplay'],
-      elements: { ...(template.defaultConfig.elements || {}), ...(config.elements || {}) } as GameConfig['elements'],
+      gameplay: {
+        ...(template.defaultConfig.gameplay || {}),
+        ...(config.gameplay || {}),
+      } as GameConfig['gameplay'],
+      elements: {
+        ...(template.defaultConfig.elements || {}),
+        ...(config.elements || {}),
+      } as GameConfig['elements'],
       controls: config.controls || template.defaultConfig.controls || 'both',
       platforms: config.platforms || template.defaultConfig.platforms || ['web'],
       aiAssistance: config.aiAssistance ?? true,
-      customization: { ...(template.defaultConfig.customization || {}), ...(config.customization || {}) }
+      customization: {
+        ...(template.defaultConfig.customization || {}),
+        ...(config.customization || {}),
+      },
     };
 
     const project: GeneratedProject = {
@@ -192,7 +247,7 @@ class LowCodeGameGeneratorService {
       dependencies: [],
       progress: 0,
       status: 'generating',
-      createdAt: Date.now()
+      createdAt: Date.now(),
     };
 
     this.projects.set(project.id, project);
@@ -272,7 +327,7 @@ const game = new Game({
 window.addEventListener('load', () => {
   game.start();
 });
-`
+`,
       },
       {
         path: 'src/core/Game.ts',
@@ -307,8 +362,8 @@ export class Game {
     this.isRunning = false;
   }
 }
-`
-      }
+`,
+      },
     ];
   }
 
@@ -333,8 +388,8 @@ export class MainScene {
     ctx.fillRect(0, 0, ${config.viewport.width}, ${config.viewport.height});
   }
 }
-`
-      }
+`,
+      },
     ];
   }
 
@@ -359,8 +414,8 @@ export class Player {
     // 跳跃逻辑
   }
 }
-`
-      }
+`,
+      },
     ];
 
     if (config.elements.enemies.length > 0) {
@@ -382,7 +437,7 @@ export class Enemy {
     // 敌人 AI
   }
 }
-`
+`,
       });
     }
 
@@ -411,8 +466,8 @@ export class HUD {
     ctx.fillText(\`生命: \${this.lives}\`, 10, 60);
   }
 }
-`
-      }
+`,
+      },
     ];
   }
 
@@ -421,13 +476,17 @@ export class HUD {
     return [
       {
         path: 'tapdev.config.json',
-        content: JSON.stringify({
-          name: config.title,
-          description: config.description,
-          genre: config.genre,
-          viewport: config.viewport,
-          platforms: config.platforms
-        }, null, 2)
+        content: JSON.stringify(
+          {
+            name: config.title,
+            description: config.description,
+            genre: config.genre,
+            viewport: config.viewport,
+            platforms: config.platforms,
+          },
+          null,
+          2
+        ),
       },
       {
         path: 'README.md',
@@ -449,16 +508,14 @@ ${config.platforms.join(', ')}
 npm install
 npm run dev
 \`\`\`
-`
-      }
+`,
+      },
     ];
   }
 
   // 获取依赖
   private getDependencies(config: GameConfig): { name: string; version: string }[] {
-    const deps = [
-      { name: 'typescript', version: '^5.0.0' }
-    ];
+    const deps = [{ name: 'typescript', version: '^5.0.0' }];
     if (config.platforms.includes('taptap')) {
       deps.push({ name: '@taptap/sdk', version: '^1.0.0' });
     }
@@ -473,7 +530,7 @@ npm run dev
   // 列出模板
   listTemplates(filter?: { genre?: GameGenre }): GameTemplate[] {
     let templates = Array.from(this.templates.values());
-    if (filter?.genre) templates = templates.filter(t => t.genre === filter.genre);
+    if (filter?.genre) templates = templates.filter((t) => t.genre === filter.genre);
     return templates;
   }
 
@@ -490,7 +547,9 @@ npm run dev
   // 订阅
   subscribe(listener: (event: string, data: any) => void): () => void {
     this.listeners.add(listener);
-    return () => { this.listeners.delete(listener); };
+    return () => {
+      this.listeners.delete(listener);
+    };
   }
 
   private notify(event: string, data: any): void {
@@ -498,7 +557,7 @@ npm run dev
   }
 
   private delay(ms: number): Promise<void> {
-    return new Promise(r => setTimeout(r, ms));
+    return new Promise((r) => setTimeout(r, ms));
   }
 }
 

@@ -1,5 +1,11 @@
 import type { PluginContext, PluginMeta, PluginHook } from '@tapdev/types';
-import { gitService, type GitStatus, type GitCommit, type GitBranch, type GitDiff } from '../../collab/git-service';
+import {
+  gitService,
+  type GitStatus,
+  type GitCommit,
+  type GitBranch,
+  type GitDiff,
+} from '../../collab/git-service';
 
 export const meta: PluginMeta = {
   id: 'tapdev.git',
@@ -41,7 +47,7 @@ export class GitPlugin {
 
   updateConfig(config: Partial<GitPluginConfig>): void {
     Object.assign(this.config, config);
-    
+
     if (config.autoFetch !== undefined) {
       if (config.autoFetch) {
         this.startAutoFetch();
@@ -117,15 +123,15 @@ export class GitPlugin {
   async getRemotes(): Promise<{ name: string; url: string }[]> {
     const { stdout, code } = await gitService.exec(['remote', '-v']);
     if (code !== 0) return [];
-    
+
     const remotes = new Map<string, string>();
-    stdout.split('\n').forEach(line => {
+    stdout.split('\n').forEach((line) => {
       const match = line.match(/^(\S+)\s+(\S+)\s+\(fetch\)/);
       if (match) {
         remotes.set(match[1], match[2]);
       }
     });
-    
+
     return Array.from(remotes.entries()).map(([name, url]) => ({ name, url }));
   }
 
@@ -152,14 +158,17 @@ export class GitPlugin {
   async stashList(): Promise<{ id: string; message: string }[]> {
     const { stdout, code } = await gitService.exec(['stash', 'list']);
     if (code !== 0) return [];
-    
-    return stdout.split('\n').filter(Boolean).map(line => {
-      const match = line.match(/^stash@\{(\d+)\}:\s*(.+)$/);
-      return {
-        id: match?.[1] || '0',
-        message: match?.[2] || line,
-      };
-    });
+
+    return stdout
+      .split('\n')
+      .filter(Boolean)
+      .map((line) => {
+        const match = line.match(/^stash@\{(\d+)\}:\s*(.+)$/);
+        return {
+          id: match?.[1] || '0',
+          message: match?.[2] || line,
+        };
+      });
   }
 
   async stashApply(index = 0): Promise<boolean> {
@@ -192,73 +201,97 @@ export const gitPlugin = new GitPlugin();
 export function activate(ctx: PluginContext): void {
   const plugin = gitPlugin;
 
-  ctx.registerCommand('git-commit', async () => {
-    ctx.showNotification('正在提交...', 'info');
-  }, {
-    id: 'git-commit',
-    title: '提交更改',
-    description: '提交当前的更改到仓库',
-    icon: 'git-commit',
-    shortcut: 'Ctrl+Shift+C',
-    category: 'Git',
-  });
-
-  ctx.registerCommand('git-push', async () => {
-    const result = await plugin.push();
-    ctx.showNotification(result ? '推送成功' : '推送失败', result ? 'success' : 'error');
-  }, {
-    id: 'git-push',
-    title: '推送更改',
-    description: '将本地提交推送到远程仓库',
-    icon: 'upload-cloud',
-    shortcut: 'Ctrl+Shift+P',
-    category: 'Git',
-  });
-
-  ctx.registerCommand('git-pull', async () => {
-    const result = await plugin.pull();
-    ctx.showNotification(result ? '拉取成功' : '拉取失败', result ? 'success' : 'error');
-  }, {
-    id: 'git-pull',
-    title: '拉取更改',
-    description: '从远程仓库拉取最新更改',
-    icon: 'download-cloud',
-    shortcut: 'Ctrl+Shift+U',
-    category: 'Git',
-  });
-
-  ctx.registerCommand('git-status', async () => {
-    const status = await plugin.getStatus();
-    if (status) {
-      ctx.showNotification(`分支: ${status.branch}`, 'info');
+  ctx.registerCommand(
+    'git-commit',
+    async () => {
+      ctx.showNotification('正在提交...', 'info');
+    },
+    {
+      id: 'git-commit',
+      title: '提交更改',
+      description: '提交当前的更改到仓库',
+      icon: 'git-commit',
+      shortcut: 'Ctrl+Shift+C',
+      category: 'Git',
     }
-  }, {
-    id: 'git-status',
-    title: '查看状态',
-    description: '查看当前 Git 仓库状态',
-    icon: 'git-branch',
-    category: 'Git',
-  });
+  );
 
-  ctx.registerCommand('git-branches', async () => {
-    ctx.showNotification('打开分支管理器', 'info');
-  }, {
-    id: 'git-branches',
-    title: '分支管理',
-    description: '管理 Git 分支',
-    icon: 'git-branch',
-    category: 'Git',
-  });
+  ctx.registerCommand(
+    'git-push',
+    async () => {
+      const result = await plugin.push();
+      ctx.showNotification(result ? '推送成功' : '推送失败', result ? 'success' : 'error');
+    },
+    {
+      id: 'git-push',
+      title: '推送更改',
+      description: '将本地提交推送到远程仓库',
+      icon: 'upload-cloud',
+      shortcut: 'Ctrl+Shift+P',
+      category: 'Git',
+    }
+  );
 
-  ctx.registerCommand('git-log', async () => {
-    ctx.showNotification('打开提交历史', 'info');
-  }, {
-    id: 'git-log',
-    title: '提交历史',
-    description: '查看提交历史记录',
-    icon: 'history',
-    category: 'Git',
-  });
+  ctx.registerCommand(
+    'git-pull',
+    async () => {
+      const result = await plugin.pull();
+      ctx.showNotification(result ? '拉取成功' : '拉取失败', result ? 'success' : 'error');
+    },
+    {
+      id: 'git-pull',
+      title: '拉取更改',
+      description: '从远程仓库拉取最新更改',
+      icon: 'download-cloud',
+      shortcut: 'Ctrl+Shift+U',
+      category: 'Git',
+    }
+  );
+
+  ctx.registerCommand(
+    'git-status',
+    async () => {
+      const status = await plugin.getStatus();
+      if (status) {
+        ctx.showNotification(`分支: ${status.branch}`, 'info');
+      }
+    },
+    {
+      id: 'git-status',
+      title: '查看状态',
+      description: '查看当前 Git 仓库状态',
+      icon: 'git-branch',
+      category: 'Git',
+    }
+  );
+
+  ctx.registerCommand(
+    'git-branches',
+    async () => {
+      ctx.showNotification('打开分支管理器', 'info');
+    },
+    {
+      id: 'git-branches',
+      title: '分支管理',
+      description: '管理 Git 分支',
+      icon: 'git-branch',
+      category: 'Git',
+    }
+  );
+
+  ctx.registerCommand(
+    'git-log',
+    async () => {
+      ctx.showNotification('打开提交历史', 'info');
+    },
+    {
+      id: 'git-log',
+      title: '提交历史',
+      description: '查看提交历史记录',
+      icon: 'history',
+      category: 'Git',
+    }
+  );
 
   ctx.registerPanel('git-panel', {
     id: 'git-panel',

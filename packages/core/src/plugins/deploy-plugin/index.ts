@@ -14,7 +14,14 @@ export const meta: PluginMeta = {
   homepage: 'https://tapdev.io/plugins/deploy',
 };
 
-export type DeployPlatform = 'taptap' | 'wechat' | 'web' | 'cdn' | 'github-pages' | 'vercel' | 'netlify';
+export type DeployPlatform =
+  | 'taptap'
+  | 'wechat'
+  | 'web'
+  | 'cdn'
+  | 'github-pages'
+  | 'vercel'
+  | 'netlify';
 
 export interface DeployTarget {
   id: string;
@@ -105,7 +112,7 @@ export class DeployPlugin {
   getConfig(): DeployConfig {
     return {
       ...this.config,
-      targets: this.config.targets.map(t => ({ ...t })),
+      targets: this.config.targets.map((t) => ({ ...t })),
     };
   }
 
@@ -114,16 +121,16 @@ export class DeployPlugin {
   }
 
   getTargets(): DeployTarget[] {
-    return this.config.targets.map(t => ({ ...t }));
+    return this.config.targets.map((t) => ({ ...t }));
   }
 
   getEnabledTargets(): DeployTarget[] {
-    return this.config.targets.filter(t => t.enabled);
+    return this.config.targets.filter((t) => t.enabled);
   }
 
   async deploy(targetId?: string): Promise<DeployResult[]> {
     const targets = targetId
-      ? this.config.targets.filter(t => t.id === targetId)
+      ? this.config.targets.filter((t) => t.id === targetId)
       : this.getEnabledTargets();
 
     const results: DeployResult[] = [];
@@ -199,7 +206,7 @@ export class DeployPlugin {
   }
 
   async rollback(buildId: string): Promise<boolean> {
-    const deploy = this.deployHistory.find(d => d.buildId === buildId);
+    const deploy = this.deployHistory.find((d) => d.buildId === buildId);
     if (!deploy) return false;
 
     await this.delay(1000);
@@ -207,7 +214,7 @@ export class DeployPlugin {
   }
 
   async configureTarget(targetId: string, config: Record<string, unknown>): Promise<boolean> {
-    const target = this.config.targets.find(t => t.id === targetId);
+    const target = this.config.targets.find((t) => t.id === targetId);
     if (!target) return false;
 
     target.config = { ...target.config, ...config };
@@ -215,21 +222,21 @@ export class DeployPlugin {
   }
 
   enableTarget(targetId: string): void {
-    const target = this.config.targets.find(t => t.id === targetId);
+    const target = this.config.targets.find((t) => t.id === targetId);
     if (target) {
       target.enabled = true;
     }
   }
 
   disableTarget(targetId: string): void {
-    const target = this.config.targets.find(t => t.id === targetId);
+    const target = this.config.targets.find((t) => t.id === targetId);
     if (target) {
       target.enabled = false;
     }
   }
 
   async validateConfig(targetId: string): Promise<{ valid: boolean; errors: string[] }> {
-    const target = this.config.targets.find(t => t.id === targetId);
+    const target = this.config.targets.find((t) => t.id === targetId);
     if (!target) {
       return { valid: false, errors: ['部署目标不存在'] };
     }
@@ -280,7 +287,7 @@ export class DeployPlugin {
   }
 
   private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }
 
@@ -289,71 +296,91 @@ export const deployPlugin = new DeployPlugin();
 export function activate(ctx: PluginContext): void {
   const plugin = deployPlugin;
 
-  ctx.registerCommand('deploy', async () => {
-    ctx.showNotification('正在部署...', 'info');
-    const results = await plugin.deploy();
-    const successCount = results.filter(r => r.success).length;
-    ctx.showNotification(
-      `部署完成: ${successCount}/${results.length} 成功`,
-      successCount > 0 ? 'success' : 'error'
-    );
-  }, {
-    id: 'deploy',
-    title: '一键部署',
-    description: '部署到所有已启用的平台',
-    icon: 'rocket',
-    shortcut: 'Ctrl+Shift+D',
-    category: '部署',
-  });
-
-  ctx.registerCommand('deploy-web', async () => {
-    ctx.showNotification('正在部署到 Web...', 'info');
-    const result = await plugin.deploy('web');
-    if (result[0]?.success) {
-      ctx.showNotification('Web 部署成功', 'success');
-      if (result[0].url) {
-        ctx.openUrl(result[0].url);
-      }
-    } else {
-      ctx.showNotification('Web 部署失败', 'error');
+  ctx.registerCommand(
+    'deploy',
+    async () => {
+      ctx.showNotification('正在部署...', 'info');
+      const results = await plugin.deploy();
+      const successCount = results.filter((r) => r.success).length;
+      ctx.showNotification(
+        `部署完成: ${successCount}/${results.length} 成功`,
+        successCount > 0 ? 'success' : 'error'
+      );
+    },
+    {
+      id: 'deploy',
+      title: '一键部署',
+      description: '部署到所有已启用的平台',
+      icon: 'rocket',
+      shortcut: 'Ctrl+Shift+D',
+      category: '部署',
     }
-  }, {
-    id: 'deploy-web',
-    title: '部署到 Web',
-    description: '部署项目到 Web 托管',
-    icon: 'globe',
-    category: '部署',
-  });
+  );
 
-  ctx.registerCommand('deploy-taptap', async () => {
-    ctx.showNotification('正在部署到 TapTap...', 'info');
-  }, {
-    id: 'deploy-taptap',
-    title: '部署到 TapTap',
-    description: '部署到 TapTap 小游戏平台',
-    icon: 'smartphone',
-    category: '部署',
-  });
+  ctx.registerCommand(
+    'deploy-web',
+    async () => {
+      ctx.showNotification('正在部署到 Web...', 'info');
+      const result = await plugin.deploy('web');
+      if (result[0]?.success) {
+        ctx.showNotification('Web 部署成功', 'success');
+        if (result[0].url) {
+          ctx.openUrl(result[0].url);
+        }
+      } else {
+        ctx.showNotification('Web 部署失败', 'error');
+      }
+    },
+    {
+      id: 'deploy-web',
+      title: '部署到 Web',
+      description: '部署项目到 Web 托管',
+      icon: 'globe',
+      category: '部署',
+    }
+  );
 
-  ctx.registerCommand('deploy-history', async () => {
-    ctx.showNotification('打开部署历史', 'info');
-  }, {
-    id: 'deploy-history',
-    title: '部署历史',
-    description: '查看部署历史记录',
-    icon: 'history',
-    category: '部署',
-  });
+  ctx.registerCommand(
+    'deploy-taptap',
+    async () => {
+      ctx.showNotification('正在部署到 TapTap...', 'info');
+    },
+    {
+      id: 'deploy-taptap',
+      title: '部署到 TapTap',
+      description: '部署到 TapTap 小游戏平台',
+      icon: 'smartphone',
+      category: '部署',
+    }
+  );
 
-  ctx.registerCommand('deploy-settings', async () => {
-    ctx.showNotification('打开部署设置', 'info');
-  }, {
-    id: 'deploy-settings',
-    title: '部署设置',
-    description: '配置部署目标和参数',
-    icon: 'settings',
-    category: '部署',
-  });
+  ctx.registerCommand(
+    'deploy-history',
+    async () => {
+      ctx.showNotification('打开部署历史', 'info');
+    },
+    {
+      id: 'deploy-history',
+      title: '部署历史',
+      description: '查看部署历史记录',
+      icon: 'history',
+      category: '部署',
+    }
+  );
+
+  ctx.registerCommand(
+    'deploy-settings',
+    async () => {
+      ctx.showNotification('打开部署设置', 'info');
+    },
+    {
+      id: 'deploy-settings',
+      title: '部署设置',
+      description: '配置部署目标和参数',
+      icon: 'settings',
+      category: '部署',
+    }
+  );
 
   ctx.registerPanel('deploy-panel', {
     id: 'deploy-panel',

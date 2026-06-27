@@ -79,7 +79,7 @@ export class PWAService {
 
     this.deferredPrompt.prompt();
     const result = await this.deferredPrompt.userChoice;
-    
+
     if (result.outcome === 'accepted') {
       this.isInstalled = true;
       globalEventBus.emit({ type: 'pwa:installed' });

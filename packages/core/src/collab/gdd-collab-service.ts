@@ -1,12 +1,21 @@
 // 游戏设计文档（GDD）协作
 // 文档在线协作编辑、版本历史、模板
 
-import { globalEventBus } from '../core/event-bus';
+import { globalEventBus } from '../event-bus';
 
 // 文档块
 export interface DocBlock {
   id: string;
-  type: 'paragraph' | 'heading' | 'bullet' | 'numbered' | 'code' | 'image' | 'table' | 'quote' | 'checklist';
+  type:
+    | 'paragraph'
+    | 'heading'
+    | 'bullet'
+    | 'numbered'
+    | 'code'
+    | 'image'
+    | 'table'
+    | 'quote'
+    | 'checklist';
   content: string;
   metadata?: Record<string, any>;
 }
@@ -18,8 +27,20 @@ export interface GameDesignDoc {
   template: string;
   blocks: DocBlock[];
   tags: string[];
-  category: 'gdd' | 'level-design' | 'character' | 'narrative' | 'system' | 'art' | 'audio' | 'monetization';
-  collaborators: { userId: string; role: 'owner' | 'editor' | 'commenter' | 'viewer'; joinedAt: number }[];
+  category:
+    | 'gdd'
+    | 'level-design'
+    | 'character'
+    | 'narrative'
+    | 'system'
+    | 'art'
+    | 'audio'
+    | 'monetization';
+  collaborators: {
+    userId: string;
+    role: 'owner' | 'editor' | 'commenter' | 'viewer';
+    joinedAt: number;
+  }[];
   versions: DocVersion[];
   comments: DocComment[];
   linkedResources: { type: 'code' | 'asset' | 'task' | 'other-doc'; id: string; ref: string }[];
@@ -94,8 +115,8 @@ class GDDCollabService {
           { type: 'heading', content: '差异化卖点' },
           { type: 'numbered', content: '与同类游戏的差异化' },
           { type: 'heading', content: '技术方案' },
-          { type: 'paragraph', content: '使用的引擎和技术栈...' }
-        ]
+          { type: 'paragraph', content: '使用的引擎和技术栈...' },
+        ],
       },
       {
         id: 'level-design',
@@ -112,8 +133,8 @@ class GDDCollabService {
           { type: 'bullet', content: '敌人类型 2' },
           { type: 'heading', content: '道具和奖励' },
           { type: 'bullet', content: '可收集道具' },
-          { type: 'bullet', content: '通关奖励' }
-        ]
+          { type: 'bullet', content: '通关奖励' },
+        ],
       },
       {
         id: 'character-design',
@@ -129,17 +150,21 @@ class GDDCollabService {
           { type: 'heading', content: '背景故事' },
           { type: 'paragraph', content: '角色的过去和动机' },
           { type: 'heading', content: '能力设定' },
-          { type: 'bullet', content: '技能 1' }
-        ]
-      }
+          { type: 'bullet', content: '技能 1' },
+        ],
+      },
     ];
   }
 
   // 创建文档
-  createDoc(title: string, templateId?: string, category?: GameDesignDoc['category']): GameDesignDoc {
+  createDoc(
+    title: string,
+    templateId?: string,
+    category?: GameDesignDoc['category']
+  ): GameDesignDoc {
     let blocks: DocBlock[] = [];
     if (templateId) {
-      const tpl = this.templates.find(t => t.id === templateId);
+      const tpl = this.templates.find((t) => t.id === templateId);
       if (tpl) {
         blocks = tpl.blocks.map((b, i) => ({ ...b, id: `block-${i}` }));
       }
@@ -160,7 +185,7 @@ class GDDCollabService {
       createdAt: Date.now(),
       updatedAt: Date.now(),
       createdBy: this.currentUser,
-      activeSessions: []
+      activeSessions: [],
     };
 
     this.docs.set(doc.id, doc);
@@ -170,7 +195,7 @@ class GDDCollabService {
 
   // 从模板创建
   createFromTemplate(templateId: string, title: string): GameDesignDoc {
-    const tpl = this.templates.find(t => t.id === templateId);
+    const tpl = this.templates.find((t) => t.id === templateId);
     if (!tpl) throw new Error('模板不存在');
     return this.createDoc(title, templateId, tpl.category);
   }
@@ -179,7 +204,7 @@ class GDDCollabService {
   updateBlock(docId: string, blockId: string, updates: Partial<DocBlock>): void {
     const doc = this.docs.get(docId);
     if (!doc) return;
-    const block = doc.blocks.find(b => b.id === blockId);
+    const block = doc.blocks.find((b) => b.id === blockId);
     if (!block) return;
 
     Object.assign(block, updates);
@@ -193,7 +218,7 @@ class GDDCollabService {
     if (!doc) throw new Error('文档不存在');
     const newBlock: DocBlock = {
       ...block,
-      id: `block-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`
+      id: `block-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
     };
     doc.blocks.splice(index, 0, newBlock);
     doc.updatedAt = Date.now();
@@ -205,7 +230,7 @@ class GDDCollabService {
   deleteBlock(docId: string, blockId: string): void {
     const doc = this.docs.get(docId);
     if (!doc) return;
-    doc.blocks = doc.blocks.filter(b => b.id !== blockId);
+    doc.blocks = doc.blocks.filter((b) => b.id !== blockId);
     doc.updatedAt = Date.now();
     this.notify('block:deleted', { docId, blockId });
   }
@@ -214,7 +239,7 @@ class GDDCollabService {
   moveBlock(docId: string, blockId: string, newIndex: number): void {
     const doc = this.docs.get(docId);
     if (!doc) return;
-    const idx = doc.blocks.findIndex(b => b.id === blockId);
+    const idx = doc.blocks.findIndex((b) => b.id === blockId);
     if (idx === -1) return;
     const [block] = doc.blocks.splice(idx, 1);
     doc.blocks.splice(newIndex, 0, block);
@@ -223,16 +248,23 @@ class GDDCollabService {
   }
 
   // 添加协作者
-  addCollaborator(docId: string, userId: string, role: GameDesignDoc['collaborators'][0]['role']): void {
+  addCollaborator(
+    docId: string,
+    userId: string,
+    role: GameDesignDoc['collaborators'][0]['role']
+  ): void {
     const doc = this.docs.get(docId);
     if (!doc) return;
-    if (doc.collaborators.find(c => c.userId === userId)) return;
+    if (doc.collaborators.find((c) => c.userId === userId)) return;
     doc.collaborators.push({ userId, role, joinedAt: Date.now() });
     this.notify('collaborator:added', { docId, userId, role });
   }
 
   // 模拟远程操作（用于演示实时协作）
-  applyRemoteOp(docId: string, op: { type: string; blockId?: string; content?: any; userId: string }): void {
+  applyRemoteOp(
+    docId: string,
+    op: { type: string; blockId?: string; content?: any; userId: string }
+  ): void {
     const doc = this.docs.get(docId);
     if (!doc) return;
     this.remoteOps.push({ docId, op, userId: op.userId, timestamp: Date.now() });
@@ -245,10 +277,10 @@ class GDDCollabService {
     if (!doc) return;
 
     // 添加到活跃会话
-    if (!doc.activeSessions.find(s => s.userId === userId)) {
+    if (!doc.activeSessions.find((s) => s.userId === userId)) {
       doc.activeSessions.push({ userId, cursor: 0 });
     } else {
-      const session = doc.activeSessions.find(s => s.userId === userId);
+      const session = doc.activeSessions.find((s) => s.userId === userId);
       if (session) session.cursor = Math.floor(Math.random() * doc.blocks.length);
     }
     this.notify('session:updated', { docId, activeSessions: doc.activeSessions });
@@ -262,14 +294,15 @@ class GDDCollabService {
 
     const lastVersion = doc.versions[doc.versions.length - 1];
     if (lastVersion) {
-      const oldBlocks = new Map(lastVersion.blocks.map(b => [b.id, b]));
+      const oldBlocks = new Map(lastVersion.blocks.map((b) => [b.id, b]));
       for (const block of doc.blocks) {
         const old = oldBlocks.get(block.id);
         if (!old) changes.push({ blockId: block.id, type: 'added' });
-        else if (JSON.stringify(old) !== JSON.stringify(block)) changes.push({ blockId: block.id, type: 'modified' });
+        else if (JSON.stringify(old) !== JSON.stringify(block))
+          changes.push({ blockId: block.id, type: 'modified' });
       }
       for (const old of lastVersion.blocks) {
-        if (!doc.blocks.find(b => b.id === old.id)) {
+        if (!doc.blocks.find((b) => b.id === old.id)) {
           changes.push({ blockId: old.id, type: 'deleted' });
         }
       }
@@ -284,7 +317,7 @@ class GDDCollabService {
       author: this.currentUser,
       message,
       timestamp: Date.now(),
-      changes
+      changes,
     };
     doc.versions.push(version);
     this.notify('version:saved', { docId, version });
@@ -295,7 +328,7 @@ class GDDCollabService {
   rollbackToVersion(docId: string, versionId: string): void {
     const doc = this.docs.get(docId);
     if (!doc) return;
-    const version = doc.versions.find(v => v.id === versionId);
+    const version = doc.versions.find((v) => v.id === versionId);
     if (!version) return;
     doc.blocks = JSON.parse(JSON.stringify(version.blocks));
     doc.updatedAt = Date.now();
@@ -303,7 +336,12 @@ class GDDCollabService {
   }
 
   // 添加评论
-  addComment(docId: string, content: string, blockId?: string, range?: { start: number; end: number }): DocComment {
+  addComment(
+    docId: string,
+    content: string,
+    blockId?: string,
+    range?: { start: number; end: number }
+  ): DocComment {
     const doc = this.docs.get(docId);
     if (!doc) throw new Error('文档不存在');
     const comment: DocComment = {
@@ -315,7 +353,7 @@ class GDDCollabService {
       resolved: false,
       replies: [],
       timestamp: Date.now(),
-      reactions: []
+      reactions: [],
     };
     doc.comments.push(comment);
     this.notify('comment:added', { docId, comment });
@@ -326,13 +364,13 @@ class GDDCollabService {
   replyToComment(docId: string, commentId: string, content: string): void {
     const doc = this.docs.get(docId);
     if (!doc) return;
-    const comment = doc.comments.find(c => c.id === commentId);
+    const comment = doc.comments.find((c) => c.id === commentId);
     if (!comment) return;
     comment.replies.push({
       id: `reply-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       author: this.currentUser,
       content,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     });
     this.notify('comment:replied', { docId, commentId });
   }
@@ -341,14 +379,19 @@ class GDDCollabService {
   resolveComment(docId: string, commentId: string): void {
     const doc = this.docs.get(docId);
     if (!doc) return;
-    const comment = doc.comments.find(c => c.id === commentId);
+    const comment = doc.comments.find((c) => c.id === commentId);
     if (!comment) return;
     comment.resolved = true;
     this.notify('comment:resolved', { docId, commentId });
   }
 
   // 链接资源
-  linkResource(docId: string, type: GameDesignDoc['linkedResources'][0]['type'], ref: string, id: string): void {
+  linkResource(
+    docId: string,
+    type: GameDesignDoc['linkedResources'][0]['type'],
+    ref: string,
+    id: string
+  ): void {
     const doc = this.docs.get(docId);
     if (!doc) return;
     doc.linkedResources.push({ type, id, ref });
@@ -358,18 +401,22 @@ class GDDCollabService {
   // 搜索文档
   searchDocs(query: string): GameDesignDoc[] {
     const q = query.toLowerCase();
-    return Array.from(this.docs.values()).filter(doc =>
-      doc.title.toLowerCase().includes(q) ||
-      doc.blocks.some(b => b.content.toLowerCase().includes(q)) ||
-      doc.tags.some(t => t.toLowerCase().includes(q))
+    return Array.from(this.docs.values()).filter(
+      (doc) =>
+        doc.title.toLowerCase().includes(q) ||
+        doc.blocks.some((b) => b.content.toLowerCase().includes(q)) ||
+        doc.tags.some((t) => t.toLowerCase().includes(q))
     );
   }
 
   // 列出文档
-  listDocs(filter?: { category?: GameDesignDoc['category']; status?: GameDesignDoc['status'] }): GameDesignDoc[] {
+  listDocs(filter?: {
+    category?: GameDesignDoc['category'];
+    status?: GameDesignDoc['status'];
+  }): GameDesignDoc[] {
     let docs = Array.from(this.docs.values());
-    if (filter?.category) docs = docs.filter(d => d.category === filter.category);
-    if (filter?.status) docs = docs.filter(d => d.status === filter.status);
+    if (filter?.category) docs = docs.filter((d) => d.category === filter.category);
+    if (filter?.status) docs = docs.filter((d) => d.status === filter.status);
     return docs.sort((a, b) => b.updatedAt - a.updatedAt);
   }
 
@@ -419,7 +466,9 @@ class GDDCollabService {
   // 订阅
   subscribe(listener: (event: string, data: any) => void): () => void {
     this.listeners.add(listener);
-    return () => { this.listeners.delete(listener); };
+    return () => {
+      this.listeners.delete(listener);
+    };
   }
 
   private notify(event: string, data: any): void {

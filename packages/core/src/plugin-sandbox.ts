@@ -142,7 +142,7 @@ export class PluginSandbox {
     runtime.executionCount++;
 
     const methods = this.apiMethods.get(pluginId) || [];
-    const method = methods.find(m => m.name === methodName);
+    const method = methods.find((m) => m.name === methodName);
 
     if (!method) {
       throw new Error(`方法不存在: ${methodName}`);
@@ -157,10 +157,14 @@ export class PluginSandbox {
     }
   }
 
-  registerAPIMethod(pluginId: string, name: string, handler: (...args: unknown[]) => unknown): void {
+  registerAPIMethod(
+    pluginId: string,
+    name: string,
+    handler: (...args: unknown[]) => unknown
+  ): void {
     const methods = this.apiMethods.get(pluginId);
     if (methods) {
-      const existing = methods.find(m => m.name === name);
+      const existing = methods.find((m) => m.name === name);
       if (existing) {
         existing.handler = handler;
       } else {
@@ -174,9 +178,9 @@ export class PluginSandbox {
     if (handlers && handlers.has(message.type)) {
       handlers.get(message.type)!(message.payload);
     }
-    globalEventBus.emit({ 
-      type: `sandbox:message:${pluginId}`, 
-      payload: { ...message, pluginId } 
+    globalEventBus.emit({
+      type: `sandbox:message:${pluginId}`,
+      payload: { ...message, pluginId },
     });
   }
 
@@ -243,7 +247,7 @@ export class PluginSandbox {
 
   getActiveSandboxCount(): number {
     return Array.from(this.sandboxes.values()).filter(
-      r => r.status === 'running' || r.status === 'paused'
+      (r) => r.status === 'running' || r.status === 'paused'
     ).length;
   }
 
@@ -253,7 +257,10 @@ export class PluginSandbox {
 
   setSandboxPermissions(pluginId: string, permissions: Partial<SandboxPermissions>): void {
     Object.assign(this.defaultPermissions, permissions);
-    globalEventBus.emit({ type: 'sandbox:permissions-updated', payload: { pluginId, permissions } });
+    globalEventBus.emit({
+      type: 'sandbox:permissions-updated',
+      payload: { pluginId, permissions },
+    });
   }
 
   private executeCode(pluginId: string, code: string): unknown {
@@ -288,11 +295,14 @@ export class PluginSandbox {
     }
   }
 
-  private createSandboxGlobal(pluginId: string, permissions: SandboxPermissions): Record<string, unknown> {
+  private createSandboxGlobal(
+    pluginId: string,
+    permissions: SandboxPermissions
+  ): Record<string, unknown> {
     const sandboxConsole: Record<string, (...args: unknown[]) => void> = {};
 
     if (permissions.allowConsole) {
-      ['log', 'warn', 'error', 'info', 'debug'].forEach(method => {
+      ['log', 'warn', 'error', 'info', 'debug'].forEach((method) => {
         sandboxConsole[method] = (...args: unknown[]) => {
           globalEventBus.emit({
             type: `sandbox:console:${pluginId}`,
@@ -307,7 +317,7 @@ export class PluginSandbox {
         };
       });
     } else {
-      ['log', 'warn', 'error', 'info', 'debug'].forEach(method => {
+      ['log', 'warn', 'error', 'info', 'debug'].forEach((method) => {
         sandboxConsole[method] = () => {};
       });
     }
@@ -321,7 +331,11 @@ export class PluginSandbox {
     };
 
     if (permissions.allowSetTimeout) {
-      sandboxGlobal.setTimeout = (callback: (...args: unknown[]) => void, delay: number, ...args: unknown[]) => {
+      sandboxGlobal.setTimeout = (
+        callback: (...args: unknown[]) => void,
+        delay: number,
+        ...args: unknown[]
+      ) => {
         const id = ++timerId;
         const timeout = setTimeout(() => {
           try {
@@ -349,7 +363,11 @@ export class PluginSandbox {
     }
 
     if (permissions.allowSetInterval) {
-      sandboxGlobal.setInterval = (callback: (...args: unknown[]) => void, delay: number, ...args: unknown[]) => {
+      sandboxGlobal.setInterval = (
+        callback: (...args: unknown[]) => void,
+        delay: number,
+        ...args: unknown[]
+      ) => {
         const id = ++timerId;
         const interval = setInterval(() => {
           try {
@@ -399,7 +417,7 @@ export class PluginSandbox {
               keysToRemove.push(key);
             }
           }
-          keysToRemove.forEach(k => localStorage.removeItem(k));
+          keysToRemove.forEach((k) => localStorage.removeItem(k));
         },
         get length() {
           let count = 0;

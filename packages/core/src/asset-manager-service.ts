@@ -1,5 +1,5 @@
 import { globalEventBus } from './event-bus';
-import { randomUUID } from 'node:crypto';
+import { randomUUID } from './utils/crypto-utils';
 
 export type AssetType = 'image' | 'audio' | 'font' | 'video' | 'spritesheet' | 'other';
 
@@ -106,32 +106,33 @@ export class AssetManagerService {
 
     if (filter) {
       if (filter.types && filter.types.length > 0) {
-        result = result.filter(a => filter.types!.includes(a.type));
+        result = result.filter((a) => filter.types!.includes(a.type));
       }
       if (filter.formats && filter.formats.length > 0) {
-        result = result.filter(a => filter.formats!.includes(a.format));
+        result = result.filter((a) => filter.formats!.includes(a.format));
       }
       if (filter.minSize !== undefined) {
-        result = result.filter(a => a.size >= filter.minSize!);
+        result = result.filter((a) => a.size >= filter.minSize!);
       }
       if (filter.maxSize !== undefined) {
-        result = result.filter(a => a.size <= filter.maxSize!);
+        result = result.filter((a) => a.size <= filter.maxSize!);
       }
       if (filter.dateFrom !== undefined) {
-        result = result.filter(a => a.lastModified >= filter.dateFrom!);
+        result = result.filter((a) => a.lastModified >= filter.dateFrom!);
       }
       if (filter.dateTo !== undefined) {
-        result = result.filter(a => a.lastModified <= filter.dateTo!);
+        result = result.filter((a) => a.lastModified <= filter.dateTo!);
       }
       if (filter.tags && filter.tags.length > 0) {
-        result = result.filter(a => filter.tags!.some(t => a.tags.includes(t)));
+        result = result.filter((a) => filter.tags!.some((t) => a.tags.includes(t)));
       }
       if (filter.searchQuery && filter.searchQuery.trim() !== '') {
         const query = filter.searchQuery.toLowerCase();
-        result = result.filter(a => 
-          a.name.toLowerCase().includes(query) ||
-          a.path.toLowerCase().includes(query) ||
-          a.tags.some(t => t.toLowerCase().includes(query))
+        result = result.filter(
+          (a) =>
+            a.name.toLowerCase().includes(query) ||
+            a.path.toLowerCase().includes(query) ||
+            a.tags.some((t) => t.toLowerCase().includes(query))
         );
       }
     }
@@ -144,7 +145,7 @@ export class AssetManagerService {
   }
 
   getAssetByPath(path: string): AssetItem | undefined {
-    return Array.from(this.assets.values()).find(a => a.path === path);
+    return Array.from(this.assets.values()).find((a) => a.path === path);
   }
 
   async loadAssets(directoryPath: string): Promise<AssetItem[]> {
@@ -153,15 +154,21 @@ export class AssetManagerService {
 
     try {
       const mockAssets = this.generateMockAssets();
-      mockAssets.forEach(asset => {
+      mockAssets.forEach((asset) => {
         this.assets.set(asset.id, asset);
         this.updateSearchIndex(asset);
       });
 
-      globalEventBus.emit({ type: 'asset:loaded', payload: { count: mockAssets.length, assets: mockAssets } });
+      globalEventBus.emit({
+        type: 'asset:loaded',
+        payload: { count: mockAssets.length, assets: mockAssets },
+      });
       return mockAssets;
     } catch (error) {
-      globalEventBus.emit({ type: 'asset:error', payload: { error: error instanceof Error ? error.message : '加载失败' } });
+      globalEventBus.emit({
+        type: 'asset:error',
+        payload: { error: error instanceof Error ? error.message : '加载失败' },
+      });
       throw error;
     } finally {
       this.isLoading = false;
@@ -208,7 +215,10 @@ export class AssetManagerService {
     globalEventBus.emit({ type: 'asset:removed', payload: { id, path: asset.path } });
   }
 
-  async updateAsset(id: string, updates: Partial<Pick<AssetItem, 'name' | 'tags'>>): Promise<AssetItem | undefined> {
+  async updateAsset(
+    id: string,
+    updates: Partial<Pick<AssetItem, 'name' | 'tags'>>
+  ): Promise<AssetItem | undefined> {
     const asset = this.assets.get(id);
     if (!asset) return undefined;
 
@@ -299,7 +309,8 @@ export class AssetManagerService {
       throw new Error('资源不存在');
     }
 
-    const previewUrl = asset.previewUrl || asset.thumbnailUrl || this.generateMockThumbnail(asset.name);
+    const previewUrl =
+      asset.previewUrl || asset.thumbnailUrl || this.generateMockThumbnail(asset.name);
 
     globalEventBus.emit({ type: 'asset:preview', payload: { assetId: id, previewUrl } });
     return { url: previewUrl, type: asset.type };
@@ -332,7 +343,7 @@ export class AssetManagerService {
     let totalSize = 0;
     let compressedCount = 0;
 
-    this.assets.forEach(asset => {
+    this.assets.forEach((asset) => {
       byType[asset.type]++;
       totalSize += asset.size;
       if (asset.compressed) compressedCount++;
@@ -405,7 +416,7 @@ export class AssetManagerService {
     const keywords = [
       asset.name.toLowerCase(),
       asset.path.toLowerCase(),
-      ...asset.tags.map(t => t.toLowerCase()),
+      ...asset.tags.map((t) => t.toLowerCase()),
     ];
     this.searchIndex.set(asset.id, keywords);
   }
@@ -492,9 +503,7 @@ export class AssetManagerService {
       });
     });
 
-    const videos = [
-      { name: 'intro.mp4', size: 15678901, duration: 12 },
-    ];
+    const videos = [{ name: 'intro.mp4', size: 15678901, duration: 12 }];
 
     videos.forEach((video, index) => {
       mockAssets.push({
@@ -514,9 +523,7 @@ export class AssetManagerService {
       });
     });
 
-    const spritesheets = [
-      { name: 'hero_anim.json', size: 12345, frameCount: 16 },
-    ];
+    const spritesheets = [{ name: 'hero_anim.json', size: 12345, frameCount: 16 }];
 
     spritesheets.forEach((ss, index) => {
       mockAssets.push({

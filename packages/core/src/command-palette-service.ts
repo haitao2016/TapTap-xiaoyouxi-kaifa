@@ -46,7 +46,7 @@ export class CommandPaletteService {
   }
 
   getCommandsByCategory(category: string): Command[] {
-    return Array.from(this.commands.values()).filter(c => c.category === category);
+    return Array.from(this.commands.values()).filter((c) => c.category === category);
   }
 
   getCategories(): string[] {
@@ -64,21 +64,21 @@ export class CommandPaletteService {
     }
 
     const lowerQuery = query.toLowerCase();
-    const tokens = lowerQuery.split(/\s+/).filter(t => t.length > 0);
+    const tokens = lowerQuery.split(/\s+/).filter((t) => t.length > 0);
 
     const matches: CommandMatch[] = [];
 
-    this.commands.forEach(command => {
+    this.commands.forEach((command) => {
       const searchText = [
         command.name.toLowerCase(),
         command.description.toLowerCase(),
-        ...command.keywords.map(k => k.toLowerCase()),
+        ...command.keywords.map((k) => k.toLowerCase()),
       ].join(' ');
 
       let score = 0;
       const foundMatches: string[] = [];
 
-      tokens.forEach(token => {
+      tokens.forEach((token) => {
         if (command.name.toLowerCase().includes(token)) {
           score += 3;
           foundMatches.push(command.name);
@@ -87,7 +87,7 @@ export class CommandPaletteService {
           score += 2;
           foundMatches.push(command.description);
         }
-        if (command.keywords.some(k => k.toLowerCase().includes(token))) {
+        if (command.keywords.some((k) => k.toLowerCase().includes(token))) {
           score += 1;
           foundMatches.push(command.keywords.join(', '));
         }

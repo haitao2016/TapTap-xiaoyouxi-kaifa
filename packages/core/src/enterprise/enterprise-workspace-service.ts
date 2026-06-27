@@ -1,7 +1,7 @@
 // 企业版工作空间
 // 组织架构、RBAC、SSO、审计日志、私有化部署
 
-import { globalEventBus } from '../core/event-bus';
+import { globalEventBus } from '../event-bus';
 
 // 组织
 export interface Organization {
@@ -90,13 +90,26 @@ export interface EnterpriseRole {
 
 // 权限
 export type Permission =
-  | 'project:create' | 'project:delete' | 'project:read' | 'project:update'
-  | 'project:build' | 'project:deploy' | 'project:share'
-  | 'asset:upload' | 'asset:delete' | 'asset:share'
-  | 'team:invite' | 'team:remove' | 'team:manage'
-  | 'org:settings' | 'org:billing' | 'org:audit'
-  | 'plugin:install' | 'plugin:publish'
-  | 'analytics:view' | 'analytics:export';
+  | 'project:create'
+  | 'project:delete'
+  | 'project:read'
+  | 'project:update'
+  | 'project:build'
+  | 'project:deploy'
+  | 'project:share'
+  | 'asset:upload'
+  | 'asset:delete'
+  | 'asset:share'
+  | 'team:invite'
+  | 'team:remove'
+  | 'team:manage'
+  | 'org:settings'
+  | 'org:billing'
+  | 'org:audit'
+  | 'plugin:install'
+  | 'plugin:publish'
+  | 'analytics:view'
+  | 'analytics:export';
 
 // 审计日志
 export interface AuditLog {
@@ -135,50 +148,72 @@ class EnterpriseWorkspaceService {
         name: '组织管理员',
         description: '拥有组织的所有权限',
         permissions: [
-          'project:create', 'project:delete', 'project:read', 'project:update',
-          'project:build', 'project:deploy', 'project:share',
-          'asset:upload', 'asset:delete', 'asset:share',
-          'team:invite', 'team:remove', 'team:manage',
-          'org:settings', 'org:billing', 'org:audit',
-          'plugin:install', 'plugin:publish',
-          'analytics:view', 'analytics:export'
+          'project:create',
+          'project:delete',
+          'project:read',
+          'project:update',
+          'project:build',
+          'project:deploy',
+          'project:share',
+          'asset:upload',
+          'asset:delete',
+          'asset:share',
+          'team:invite',
+          'team:remove',
+          'team:manage',
+          'org:settings',
+          'org:billing',
+          'org:audit',
+          'plugin:install',
+          'plugin:publish',
+          'analytics:view',
+          'analytics:export',
         ],
-        isSystem: true
+        isSystem: true,
       },
       {
         id: 'project-manager',
         name: '项目经理',
         description: '管理项目和团队',
         permissions: [
-          'project:create', 'project:read', 'project:update',
-          'project:build', 'project:deploy', 'project:share',
-          'asset:upload', 'asset:share',
-          'team:invite', 'team:remove',
-          'analytics:view', 'analytics:export'
+          'project:create',
+          'project:read',
+          'project:update',
+          'project:build',
+          'project:deploy',
+          'project:share',
+          'asset:upload',
+          'asset:share',
+          'team:invite',
+          'team:remove',
+          'analytics:view',
+          'analytics:export',
         ],
         isSystem: true,
-        inheritsFrom: []
+        inheritsFrom: [],
       },
       {
         id: 'developer',
         name: '开发者',
         description: '标准开发权限',
         permissions: [
-          'project:create', 'project:read', 'project:update',
+          'project:create',
+          'project:read',
+          'project:update',
           'project:build',
           'asset:upload',
           'plugin:install',
-          'analytics:view'
+          'analytics:view',
         ],
-        isSystem: true
+        isSystem: true,
       },
       {
         id: 'viewer',
         name: '访客',
         description: '只读访问',
         permissions: ['project:read', 'analytics:view'],
-        isSystem: true
-      }
+        isSystem: true,
+      },
     ];
 
     for (const role of systemRoles) {
@@ -187,7 +222,13 @@ class EnterpriseWorkspaceService {
   }
 
   // 创建组织
-  createOrg(config: Omit<Organization, 'id' | 'createdAt' | 'auditLogEnabled' | 'privateDeployment' | 'sla' | 'settings'> & Partial<Pick<Organization, 'auditLogEnabled' | 'privateDeployment' | 'sla' | 'settings'>>): Organization {
+  createOrg(
+    config: Omit<
+      Organization,
+      'id' | 'createdAt' | 'auditLogEnabled' | 'privateDeployment' | 'sla' | 'settings'
+    > &
+      Partial<Pick<Organization, 'auditLogEnabled' | 'privateDeployment' | 'sla' | 'settings'>>
+  ): Organization {
     const org: Organization = {
       ...config,
       id: `org-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
@@ -197,9 +238,14 @@ class EnterpriseWorkspaceService {
       sla: config.sla || { uptime: 99.9, supportResponse: 24, dedicatedManager: false },
       settings: config.settings || {
         allowedDomains: [],
-        passwordPolicy: { minLength: 8, requireUpper: true, requireNumber: true, requireSpecial: false },
-        twoFactorRequired: false
-      }
+        passwordPolicy: {
+          minLength: 8,
+          requireUpper: true,
+          requireNumber: true,
+          requireSpecial: false,
+        },
+        twoFactorRequired: false,
+      },
     };
     this.orgs.set(org.id, org);
     this.currentOrgId = org.id;
@@ -220,10 +266,16 @@ class EnterpriseWorkspaceService {
       twoFactorEnabled: false,
       ssoLinked: false,
       joinedAt: Date.now(),
-      quota: { projects: 10, storageGB: 10, bandwidthGB: 50 }
+      quota: { projects: 10, storageGB: 10, bandwidthGB: 50 },
     };
     this.users.set(user.id, user);
-    this.logAction(orgId, user.id, 'invite_user', { type: 'user', id: user.id, name: email }, { roleIds });
+    this.logAction(
+      orgId,
+      user.id,
+      'invite_user',
+      { type: 'user', id: user.id, name: email },
+      { roleIds }
+    );
     this.notify('user:invited', user);
     return user;
   }
@@ -233,7 +285,13 @@ class EnterpriseWorkspaceService {
     const user = this.users.get(userId);
     if (!user) return;
     if (!user.roleIds.includes(roleId)) user.roleIds.push(roleId);
-    this.logAction(user.orgId, this.currentUserId || userId, 'assign_role', { type: 'user', id: userId, name: user.email }, { roleId });
+    this.logAction(
+      user.orgId,
+      this.currentUserId || userId,
+      'assign_role',
+      { type: 'user', id: userId, name: user.email },
+      { roleId }
+    );
     this.notify('role:assigned', { userId, roleId });
   }
 
@@ -241,8 +299,14 @@ class EnterpriseWorkspaceService {
   removeRole(userId: string, roleId: string): void {
     const user = this.users.get(userId);
     if (!user) return;
-    user.roleIds = user.roleIds.filter(r => r !== roleId);
-    this.logAction(user.orgId, this.currentUserId || userId, 'remove_role', { type: 'user', id: userId, name: user.email }, { roleId });
+    user.roleIds = user.roleIds.filter((r) => r !== roleId);
+    this.logAction(
+      user.orgId,
+      this.currentUserId || userId,
+      'remove_role',
+      { type: 'user', id: userId, name: user.email },
+      { roleId }
+    );
   }
 
   // 检查权限
@@ -273,7 +337,7 @@ class EnterpriseWorkspaceService {
       name,
       parentId,
       managerId: managerId || '',
-      memberIds: []
+      memberIds: [],
     };
     this.departments.set(dept.id, dept);
     this.notify('dept:created', dept);
@@ -295,7 +359,13 @@ class EnterpriseWorkspaceService {
     if (!org) return;
     org.ssoEnabled = true;
     org.ssoConfig = config;
-    this.logAction(orgId, this.currentUserId || '', 'enable_sso', { type: 'org', id: orgId, name: org.name }, { type: config?.type });
+    this.logAction(
+      orgId,
+      this.currentUserId || '',
+      'enable_sso',
+      { type: 'org', id: orgId, name: org.name },
+      { type: config?.type }
+    );
   }
 
   // 审计日志
@@ -319,20 +389,27 @@ class EnterpriseWorkspaceService {
       userAgent: navigator?.userAgent || '',
       timestamp: Date.now(),
       result,
-      riskLevel
+      riskLevel,
     };
     this.auditLogs.push(log);
     this.notify('audit:logged', log);
   }
 
   // 查询审计日志
-  queryAuditLogs(filter: { orgId?: string; userId?: string; action?: string; startTime?: number; endTime?: number; limit?: number }): AuditLog[] {
+  queryAuditLogs(filter: {
+    orgId?: string;
+    userId?: string;
+    action?: string;
+    startTime?: number;
+    endTime?: number;
+    limit?: number;
+  }): AuditLog[] {
     let logs = this.auditLogs;
-    if (filter.orgId) logs = logs.filter(l => l.orgId === filter.orgId);
-    if (filter.userId) logs = logs.filter(l => l.userId === filter.userId);
-    if (filter.action) logs = logs.filter(l => l.action === filter.action);
-    if (filter.startTime) logs = logs.filter(l => l.timestamp >= filter.startTime!);
-    if (filter.endTime) logs = logs.filter(l => l.timestamp <= filter.endTime!);
+    if (filter.orgId) logs = logs.filter((l) => l.orgId === filter.orgId);
+    if (filter.userId) logs = logs.filter((l) => l.userId === filter.userId);
+    if (filter.action) logs = logs.filter((l) => l.action === filter.action);
+    if (filter.startTime) logs = logs.filter((l) => l.timestamp >= filter.startTime!);
+    if (filter.endTime) logs = logs.filter((l) => l.timestamp <= filter.endTime!);
     if (filter.limit) logs = logs.slice(-filter.limit);
     return logs;
   }
@@ -343,31 +420,47 @@ class EnterpriseWorkspaceService {
     const csv = ['时间,用户,操作,资源,结果,风险级别'];
     for (const log of logs) {
       const user = this.users.get(log.userId);
-      csv.push(`${new Date(log.timestamp).toISOString()},${user?.email || log.userId},${log.action},${log.resource.name},${log.result},${log.riskLevel}`);
+      csv.push(
+        `${new Date(log.timestamp).toISOString()},${user?.email || log.userId},${log.action},${log.resource.name},${log.result},${log.riskLevel}`
+      );
     }
     return csv.join('\n');
   }
 
   // 创建自定义角色
-  createCustomRole(name: string, description: string, permissions: Permission[], inheritsFrom?: string[]): EnterpriseRole {
+  createCustomRole(
+    name: string,
+    description: string,
+    permissions: Permission[],
+    inheritsFrom?: string[]
+  ): EnterpriseRole {
     const role: EnterpriseRole = {
       id: `role-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       name,
       description,
       permissions,
       isSystem: false,
-      inheritsFrom
+      inheritsFrom,
     };
     this.roles.set(role.id, role);
     return role;
   }
 
   // 配置私有化部署
-  configurePrivateDeployment(orgId: string, config: { region: string; endpoint: string; ssl: boolean }): void {
+  configurePrivateDeployment(
+    orgId: string,
+    config: { region: string; endpoint: string; ssl: boolean }
+  ): void {
     const org = this.orgs.get(orgId);
     if (!org) return;
     org.privateDeployment = true;
-    this.logAction(orgId, this.currentUserId || '', 'configure_private_deployment', { type: 'org', id: orgId, name: org.name }, config);
+    this.logAction(
+      orgId,
+      this.currentUserId || '',
+      'configure_private_deployment',
+      { type: 'org', id: orgId, name: org.name },
+      config
+    );
   }
 
   // 升级计划
@@ -379,14 +472,24 @@ class EnterpriseWorkspaceService {
     if (plan === 'enterprise') {
       org.sla = { uptime: 99.99, supportResponse: 1, dedicatedManager: true };
     }
-    this.logAction(orgId, this.currentUserId || '', 'upgrade_plan', { type: 'org', id: orgId, name: org.name }, { from: oldPlan, to: plan });
+    this.logAction(
+      orgId,
+      this.currentUserId || '',
+      'upgrade_plan',
+      { type: 'org', id: orgId, name: org.name },
+      { from: oldPlan, to: plan }
+    );
   }
 
   // 列出用户
-  listUsers(orgId: string, filter?: { status?: EnterpriseUser['status']; departmentId?: string }): EnterpriseUser[] {
-    let users = Array.from(this.users.values()).filter(u => u.orgId === orgId);
-    if (filter?.status) users = users.filter(u => u.status === filter.status);
-    if (filter?.departmentId) users = users.filter(u => u.departmentIds.includes(filter.departmentId!));
+  listUsers(
+    orgId: string,
+    filter?: { status?: EnterpriseUser['status']; departmentId?: string }
+  ): EnterpriseUser[] {
+    let users = Array.from(this.users.values()).filter((u) => u.orgId === orgId);
+    if (filter?.status) users = users.filter((u) => u.status === filter.status);
+    if (filter?.departmentId)
+      users = users.filter((u) => u.departmentIds.includes(filter.departmentId!));
     return users;
   }
 
@@ -397,7 +500,7 @@ class EnterpriseWorkspaceService {
 
   // 列出部门
   listDepartments(orgId: string): Department[] {
-    return Array.from(this.departments.values()).filter(d => d.orgId === orgId);
+    return Array.from(this.departments.values()).filter((d) => d.orgId === orgId);
   }
 
   // 获取组织
@@ -413,7 +516,9 @@ class EnterpriseWorkspaceService {
   // 订阅
   subscribe(listener: (event: string, data: any) => void): () => void {
     this.listeners.add(listener);
-    return () => { this.listeners.delete(listener); };
+    return () => {
+      this.listeners.delete(listener);
+    };
   }
 
   private notify(event: string, data: any): void {

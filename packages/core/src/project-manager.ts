@@ -8,7 +8,7 @@ import type {
 import { globalEventBus } from './event-bus';
 import { templateService } from './template-service';
 import type { VirtualFile } from './template-service';
-import { randomUUID } from 'node:crypto';
+import { randomUUID } from './utils/crypto-utils';
 import {
   existsSync,
   readFileSync,
@@ -272,7 +272,10 @@ export class ProjectManager {
   private settings: AppSettings = { ...DEFAULT_SETTINGS };
   private projectSettings = new Map<string, ProjectSettings>();
   private environmentConfigs = new Map<string, Record<EnvironmentType, ProjectEnvironmentConfig>>();
-  private fileWatchers = new Map<string, { watcher: FSWatcher; callbacks: Set<FileWatchCallback> }>();
+  private fileWatchers = new Map<
+    string,
+    { watcher: FSWatcher; callbacks: Set<FileWatchCallback> }
+  >();
   private fileContentCache = new Map<string, { content: string; mtime: number }>();
 
   getCurrentProject(): (ProjectMeta & { id: string }) | null {
@@ -308,8 +311,7 @@ export class ProjectManager {
   }): ProjectMeta & FlatProject {
     const now = new Date().toISOString();
     const tplMeta = DEFAULT_TEMPLATES.find((t) => t.id === options.template);
-    const engine: EngineType =
-      options.engine ?? tplMeta?.engine ?? 'native-js';
+    const engine: EngineType = options.engine ?? tplMeta?.engine ?? 'native-js';
 
     const project: FlatProject = {
       id: randomUUID(),
@@ -358,7 +360,7 @@ export class ProjectManager {
     onProgress?: (progress: number, stage: string) => void;
   }): Promise<ProjectMeta & { id: string }> {
     const meta = this.createProject(options);
-    const flat = [...this.projects.values()].find(p => p.name === options.name);
+    const flat = [...this.projects.values()].find((p) => p.name === options.name);
     if (!flat) {
       throw new Error('项目创建失败');
     }
@@ -719,9 +721,7 @@ dist-ssr
     if (!query) return [];
     const lower = query.toLowerCase();
     return [...this.projects.values()].filter(
-      (p) =>
-        p.name.toLowerCase().includes(lower) ||
-        p.description.toLowerCase().includes(lower)
+      (p) => p.name.toLowerCase().includes(lower) || p.description.toLowerCase().includes(lower)
     );
   }
 
@@ -921,7 +921,10 @@ dist-ssr
     return existsSync(fullPath);
   }
 
-  getFileStats(filePath: string, projectPath?: string): {
+  getFileStats(
+    filePath: string,
+    projectPath?: string
+  ): {
     size: number;
     mtime: number;
     isDirectory: boolean;
@@ -939,10 +942,7 @@ dist-ssr
     }
   }
 
-  searchFiles(
-    searchPath: string,
-    options: FileSearchOptions
-  ): FileSearchResult[] {
+  searchFiles(searchPath: string, options: FileSearchOptions): FileSearchResult[] {
     const results: FileSearchResult[] = [];
     const maxResults = options.maxResults || 100;
     const query = options.query.toLowerCase();
@@ -956,14 +956,11 @@ dist-ssr
     ];
 
     const shouldIgnore = (path: string): boolean => {
-      return ignorePatterns.some((pattern) =>
-        path.toLowerCase().includes(pattern.toLowerCase())
-      );
+      return ignorePatterns.some((pattern) => path.toLowerCase().includes(pattern.toLowerCase()));
     };
 
     const matchesExtension = (path: string): boolean => {
-      if (!options.fileExtensions || options.fileExtensions.length === 0)
-        return true;
+      if (!options.fileExtensions || options.fileExtensions.length === 0) return true;
       const ext = extname(path).slice(1).toLowerCase();
       return options.fileExtensions.some((e) => e.toLowerCase() === ext);
     };
@@ -1046,29 +1043,21 @@ dist-ssr
     return results.slice(0, maxResults);
   }
 
-  watchPath(
-    watchKey: string,
-    path: string,
-    callback: FileWatchCallback
-  ): () => void {
+  watchPath(watchKey: string, path: string, callback: FileWatchCallback): () => void {
     if (!this.fileWatchers.has(watchKey)) {
       const callbacks = new Set<FileWatchCallback>();
       let watcher: FSWatcher | null = null;
 
       try {
-        watcher = watch(
-          path,
-          { recursive: true, persistent: false },
-          (eventType, filename) => {
-            if (!filename) return;
-            const event: FileWatchEvent = {
-              type: eventType === 'rename' ? 'rename' : 'update',
-              path: filename as string,
-              timestamp: Date.now(),
-            };
-            callbacks.forEach((cb) => cb(event));
-          }
-        );
+        watcher = watch(path, { recursive: true, persistent: false }, (eventType, filename) => {
+          if (!filename) return;
+          const event: FileWatchEvent = {
+            type: eventType === 'rename' ? 'rename' : 'update',
+            path: filename as string,
+            timestamp: Date.now(),
+          };
+          callbacks.forEach((cb) => cb(event));
+        });
       } catch {
         return () => {};
       }
@@ -1171,7 +1160,10 @@ dist-ssr
       }
     }
 
-    if (cfg.engine && !['unity', 'cocos', 'laya', 'native-js', 'custom'].includes(cfg.engine as string)) {
+    if (
+      cfg.engine &&
+      !['unity', 'cocos', 'laya', 'native-js', 'custom'].includes(cfg.engine as string)
+    ) {
       errors.push(`无效的引擎类型: ${cfg.engine}`);
     }
 
@@ -1182,10 +1174,7 @@ dist-ssr
     };
   }
 
-  getEnvironmentConfig(
-    projectId: string,
-    environment: EnvironmentType
-  ): ProjectEnvironmentConfig {
+  getEnvironmentConfig(projectId: string, environment: EnvironmentType): ProjectEnvironmentConfig {
     const configs = this.environmentConfigs.get(projectId);
     if (!configs) {
       return this.getDefaultEnvironmentConfig(environment);
@@ -1211,9 +1200,7 @@ dist-ssr
     this.saveEnvironmentConfigs(projectId);
   }
 
-  getAllEnvironmentConfigs(
-    projectId: string
-  ): Record<EnvironmentType, ProjectEnvironmentConfig> {
+  getAllEnvironmentConfigs(projectId: string): Record<EnvironmentType, ProjectEnvironmentConfig> {
     const configs = this.environmentConfigs.get(projectId);
     if (!configs) {
       return {
@@ -1229,9 +1216,7 @@ dist-ssr
     };
   }
 
-  private getDefaultEnvironmentConfig(
-    env: EnvironmentType
-  ): ProjectEnvironmentConfig {
+  private getDefaultEnvironmentConfig(env: EnvironmentType): ProjectEnvironmentConfig {
     const base: ProjectEnvironmentConfig = {
       apiBaseUrl: '',
       debugMode: false,
@@ -1312,10 +1297,7 @@ dist-ssr
     return JSON.parse(JSON.stringify(settings));
   }
 
-  updateProjectSettings(
-    projectId: string,
-    partial: Partial<ProjectSettings>
-  ): void {
+  updateProjectSettings(projectId: string, partial: Partial<ProjectSettings>): void {
     const currentSettings = this.projectSettings.get(projectId);
     const settings: ProjectSettings = currentSettings
       ? JSON.parse(JSON.stringify(currentSettings))
@@ -1383,10 +1365,7 @@ dist-ssr
   }
 
   private initializeProjectSettings(projectId: string): void {
-    this.projectSettings.set(
-      projectId,
-      JSON.parse(JSON.stringify(DEFAULT_PROJECT_SETTINGS))
-    );
+    this.projectSettings.set(projectId, JSON.parse(JSON.stringify(DEFAULT_PROJECT_SETTINGS)));
   }
 
   private loadProjectSettings(projectId: string): void {

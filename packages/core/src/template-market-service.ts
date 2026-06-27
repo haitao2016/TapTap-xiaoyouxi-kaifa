@@ -19,14 +19,17 @@ export class TemplateMarketService {
   private ratings = new Map<string, TemplateRating[]>();
   private downloads = new Map<string, TemplateDownload[]>();
 
-  async searchTemplates(query: string, filters?: {
-    category?: string;
-    framework?: string;
-    language?: string;
-    sortBy?: 'downloads' | 'stars' | 'updated';
-  }): Promise<ProjectTemplate[]> {
+  async searchTemplates(
+    query: string,
+    filters?: {
+      category?: string;
+      framework?: string;
+      language?: string;
+      sortBy?: 'downloads' | 'stars' | 'updated';
+    }
+  ): Promise<ProjectTemplate[]> {
     const result = templateService.getTemplates({ query, ...filters });
-    return result.templates.map(template => ({
+    return result.templates.map((template) => ({
       ...template,
       downloads: this.getDownloadCount(template.id),
     }));
@@ -62,9 +65,14 @@ export class TemplateMarketService {
     return true;
   }
 
-  async rateTemplate(templateId: string, userId: string, rating: number, comment?: string): Promise<void> {
+  async rateTemplate(
+    templateId: string,
+    userId: string,
+    rating: number,
+    comment?: string
+  ): Promise<void> {
     const existingRatings = this.ratings.get(templateId) || [];
-    const existingIndex = existingRatings.findIndex(r => r.userId === userId);
+    const existingIndex = existingRatings.findIndex((r) => r.userId === userId);
 
     const newRating: TemplateRating = {
       userId,
@@ -95,7 +103,9 @@ export class TemplateMarketService {
     return this.downloads.get(templateId)?.length || 0;
   }
 
-  async submitTemplate(template: Omit<ProjectTemplate, 'downloads' | 'stars' | 'createdAt' | 'updatedAt'>): Promise<string> {
+  async submitTemplate(
+    template: Omit<ProjectTemplate, 'downloads' | 'stars' | 'createdAt' | 'updatedAt'>
+  ): Promise<string> {
     const newTemplate: ProjectTemplate = {
       ...template,
       downloads: 0,
@@ -110,7 +120,7 @@ export class TemplateMarketService {
   async getPopularTemplates(limit: number = 10): Promise<ProjectTemplate[]> {
     const result = templateService.getTemplates();
     return result.templates
-      .map(t => ({
+      .map((t) => ({
         ...t,
         downloads: this.getDownloadCount(t.id),
       }))

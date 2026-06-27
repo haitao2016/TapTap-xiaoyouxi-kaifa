@@ -1,7 +1,7 @@
 // 设计资源版本管理
 // PSD/AI/Figma 等设计文件的版本管理
 
-import { globalEventBus } from '../core/event-bus';
+import { globalEventBus } from '../event-bus';
 
 // 设计资源类型
 export type DesignFormat = 'psd' | 'ai' | 'figma' | 'sketch' | 'xd' | 'svg' | 'pdf';
@@ -86,28 +86,35 @@ class DesignVersionService {
   private autoSnapshotInterval = 30 * 60 * 1000; // 30 分钟
 
   // 创建资源
-  createResource(config: Omit<DesignResource, 'id' | 'currentVersion' | 'createdAt' | 'updatedAt' | 'relatedCommits'>): DesignResource {
+  createResource(
+    config: Omit<
+      DesignResource,
+      'id' | 'currentVersion' | 'createdAt' | 'updatedAt' | 'relatedCommits'
+    >
+  ): DesignResource {
     const resource: DesignResource = {
       ...config,
       id: `design-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       currentVersion: 1,
       createdAt: Date.now(),
       updatedAt: Date.now(),
-      relatedCommits: []
+      relatedCommits: [],
     };
     this.resources.set(resource.id, resource);
-    this.versions.set(resource.id, [{
-      id: `ver-${Date.now()}`,
-      resourceId: resource.id,
-      versionNumber: 1,
-      url: resource.url,
-      size: resource.size,
-      uploader: this.currentUser,
-      uploadedAt: Date.now(),
-      changeNote: '初始版本',
-      diff: { sizeDelta: 0, layerChanges: { added: 0, removed: 0, modified: 0 }, visualDiff: 0 },
-      isAutoSnapshot: false
-    }]);
+    this.versions.set(resource.id, [
+      {
+        id: `ver-${Date.now()}`,
+        resourceId: resource.id,
+        versionNumber: 1,
+        url: resource.url,
+        size: resource.size,
+        uploader: this.currentUser,
+        uploadedAt: Date.now(),
+        changeNote: '初始版本',
+        diff: { sizeDelta: 0, layerChanges: { added: 0, removed: 0, modified: 0 }, visualDiff: 0 },
+        isAutoSnapshot: false,
+      },
+    ]);
 
     if (resource.autoSnapshotEnabled) {
       this.scheduleAutoSnapshot(resource.id);
@@ -118,7 +125,12 @@ class DesignVersionService {
   }
 
   // 上传新版本
-  uploadVersion(resourceId: string, file: { url: string; size: number }, changeNote: string, isAutoSnapshot: boolean = false): DesignVersion {
+  uploadVersion(
+    resourceId: string,
+    file: { url: string; size: number },
+    changeNote: string,
+    isAutoSnapshot: boolean = false
+  ): DesignVersion {
     const resource = this.resources.get(resourceId);
     if (!resource) throw new Error('资源不存在');
 
@@ -134,7 +146,7 @@ class DesignVersionService {
       uploadedAt: Date.now(),
       changeNote,
       diff: this.calculateDiff(lastVersion, file),
-      isAutoSnapshot
+      isAutoSnapshot,
     };
 
     oldVersions.push(newVersion);
@@ -157,17 +169,29 @@ class DesignVersionService {
       if (resource.status === 'archived' || resource.status === 'final') return;
 
       // 模拟自动快照
-      this.uploadVersion(resourceId, {
-        url: resource.url,
-        size: resource.size + Math.floor(Math.random() * 1000)
-      }, '自动快照', true);
+      this.uploadVersion(
+        resourceId,
+        {
+          url: resource.url,
+          size: resource.size + Math.floor(Math.random() * 1000),
+        },
+        '自动快照',
+        true
+      );
     }, this.autoSnapshotInterval);
   }
 
   // 计算差异
-  private calculateDiff(oldVersion: DesignVersion | undefined, newFile: { size: number }): DesignVersion['diff'] {
+  private calculateDiff(
+    oldVersion: DesignVersion | undefined,
+    newFile: { size: number }
+  ): DesignVersion['diff'] {
     if (!oldVersion) {
-      return { sizeDelta: newFile.size, layerChanges: { added: 0, removed: 0, modified: 0 }, visualDiff: 0 };
+      return {
+        sizeDelta: newFile.size,
+        layerChanges: { added: 0, removed: 0, modified: 0 },
+        visualDiff: 0,
+      };
     }
     const sizeDelta = newFile.size - oldVersion.size;
     return {
@@ -175,16 +199,16 @@ class DesignVersionService {
       layerChanges: {
         added: Math.floor(Math.random() * 5),
         removed: Math.floor(Math.random() * 3),
-        modified: Math.floor(Math.random() * 10)
+        modified: Math.floor(Math.random() * 10),
       },
-      visualDiff: 0.7 + Math.random() * 0.3
+      visualDiff: 0.7 + Math.random() * 0.3,
     };
   }
 
   // 添加版本标签
   tagVersion(resourceId: string, versionNumber: number, tag: string): void {
     const versions = this.versions.get(resourceId) || [];
-    const v = versions.find(v => v.versionNumber === versionNumber);
+    const v = versions.find((v) => v.versionNumber === versionNumber);
     if (!v) throw new Error('版本不存在');
     v.tag = tag;
     this.notify('version:tagged', { resourceId, versionNumber, tag });
@@ -193,8 +217,8 @@ class DesignVersionService {
   // 比较版本
   compareVersions(resourceId: string, oldV: number, newV: number): VersionComparison {
     const versions = this.versions.get(resourceId) || [];
-    const vA = versions.find(v => v.versionNumber === oldV);
-    const vB = versions.find(v => v.versionNumber === newV);
+    const vA = versions.find((v) => v.versionNumber === oldV);
+    const vB = versions.find((v) => v.versionNumber === newV);
     if (!vA || !vB) throw new Error('版本不存在');
 
     return {
@@ -204,15 +228,15 @@ class DesignVersionService {
         layerChanges: {
           added: [`新背景层 v${newV}`, `新装饰元素 v${newV}`],
           removed: [`已删除的占位符`],
-          modified: [`主标题`, `按钮样式`]
+          modified: [`主标题`, `按钮样式`],
         },
         colorChanges: {
           added: ['#FF6B6B', '#4ECDC4'],
-          removed: ['#999999']
+          removed: ['#999999'],
         },
-        sizeDelta: vB.size - vA.size
+        sizeDelta: vB.size - vA.size,
       },
-      diffImage: this.generateDiffImage(resourceId, oldV, newV)
+      diffImage: this.generateDiffImage(resourceId, oldV, newV),
     };
   }
 
@@ -243,21 +267,27 @@ class DesignVersionService {
   // 恢复历史版本
   restoreVersion(resourceId: string, versionNumber: number): DesignVersion {
     const versions = this.versions.get(resourceId) || [];
-    const v = versions.find(v => v.versionNumber === versionNumber);
+    const v = versions.find((v) => v.versionNumber === versionNumber);
     if (!v) throw new Error('版本不存在');
-    return this.uploadVersion(resourceId, { url: v.url, size: v.size }, `从 v${versionNumber} 恢复`);
+    return this.uploadVersion(
+      resourceId,
+      { url: v.url, size: v.size },
+      `从 v${versionNumber} 恢复`
+    );
   }
 
   // 搜索资源
-  searchResources(query: string, filter?: { format?: DesignFormat; status?: DesignResource['status']; projectId?: string }): DesignResource[] {
+  searchResources(
+    query: string,
+    filter?: { format?: DesignFormat; status?: DesignResource['status']; projectId?: string }
+  ): DesignResource[] {
     const q = query.toLowerCase();
     let resources = Array.from(this.resources.values());
-    if (filter?.format) resources = resources.filter(r => r.format === filter.format);
-    if (filter?.status) resources = resources.filter(r => r.status === filter.status);
-    if (filter?.projectId) resources = resources.filter(r => r.projectId === filter.projectId);
-    return resources.filter(r =>
-      r.name.toLowerCase().includes(q) ||
-      r.tags.some(t => t.toLowerCase().includes(q))
+    if (filter?.format) resources = resources.filter((r) => r.format === filter.format);
+    if (filter?.status) resources = resources.filter((r) => r.status === filter.status);
+    if (filter?.projectId) resources = resources.filter((r) => r.projectId === filter.projectId);
+    return resources.filter(
+      (r) => r.name.toLowerCase().includes(q) || r.tags.some((t) => t.toLowerCase().includes(q))
     );
   }
 
@@ -269,7 +299,7 @@ class DesignVersionService {
   // 列出资源
   listResources(filter?: { projectId?: string }): DesignResource[] {
     let resources = Array.from(this.resources.values());
-    if (filter?.projectId) resources = resources.filter(r => r.projectId === filter.projectId);
+    if (filter?.projectId) resources = resources.filter((r) => r.projectId === filter.projectId);
     return resources.sort((a, b) => b.updatedAt - a.updatedAt);
   }
 
@@ -281,13 +311,15 @@ class DesignVersionService {
   // 获取指定版本
   getVersion(resourceId: string, versionNumber: number): DesignVersion | undefined {
     const versions = this.versions.get(resourceId) || [];
-    return versions.find(v => v.versionNumber === versionNumber);
+    return versions.find((v) => v.versionNumber === versionNumber);
   }
 
   // 订阅
   subscribe(listener: (event: string, data: any) => void): () => void {
     this.listeners.add(listener);
-    return () => { this.listeners.delete(listener); };
+    return () => {
+      this.listeners.delete(listener);
+    };
   }
 
   private notify(event: string, data: any): void {

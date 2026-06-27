@@ -1,14 +1,25 @@
 // 玩家行为分析
 // 热力图、关卡漏斗、行为路径、调优建议
 
-import { globalEventBus } from '../core/event-bus';
+import { globalEventBus } from '../event-bus';
 
 // 玩家事件
 export interface PlayerEvent {
   id: string;
   playerId: string;
   sessionId: string;
-  type: 'start' | 'end' | 'level-start' | 'level-end' | 'death' | 'collect' | 'spend' | 'click' | 'move' | 'pause' | 'custom';
+  type:
+    | 'start'
+    | 'end'
+    | 'level-start'
+    | 'level-end'
+    | 'death'
+    | 'collect'
+    | 'spend'
+    | 'click'
+    | 'move'
+    | 'pause'
+    | 'custom';
   customType?: string;
   level?: string;
   position?: { x: number; y: number; z?: number };
@@ -23,7 +34,15 @@ export interface HeatmapData {
   resolution: { width: number; height: number };
   points: { x: number; y: number; intensity: number; count: number }[];
   // 区域统计
-  regions: { name: string; x: number; y: number; width: number; height: number; count: number; avgDuration: number }[];
+  regions: {
+    name: string;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    count: number;
+    avgDuration: number;
+  }[];
   generatedAt: number;
 }
 
@@ -77,7 +96,7 @@ class PlayerAnalyticsService {
     const newEvent: PlayerEvent = {
       ...event,
       id: `evt-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     };
     this.events.push(newEvent);
 
@@ -102,25 +121,46 @@ class PlayerAnalyticsService {
 
   // 批量记录
   trackBatch(events: Omit<PlayerEvent, 'id' | 'timestamp'>[]): PlayerEvent[] {
-    return events.map(e => this.trackEvent(e));
+    return events.map((e) => this.trackEvent(e));
   }
 
   // 生成热力图
-  generateHeatmap(type: HeatmapData['type'], level: string, options?: { resolution?: { width: number; height: number }; timeRange?: { start: number; end: number } }): HeatmapData {
+  generateHeatmap(
+    type: HeatmapData['type'],
+    level: string,
+    options?: {
+      resolution?: { width: number; height: number };
+      timeRange?: { start: number; end: number };
+    }
+  ): HeatmapData {
     const resolution = options?.resolution || { width: 64, height: 64 };
-    let filtered = this.events.filter(e => e.type === (type === 'death' ? 'death' :
-      type === 'collect' ? 'collect' : type === 'movement' ? 'move' : 'click') && e.level === level);
+    let filtered = this.events.filter(
+      (e) =>
+        e.type ===
+          (type === 'death'
+            ? 'death'
+            : type === 'collect'
+              ? 'collect'
+              : type === 'movement'
+                ? 'move'
+                : 'click') && e.level === level
+    );
 
     if (options?.timeRange) {
-      filtered = filtered.filter(e => e.timestamp >= options.timeRange!.start && e.timestamp <= options.timeRange!.end);
+      filtered = filtered.filter(
+        (e) => e.timestamp >= options.timeRange!.start && e.timestamp <= options.timeRange!.end
+      );
     }
 
     // 聚合点
-    const cellMap = new Map<string, { x: number; y: number; count: number; totalIntensity: number }>();
+    const cellMap = new Map<
+      string,
+      { x: number; y: number; count: number; totalIntensity: number }
+    >();
     for (const event of filtered) {
       if (!event.position) continue;
-      const cellX = Math.floor(event.position.x / 100 * resolution.width);
-      const cellY = Math.floor(event.position.y / 100 * resolution.height);
+      const cellX = Math.floor((event.position.x / 100) * resolution.width);
+      const cellY = Math.floor((event.position.y / 100) * resolution.height);
       const key = `${cellX},${cellY}`;
       if (!cellMap.has(key)) {
         cellMap.set(key, { x: cellX, y: cellY, count: 0, totalIntensity: 0 });
@@ -131,9 +171,12 @@ class PlayerAnalyticsService {
     }
 
     // 找出最大计数用于归一化
-    const maxCount = Math.max(1, ...Array.from(cellMap.values()).map(c => c.count));
-    const points = Array.from(cellMap.values()).map(c => ({
-      x: c.x, y: c.y, count: c.count, intensity: c.count / maxCount
+    const maxCount = Math.max(1, ...Array.from(cellMap.values()).map((c) => c.count));
+    const points = Array.from(cellMap.values()).map((c) => ({
+      x: c.x,
+      y: c.y,
+      count: c.count,
+      intensity: c.count / maxCount,
     }));
 
     return {
@@ -142,12 +185,14 @@ class PlayerAnalyticsService {
       resolution,
       points,
       regions: this.identifyRegions(points),
-      generatedAt: Date.now()
+      generatedAt: Date.now(),
     };
   }
 
   // 识别热点区域
-  private identifyRegions(points: { x: number; y: number; count: number; intensity: number }[]): HeatmapData['regions'] {
+  private identifyRegions(
+    points: { x: number; y: number; count: number; intensity: number }[]
+  ): HeatmapData['regions'] {
     // 简单的区域聚类
     const sorted = [...points].sort((a, b) => b.count - a.count).slice(0, 5);
     return sorted.map((p, i) => ({
@@ -157,39 +202,43 @@ class PlayerAnalyticsService {
       width: 10,
       height: 10,
       count: p.count,
-      avgDuration: Math.random() * 5
+      avgDuration: Math.random() * 5,
     }));
   }
 
   // 生成关卡漏斗
   generateLevelFunnel(level: string): LevelFunnel {
     // 找出该关卡的所有玩家
-    const levelStarts = this.events.filter(e => e.type === 'level-start' && e.level === level);
-    const playerIds = new Set(levelStarts.map(e => e.playerId));
+    const levelStarts = this.events.filter((e) => e.type === 'level-start' && e.level === level);
+    const playerIds = new Set(levelStarts.map((e) => e.playerId));
     const totalPlayers = playerIds.size;
 
     // 计算步骤
     const stepNames = ['进入关卡', '第一波敌人', '收集首件宝物', '到达检查点', '完成关卡'];
     const steps = stepNames.map((name, i) => {
-      const playerCount = Math.max(0, Math.floor(totalPlayers * (1 - i * 0.18) * (0.7 + Math.random() * 0.3)));
+      const playerCount = Math.max(
+        0,
+        Math.floor(totalPlayers * (1 - i * 0.18) * (0.7 + Math.random() * 0.3))
+      );
       const prevCount = i > 0 ? steps[i - 1].playerCount : totalPlayers;
       return {
         name,
         playerCount,
         conversionRate: totalPlayers > 0 ? (playerCount / totalPlayers) * 100 : 0,
-        avgDuration: 10 + i * 5 + Math.random() * 10
+        avgDuration: 10 + i * 5 + Math.random() * 10,
       };
     });
 
     // 流失点
     const dropoffPoints: LevelFunnel['dropoffPoints'] = [];
     for (let i = 1; i < steps.length; i++) {
-      const dropoffRate = ((steps[i - 1].playerCount - steps[i].playerCount) / steps[i - 1].playerCount) * 100;
+      const dropoffRate =
+        ((steps[i - 1].playerCount - steps[i].playerCount) / steps[i - 1].playerCount) * 100;
       if (dropoffRate > 20) {
         dropoffPoints.push({
           step: steps[i].name,
           dropoffRate,
-          reason: this.inferDropoffReason(steps[i].name)
+          reason: this.inferDropoffReason(steps[i].name),
         });
       }
     }
@@ -198,9 +247,10 @@ class PlayerAnalyticsService {
       level,
       steps,
       totalPlayers,
-      completionRate: totalPlayers > 0 ? (steps[steps.length - 1].playerCount / totalPlayers) * 100 : 0,
+      completionRate:
+        totalPlayers > 0 ? (steps[steps.length - 1].playerCount / totalPlayers) * 100 : 0,
       avgAttempts: 1.5 + Math.random() * 1.5,
-      dropoffPoints
+      dropoffPoints,
     };
   }
 
@@ -224,7 +274,7 @@ class PlayerAnalyticsService {
           playerId: event.playerId,
           path: [],
           duration: 0,
-          category: 'exploration'
+          category: 'exploration',
         });
       }
       const p = paths.get(event.playerId)!;
@@ -232,7 +282,7 @@ class PlayerAnalyticsService {
         type: event.type,
         target: event.level || event.data?.target || '',
         timestamp: event.timestamp,
-        duration: event.data?.duration || 0
+        duration: event.data?.duration || 0,
       });
     }
 
@@ -243,9 +293,15 @@ class PlayerAnalyticsService {
         const last = path.path[path.path.length - 1].timestamp;
         path.duration = (last - first) / 1000;
 
-        const completed = path.path.some(p => p.type === 'level-end' && p.target);
+        const completed = path.path.some((p) => p.type === 'level-end' && p.target);
         const abandoned = !completed && path.duration > 300;
-        path.category = completed ? (path.duration < 120 ? 'replay' : 'completion') : abandoned ? 'abandonment' : 'exploration';
+        path.category = completed
+          ? path.duration < 120
+            ? 'replay'
+            : 'completion'
+          : abandoned
+            ? 'abandonment'
+            : 'exploration';
       }
     }
 
@@ -255,7 +311,9 @@ class PlayerAnalyticsService {
   // 生成调优建议
   generateTuningSuggestions(filter?: { level?: string }): TuningSuggestion[] {
     const suggestions: TuningSuggestion[] = [];
-    const levels = filter?.level ? [filter.level] : Array.from(new Set(this.events.filter(e => e.level).map(e => e.level!)));
+    const levels = filter?.level
+      ? [filter.level]
+      : Array.from(new Set(this.events.filter((e) => e.level).map((e) => e.level!)));
 
     for (const level of levels) {
       const funnel = this.generateLevelFunnel(level);
@@ -273,15 +331,20 @@ class PlayerAnalyticsService {
           expectedImpact: '完成率提升 20-30%',
           confidence: 0.85,
           supportingData: [
-            { metric: '完成率', current: funnel.completionRate, target: 60, gap: 60 - funnel.completionRate }
+            {
+              metric: '完成率',
+              current: funnel.completionRate,
+              target: 60,
+              gap: 60 - funnel.completionRate,
+            },
           ],
           actions: [
             '降低敌人血量或攻击力',
             '增加血包/补给品',
             '提供更清晰的目标指引',
-            '添加教学关卡'
+            '添加教学关卡',
           ],
-          generatedAt: Date.now()
+          generatedAt: Date.now(),
         });
       }
 
@@ -299,14 +362,15 @@ class PlayerAnalyticsService {
             expectedImpact: '减少意外死亡 30-50%',
             confidence: 0.7,
             supportingData: [
-              { metric: '区域死亡数', current: topHotspot.count, target: 20, gap: topHotspot.count - 20 }
+              {
+                metric: '区域死亡数',
+                current: topHotspot.count,
+                target: 20,
+                gap: topHotspot.count - 20,
+              },
             ],
-            actions: [
-              '检查该区域的敌人配置',
-              '考虑增加可见提示',
-              '调整地形或障碍物'
-            ],
-            generatedAt: Date.now()
+            actions: ['检查该区域的敌人配置', '考虑增加可见提示', '调整地形或障碍物'],
+            generatedAt: Date.now(),
           });
         }
       }
@@ -323,14 +387,15 @@ class PlayerAnalyticsService {
           expectedImpact: '流失率降低 15-25%',
           confidence: 0.75,
           supportingData: [
-            { metric: '流失率', current: dropoff.dropoffRate, target: 15, gap: dropoff.dropoffRate - 15 }
+            {
+              metric: '流失率',
+              current: dropoff.dropoffRate,
+              target: 15,
+              gap: dropoff.dropoffRate - 15,
+            },
           ],
-          actions: [
-            '简化该阶段的玩法',
-            '提供更及时的奖励反馈',
-            '优化引导说明'
-          ],
-          generatedAt: Date.now()
+          actions: ['简化该阶段的玩法', '提供更及时的奖励反馈', '优化引导说明'],
+          generatedAt: Date.now(),
         });
       }
     }
@@ -348,11 +413,11 @@ class PlayerAnalyticsService {
     limit?: number;
   }): PlayerEvent[] {
     let events = this.events;
-    if (filter.type) events = events.filter(e => e.type === filter.type);
-    if (filter.level) events = events.filter(e => e.level === filter.level);
-    if (filter.playerId) events = events.filter(e => e.playerId === filter.playerId);
-    if (filter.startTime) events = events.filter(e => e.timestamp >= filter.startTime!);
-    if (filter.endTime) events = events.filter(e => e.timestamp <= filter.endTime!);
+    if (filter.type) events = events.filter((e) => e.type === filter.type);
+    if (filter.level) events = events.filter((e) => e.level === filter.level);
+    if (filter.playerId) events = events.filter((e) => e.playerId === filter.playerId);
+    if (filter.startTime) events = events.filter((e) => e.timestamp >= filter.startTime!);
+    if (filter.endTime) events = events.filter((e) => e.timestamp <= filter.endTime!);
     if (filter.limit) events = events.slice(-filter.limit);
     return events;
   }
@@ -366,9 +431,9 @@ class PlayerAnalyticsService {
   } {
     let events = this.events;
     if (timeRange) {
-      events = events.filter(e => e.timestamp >= timeRange.start && e.timestamp <= timeRange.end);
+      events = events.filter((e) => e.timestamp >= timeRange.start && e.timestamp <= timeRange.end);
     }
-    const uniquePlayers = new Set(events.map(e => e.playerId)).size;
+    const uniquePlayers = new Set(events.map((e) => e.playerId)).size;
     let totalDuration = 0;
     let completedSessions = 0;
     for (const session of this.sessions.values()) {
@@ -381,7 +446,7 @@ class PlayerAnalyticsService {
       totalEvents: events.length,
       uniquePlayers,
       totalSessions: completedSessions,
-      avgSessionDuration: completedSessions > 0 ? totalDuration / completedSessions / 1000 : 0
+      avgSessionDuration: completedSessions > 0 ? totalDuration / completedSessions / 1000 : 0,
     };
   }
 
@@ -389,12 +454,16 @@ class PlayerAnalyticsService {
   clearData(olderThan?: number): number {
     const cutoff = olderThan || Date.now() - 7 * 24 * 60 * 60 * 1000;
     const before = this.events.length;
-    this.events = this.events.filter(e => e.timestamp > cutoff);
+    this.events = this.events.filter((e) => e.timestamp > cutoff);
     return before - this.events.length;
   }
 
   // 模拟数据生成
-  simulateData(playerCount: number = 100, eventsPerPlayer: number = 50, level: string = 'Level 1'): void {
+  simulateData(
+    playerCount: number = 100,
+    eventsPerPlayer: number = 50,
+    level: string = 'Level 1'
+  ): void {
     for (let p = 0; p < playerCount; p++) {
       const playerId = `player-${p}`;
       const sessionId = `session-${p}-${Date.now()}`;
@@ -408,7 +477,7 @@ class PlayerAnalyticsService {
           type,
           level,
           position: { x: Math.random() * 100, y: Math.random() * 100 },
-          data: { score: Math.floor(Math.random() * 100) }
+          data: { score: Math.floor(Math.random() * 100) },
         });
       }
       this.trackEvent({ playerId, sessionId, type: 'end', level });
@@ -418,7 +487,9 @@ class PlayerAnalyticsService {
   // 订阅
   subscribe(listener: (event: string, data: any) => void): () => void {
     this.listeners.add(listener);
-    return () => { this.listeners.delete(listener); };
+    return () => {
+      this.listeners.delete(listener);
+    };
   }
 
   private notify(event: string, data: any): void {

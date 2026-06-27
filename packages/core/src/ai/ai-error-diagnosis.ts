@@ -1,5 +1,5 @@
 import { globalEventBus } from '../event-bus';
-import { randomUUID } from 'node:crypto';
+import { randomUUID } from '../utils/crypto-utils';
 
 export type ErrorCategory =
   | 'syntax'
@@ -114,14 +114,19 @@ export class AIErrorDiagnosis {
         title: '语法错误：意外的标记',
         description: '代码中存在语法错误，解析器遇到了意外的标记。',
         rootCause: '代码语法不正确，可能是缺少括号、分号或其他语法元素。',
-        detailedCause: 'JavaScript/TypeScript 解析器在解析代码时遇到了不符合语法规范的标记。常见原因包括：1) 缺少闭合括号或花括号 2) 缺少分号 3) 错误的关键字使用 4) 不匹配的引号',
+        detailedCause:
+          'JavaScript/TypeScript 解析器在解析代码时遇到了不符合语法规范的标记。常见原因包括：1) 缺少闭合括号或花括号 2) 缺少分号 3) 错误的关键字使用 4) 不匹配的引号',
         fixes: [
           {
             title: '检查错误行附近的语法',
             description: '定位到错误提示的行号，检查该行及上一行的语法是否正确。',
             order: 1,
             difficulty: 'easy',
-            verificationSteps: ['确认所有括号都正确闭合', '确认所有引号都正确配对', '确认关键字使用正确'],
+            verificationSteps: [
+              '确认所有括号都正确闭合',
+              '确认所有引号都正确配对',
+              '确认关键字使用正确',
+            ],
           },
           {
             title: '使用代码编辑器的语法检查',
@@ -131,9 +136,17 @@ export class AIErrorDiagnosis {
           },
         ],
         references: [
-          { title: 'MDN - JavaScript 语法', url: 'https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference', type: 'doc' },
+          {
+            title: 'MDN - JavaScript 语法',
+            url: 'https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference',
+            type: 'doc',
+          },
         ],
-        preventionTips: ['使用 ESLint 等工具进行代码检查', '使用 TypeScript 提供类型安全', '定期格式化代码'],
+        preventionTips: [
+          '使用 ESLint 等工具进行代码检查',
+          '使用 TypeScript 提供类型安全',
+          '定期格式化代码',
+        ],
       },
       {
         id: 'syntax-expected-token',
@@ -161,7 +174,8 @@ export class AIErrorDiagnosis {
         title: '运行时错误：访问 undefined 的属性',
         description: '试图访问 undefined 值的属性或方法。',
         rootCause: '变量或对象属性的值为 undefined，但代码试图访问其属性或调用其方法。',
-        detailedCause: '这是最常见的 JavaScript 运行时错误之一。通常发生在：1) 变量未正确初始化 2) 异步数据尚未加载完成就被访问 3) 对象属性不存在 4) 函数返回值与预期不符',
+        detailedCause:
+          '这是最常见的 JavaScript 运行时错误之一。通常发生在：1) 变量未正确初始化 2) 异步数据尚未加载完成就被访问 3) 对象属性不存在 4) 函数返回值与预期不符',
         fixes: [
           {
             title: '添加空值检查',
@@ -190,9 +204,17 @@ export class AIErrorDiagnosis {
           },
         ],
         references: [
-          { title: 'MDN - 可选链操作符', url: 'https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/Optional_chaining', type: 'doc' },
+          {
+            title: 'MDN - 可选链操作符',
+            url: 'https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Operators/Optional_chaining',
+            type: 'doc',
+          },
         ],
-        preventionTips: ['使用可选链操作符 ?.', '使用 TypeScript 严格模式', '初始化变量时提供默认值'],
+        preventionTips: [
+          '使用可选链操作符 ?.',
+          '使用 TypeScript 严格模式',
+          '初始化变量时提供默认值',
+        ],
       },
       {
         id: 'runtime-null',
@@ -220,7 +242,8 @@ export class AIErrorDiagnosis {
         title: '运行时错误：不是函数',
         description: '试图调用一个不是函数的值。',
         rootCause: '变量的值不是函数，但代码试图调用它。',
-        detailedCause: '常见原因：1) 函数名拼写错误 2) 变量被重新赋值为非函数值 3) 导入的模块不存在或导出方式错误 4) this 上下文问题',
+        detailedCause:
+          '常见原因：1) 函数名拼写错误 2) 变量被重新赋值为非函数值 3) 导入的模块不存在或导出方式错误 4) this 上下文问题',
         fixes: [
           {
             title: '检查函数名拼写',
@@ -258,14 +281,18 @@ export class AIErrorDiagnosis {
         title: '网络错误：跨域请求被阻止',
         description: '跨域资源共享 (CORS) 策略阻止了请求。',
         rootCause: '浏览器的同源策略阻止了跨域请求，服务器未正确配置 CORS 响应头。',
-        detailedCause: 'CORS（跨域资源共享）是一种安全机制，用于限制网页从不同源的服务器请求资源。当浏览器发出跨域请求时，服务器需要返回适当的响应头来允许该请求。',
+        detailedCause:
+          'CORS（跨域资源共享）是一种安全机制，用于限制网页从不同源的服务器请求资源。当浏览器发出跨域请求时，服务器需要返回适当的响应头来允许该请求。',
         fixes: [
           {
             title: '配置服务器 CORS 响应头',
             description: '在服务器端添加 Access-Control-Allow-Origin 等响应头。',
             order: 1,
             difficulty: 'medium',
-            verificationSteps: ['确认服务器返回了正确的 CORS 响应头', '使用浏览器开发者工具检查响应头'],
+            verificationSteps: [
+              '确认服务器返回了正确的 CORS 响应头',
+              '使用浏览器开发者工具检查响应头',
+            ],
           },
           {
             title: '使用代理服务器',
@@ -282,8 +309,16 @@ export class AIErrorDiagnosis {
           },
         ],
         references: [
-          { title: 'MDN - 跨域资源共享', url: 'https://developer.mozilla.org/zh-CN/docs/Web/HTTP/CORS', type: 'doc' },
-          { title: 'TapTap 开发者文档 - 网络请求', url: 'https://developer.taptap.cn/minigameapidoc/', type: 'doc' },
+          {
+            title: 'MDN - 跨域资源共享',
+            url: 'https://developer.mozilla.org/zh-CN/docs/Web/HTTP/CORS',
+            type: 'doc',
+          },
+          {
+            title: 'TapTap 开发者文档 - 网络请求',
+            url: 'https://developer.taptap.cn/minigameapidoc/',
+            type: 'doc',
+          },
         ],
         preventionTips: ['开发阶段使用代理', '确保服务器正确配置 CORS', '使用 HTTPS'],
       },
@@ -371,7 +406,11 @@ export class AIErrorDiagnosis {
           },
         ],
         references: [
-          { title: 'TapTap 开发者文档', url: 'https://developer.taptap.cn/minigameapidoc/', type: 'doc' },
+          {
+            title: 'TapTap 开发者文档',
+            url: 'https://developer.taptap.cn/minigameapidoc/',
+            type: 'doc',
+          },
         ],
       },
       {
@@ -406,14 +445,18 @@ export class AIErrorDiagnosis {
         title: '内存错误：内存不足或泄漏',
         description: '内存使用量过高，可能存在内存泄漏。',
         rootCause: '程序使用了过多内存，可能存在内存泄漏或资源未正确释放。',
-        detailedCause: '内存泄漏是指程序中已动态分配的堆内存由于某种原因未释放或无法释放，造成系统内存的浪费。常见原因：1) 未清理的事件监听器 2) 未取消的定时器 3) 闭包引用 4) DOM 元素未移除 5) 缓存无限增长',
+        detailedCause:
+          '内存泄漏是指程序中已动态分配的堆内存由于某种原因未释放或无法释放，造成系统内存的浪费。常见原因：1) 未清理的事件监听器 2) 未取消的定时器 3) 闭包引用 4) DOM 元素未移除 5) 缓存无限增长',
         fixes: [
           {
             title: '检查事件监听器',
             description: '确保所有事件监听器在不需要时被正确移除。',
             order: 1,
             difficulty: 'medium',
-            verificationSteps: ['确认 addEventListener 有对应的 removeEventListener', '确认组件卸载时清理了监听器'],
+            verificationSteps: [
+              '确认 addEventListener 有对应的 removeEventListener',
+              '确认组件卸载时清理了监听器',
+            ],
           },
           {
             title: '检查定时器',
@@ -430,9 +473,18 @@ export class AIErrorDiagnosis {
           },
         ],
         references: [
-          { title: 'Chrome DevTools - 内存分析', url: 'https://developer.chrome.com/docs/devtools/memory/', type: 'tutorial' },
+          {
+            title: 'Chrome DevTools - 内存分析',
+            url: 'https://developer.chrome.com/docs/devtools/memory/',
+            type: 'tutorial',
+          },
         ],
-        preventionTips: ['及时清理事件监听器', '及时清理定时器', '使用 WeakMap/WeakSet', '组件卸载时清理资源'],
+        preventionTips: [
+          '及时清理事件监听器',
+          '及时清理定时器',
+          '使用 WeakMap/WeakSet',
+          '组件卸载时清理资源',
+        ],
       },
       {
         id: 'performance-slow-render',
@@ -493,7 +545,11 @@ export class AIErrorDiagnosis {
           },
         ],
         references: [
-          { title: 'TapTap 开发者文档 - 快速开始', url: 'https://developer.taptap.cn/minigameapidoc/guide/start/quickstart.html', type: 'doc' },
+          {
+            title: 'TapTap 开发者文档 - 快速开始',
+            url: 'https://developer.taptap.cn/minigameapidoc/guide/start/quickstart.html',
+            type: 'doc',
+          },
         ],
       },
       {
@@ -519,7 +575,11 @@ export class AIErrorDiagnosis {
           },
         ],
         references: [
-          { title: 'TapTap 开发者文档 - 登录', url: 'https://developer.taptap.cn/minigameapidoc/api/taptap-login.html', type: 'api' },
+          {
+            title: 'TapTap 开发者文档 - 登录',
+            url: 'https://developer.taptap.cn/minigameapidoc/api/taptap-login.html',
+            type: 'api',
+          },
         ],
       },
       {
@@ -551,7 +611,11 @@ export class AIErrorDiagnosis {
           },
         ],
         references: [
-          { title: 'TypeScript 官方文档', url: 'https://www.typescriptlang.org/docs/', type: 'doc' },
+          {
+            title: 'TypeScript 官方文档',
+            url: 'https://www.typescriptlang.org/docs/',
+            type: 'doc',
+          },
         ],
       },
       {
@@ -673,7 +737,11 @@ export class AIErrorDiagnosis {
           },
         ],
         references: [
-          { title: 'MDN - 跨站脚本攻击', url: 'https://developer.mozilla.org/zh-CN/docs/Glossary/Cross-site_scripting', type: 'doc' },
+          {
+            title: 'MDN - 跨站脚本攻击',
+            url: 'https://developer.mozilla.org/zh-CN/docs/Glossary/Cross-site_scripting',
+            type: 'doc',
+          },
         ],
         preventionTips: ['永远不要相信用户输入', '对输出进行转义', '使用 CSP'],
       },
@@ -713,7 +781,8 @@ export class AIErrorDiagnosis {
             patch: {
               filePath: '',
               searchText: 'promise.then(result => {})',
-              replaceText: 'promise\n  .then(result => {})\n  .catch(error => console.error(error));',
+              replaceText:
+                'promise\n  .then(result => {})\n  .catch(error => console.error(error));',
               explanation: '添加错误处理，避免未处理的 Promise 拒绝',
             },
           },
@@ -843,9 +912,7 @@ export class AIErrorDiagnosis {
     return results;
   }
 
-  private async analyze(
-    ctx: ErrorContext,
-  ): Promise<{
+  private async analyze(ctx: ErrorContext): Promise<{
     category: ErrorCategory;
     severity: ErrorSeverity;
     rootCause: string;
@@ -916,7 +983,8 @@ export class AIErrorDiagnosis {
     if (/type|assignable|typescript|ts23/i.test(combined)) return 'type';
     if (/not defined|referenceerror|is not defined/i.test(combined)) return 'reference';
     if (/not found|404|enoent|找不到|资源/i.test(combined)) return 'resource';
-    if (/webpack|vite|rollup|module not found|can't resolve|build|编译/i.test(combined)) return 'build';
+    if (/webpack|vite|rollup|module not found|can't resolve|build|编译/i.test(combined))
+      return 'build';
     if (/xss|security|vulnerability|injection/i.test(combined)) return 'security';
     if (/debug|debugger|breakpoint/i.test(combined)) return 'debug';
     if (/cannot|undefined|null|nan|typeerror|rangeerror/i.test(combined)) return 'runtime';
@@ -965,11 +1033,14 @@ export class AIErrorDiagnosis {
 
   private generateDetailedCause(ctx: ErrorContext, category: ErrorCategory): string {
     const details: Record<ErrorCategory, string> = {
-      syntax: '代码中存在语法错误，导致解析器无法正确解析。常见原因包括：缺少括号、引号不匹配、关键字拼写错误等。',
-      runtime: '代码在运行时发生错误，通常是由于变量值不符合预期、空值访问或函数调用方式不正确导致的。',
+      syntax:
+        '代码中存在语法错误，导致解析器无法正确解析。常见原因包括：缺少括号、引号不匹配、关键字拼写错误等。',
+      runtime:
+        '代码在运行时发生错误，通常是由于变量值不符合预期、空值访问或函数调用方式不正确导致的。',
       network: '网络请求失败，可能是由于网络连接问题、服务器不可用、跨域限制或请求超时等原因导致。',
       permission: '操作被拒绝，可能是由于用户未登录、权限不足或认证过期等原因导致。',
-      performance: '代码执行性能不佳，可能导致页面卡顿或响应缓慢。常见原因包括：频繁的 DOM 操作、内存泄漏、复杂计算等。',
+      performance:
+        '代码执行性能不佳，可能导致页面卡顿或响应缓慢。常见原因包括：频繁的 DOM 操作、内存泄漏、复杂计算等。',
       sdk: 'TapTap SDK 使用过程中出现错误，请检查 SDK 初始化、调用时机和参数是否正确。',
       memory: '内存使用异常，可能存在内存泄漏或资源未正确释放的问题。',
       security: '代码可能存在安全隐患，需要注意数据验证、输入转义和权限控制。',
@@ -1263,13 +1334,33 @@ export class AIErrorDiagnosis {
 
   private generatePreventionTips(category: ErrorCategory): string[] {
     const tips: Record<ErrorCategory, string[]> = {
-      syntax: ['使用 ESLint 进行代码检查', '使用 TypeScript 提供类型安全', '使用代码格式化工具', '定期代码审查'],
-      runtime: ['添加充分的空值检查', '使用 TypeScript 严格模式', '编写单元测试', '使用可选链操作符'],
-      network: ['添加请求重试机制', '实现请求超时处理', '添加错误提示和加载状态', '使用缓存减少请求'],
+      syntax: [
+        '使用 ESLint 进行代码检查',
+        '使用 TypeScript 提供类型安全',
+        '使用代码格式化工具',
+        '定期代码审查',
+      ],
+      runtime: [
+        '添加充分的空值检查',
+        '使用 TypeScript 严格模式',
+        '编写单元测试',
+        '使用可选链操作符',
+      ],
+      network: [
+        '添加请求重试机制',
+        '实现请求超时处理',
+        '添加错误提示和加载状态',
+        '使用缓存减少请求',
+      ],
       permission: ['检查登录状态后再操作', '提供清晰的权限说明', '实现自动重试登录'],
       performance: ['使用虚拟列表', '图片懒加载', '使用节流防抖', '避免频繁的重排重绘'],
       sdk: ['仔细阅读官方文档', '按正确顺序初始化 SDK', '处理 SDK 错误回调'],
-      memory: ['及时清理事件监听器', '及时清理定时器', '使用 WeakMap/WeakSet', '组件卸载时清理资源'],
+      memory: [
+        '及时清理事件监听器',
+        '及时清理定时器',
+        '使用 WeakMap/WeakSet',
+        '组件卸载时清理资源',
+      ],
       security: ['永远不要相信用户输入', '对输出进行转义', '使用 CSP 策略', '定期更新依赖'],
       type: ['启用 TypeScript 严格模式', '避免使用 any 类型', '使用类型守卫'],
       reference: ['使用 ESLint 检查未定义变量', '保持一致的命名规范'],

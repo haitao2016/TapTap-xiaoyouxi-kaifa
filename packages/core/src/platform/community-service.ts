@@ -11,7 +11,7 @@
  * - 统计数据：评论数、反馈数、公告阅读量
  */
 import { globalEventBus } from '../event-bus';
-import { randomUUID } from 'node:crypto';
+import { randomUUID } from '../utils/crypto-utils';
 
 export type CommentSort = 'time' | 'hot' | 'rating';
 export type CommentStatus = 'pending' | 'approved' | 'rejected' | 'deleted';
@@ -312,7 +312,18 @@ const MOCK_FAQS: FAQ[] = [
 ];
 
 const COMMENT_TAGS = ['好评', '差评', '建议', 'BUG', '难度', '画面', '音效', '玩法'];
-const FEEDBACK_TAGS = ['登录', '闪退', '卡顿', '充值', '账号', 'UI', '音效', '玩法', '社交', '好友'];
+const FEEDBACK_TAGS = [
+  '登录',
+  '闪退',
+  '卡顿',
+  '充值',
+  '账号',
+  'UI',
+  '音效',
+  '玩法',
+  '社交',
+  '好友',
+];
 const FAQ_CATEGORIES = ['账号问题', '充值问题', '游戏玩法', '技术问题', '客服问题', '活动问题'];
 
 export class CommunityService {
@@ -532,7 +543,10 @@ export class CommunityService {
     return announcement;
   }
 
-  async updateAnnouncement(announcementId: string, updates: Partial<Announcement>): Promise<Announcement | null> {
+  async updateAnnouncement(
+    announcementId: string,
+    updates: Partial<Announcement>
+  ): Promise<Announcement | null> {
     const announcement = this.announcements.get(announcementId);
     if (!announcement) return null;
 
@@ -568,7 +582,10 @@ export class CommunityService {
     announcement.isPinned = pinned;
     announcement.updatedAt = Date.now();
 
-    globalEventBus.emit({ type: 'community:announcementPinned', payload: { announcementId, pinned } });
+    globalEventBus.emit({
+      type: 'community:announcementPinned',
+      payload: { announcementId, pinned },
+    });
     return true;
   }
 
@@ -647,7 +664,11 @@ export class CommunityService {
     return feedback;
   }
 
-  async updateFeedbackStatus(feedbackId: string, status: FeedbackStatus, resolution?: string): Promise<boolean> {
+  async updateFeedbackStatus(
+    feedbackId: string,
+    status: FeedbackStatus,
+    resolution?: string
+  ): Promise<boolean> {
     const feedback = this.feedbacks.get(feedbackId);
     if (!feedback) return false;
 
@@ -660,7 +681,10 @@ export class CommunityService {
       feedback.resolvedAt = Date.now();
     }
 
-    globalEventBus.emit({ type: 'community:feedbackStatusUpdated', payload: { feedbackId, status } });
+    globalEventBus.emit({
+      type: 'community:feedbackStatusUpdated',
+      payload: { feedbackId, status },
+    });
     return true;
   }
 
@@ -696,7 +720,7 @@ export class CommunityService {
         (f) =>
           f.question.toLowerCase().includes(keyword) ||
           f.answer.toLowerCase().includes(keyword) ||
-          f.tags.some((t) => t.toLowerCase().includes(keyword)),
+          f.tags.some((t) => t.toLowerCase().includes(keyword))
       );
     }
 
@@ -816,7 +840,8 @@ export class CommunityService {
       pendingComments: comments.filter((c) => c.status === 'pending').length,
       totalAnnouncements: announcements.length,
       totalFeedbacks: feedbacks.length,
-      openFeedbacks: feedbacks.filter((f) => f.status === 'open' || f.status === 'processing').length,
+      openFeedbacks: feedbacks.filter((f) => f.status === 'open' || f.status === 'processing')
+        .length,
       totalFAQs: this.faqs.size,
       announcementViews: announcements.reduce((sum, a) => sum + a.viewCount, 0),
     };

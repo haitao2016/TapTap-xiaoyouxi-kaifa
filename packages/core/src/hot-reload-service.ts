@@ -1,5 +1,5 @@
 import { globalEventBus } from './event-bus';
-import { randomUUID } from 'node:crypto';
+import { randomUUID } from './utils/crypto-utils';
 
 export type ConnectionStatus = 'disconnected' | 'connecting' | 'connected' | 'error';
 
@@ -102,7 +102,7 @@ export class HotReloadService {
   }
 
   getConnectedClients(): HotReloadClient[] {
-    return this.getClients().filter(c => c.status === 'connected');
+    return this.getClients().filter((c) => c.status === 'connected');
   }
 
   async startServer(port = 8082): Promise<void> {
@@ -140,7 +140,9 @@ export class HotReloadService {
     return this.serverPort;
   }
 
-  async connectClient(clientInfo: Omit<HotReloadClient, 'id' | 'status' | 'connectedAt' | 'lastSeen'>): Promise<HotReloadClient> {
+  async connectClient(
+    clientInfo: Omit<HotReloadClient, 'id' | 'status' | 'connectedAt' | 'lastSeen'>
+  ): Promise<HotReloadClient> {
     const client: HotReloadClient = {
       ...clientInfo,
       id: randomUUID(),
@@ -171,7 +173,10 @@ export class HotReloadService {
     this.isWatching = true;
     this.pendingChanges = [];
 
-    globalEventBus.emit({ type: 'hotreload:watchingStarted', payload: { dirs: this.config.watchDirs } });
+    globalEventBus.emit({
+      type: 'hotreload:watchingStarted',
+      payload: { dirs: this.config.watchDirs },
+    });
   }
 
   stopWatching(): void {
@@ -192,7 +197,7 @@ export class HotReloadService {
     if (!this.isWatching) return;
     if (this.shouldIgnoreFile(change.path)) return;
 
-    const existingIndex = this.pendingChanges.findIndex(c => c.path === change.path);
+    const existingIndex = this.pendingChanges.findIndex((c) => c.path === change.path);
     if (existingIndex >= 0) {
       if (change.type === 'deleted') {
         this.pendingChanges[existingIndex] = change;
@@ -229,9 +234,10 @@ export class HotReloadService {
     const patch: PatchInfo = {
       id: randomUUID(),
       version: this.generateVersion(),
-      baseVersion: this.updateHistory.length > 0
-        ? this.updateHistory[this.updateHistory.length - 1].version
-        : '0.0.0',
+      baseVersion:
+        this.updateHistory.length > 0
+          ? this.updateHistory[this.updateHistory.length - 1].version
+          : '0.0.0',
       files,
       size: totalSize,
       timestamp: Date.now(),
@@ -255,7 +261,7 @@ export class HotReloadService {
     if (!patch) return null;
 
     const targets = clientIds
-      ? clientIds.map(id => this.clients.get(id)).filter(Boolean) as HotReloadClient[]
+      ? (clientIds.map((id) => this.clients.get(id)).filter(Boolean) as HotReloadClient[])
       : this.getConnectedClients();
 
     if (targets.length === 0) {
@@ -271,7 +277,7 @@ export class HotReloadService {
       payload: { patchId: patch.id, clientCount: targets.length, files: patch.files.length },
     });
 
-    targets.forEach(client => {
+    targets.forEach((client) => {
       this.simulatePushToClient(client, patch);
     });
 
@@ -315,14 +321,14 @@ export class HotReloadService {
   }
 
   rollback(patchId: string): Promise<boolean> {
-    const patchIndex = this.updateHistory.findIndex(p => p.id === patchId);
+    const patchIndex = this.updateHistory.findIndex((p) => p.id === patchId);
     if (patchIndex === -1) {
       throw new Error('补丁不存在');
     }
 
     globalEventBus.emit({ type: 'hotreload:rollbackStart', payload: { patchId } });
 
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       setTimeout(() => {
         this.updateHistory.splice(patchIndex);
         globalEventBus.emit({ type: 'hotreload:rollbackComplete', payload: { patchId } });
@@ -372,7 +378,7 @@ export class HotReloadService {
 
     this.clearDebounceTimer();
     this.debounceTimer = window.setTimeout(() => {
-      this.pushUpdates().catch(error => {
+      this.pushUpdates().catch((error) => {
         globalEventBus.emit({
           type: 'hotreload:error',
           payload: { error: error instanceof Error ? error.message : '推送失败' },
@@ -389,7 +395,7 @@ export class HotReloadService {
   }
 
   private shouldIgnoreFile(path: string): boolean {
-    return this.config.ignorePatterns.some(pattern => {
+    return this.config.ignorePatterns.some((pattern) => {
       if (pattern.startsWith('*')) {
         return path.endsWith(pattern.slice(1));
       }
@@ -402,7 +408,7 @@ export class HotReloadService {
 
     this.heartbeatInterval = window.setInterval(() => {
       const now = Date.now();
-      this.clients.forEach(client => {
+      this.clients.forEach((client) => {
         if (client.status === 'connected' && now - client.lastSeen > 30000) {
           client.status = 'error';
           globalEventBus.emit({
@@ -499,18 +505,18 @@ export class HotReloadService {
   }
 
   private generateHash(files: FileChange[]): string {
-    const content = files.map(f => `${f.path}:${f.type}:${f.size || 0}`).join('|');
+    const content = files.map((f) => `${f.path}:${f.type}:${f.size || 0}`).join('|');
     let hash = 0;
     for (let i = 0; i < content.length; i++) {
       const char = content.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
+      hash = (hash << 5) - hash + char;
       hash = hash & hash;
     }
     return Math.abs(hash).toString(16).padStart(8, '0');
   }
 
   private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 }
 

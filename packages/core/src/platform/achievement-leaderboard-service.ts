@@ -11,7 +11,7 @@
  * - 奖励配置：排名奖励、成就奖励
  */
 import { globalEventBus } from '../event-bus';
-import { randomUUID } from 'node:crypto';
+import { randomUUID } from '../utils/crypto-utils';
 
 export type AchievementType = 'normal' | 'hidden' | 'stage' | 'limited';
 export type AchievementRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
@@ -128,7 +128,10 @@ const MOCK_ACHIEVEMENTS: Achievement[] = [
     rarity: 'common',
     points: 10,
     conditions: [{ type: 'tutorial_complete', target: 1, description: '完成新手教程' }],
-    rewards: [{ type: 'coins', amount: 100 }, { type: 'exp', amount: 50 }],
+    rewards: [
+      { type: 'coins', amount: 100 },
+      { type: 'exp', amount: 50 },
+    ],
     category: '新手',
     sortOrder: 1,
     isActive: true,
@@ -160,11 +163,21 @@ const MOCK_ACHIEVEMENTS: Achievement[] = [
     rarity: 'rare',
     points: 50,
     conditions: [{ type: 'battle_wins', target: 100, unit: '场', description: '赢得100场战斗' }],
-    rewards: [{ type: 'coins', amount: 1000 }, { type: 'title', itemName: '百战老兵' }],
+    rewards: [
+      { type: 'coins', amount: 1000 },
+      { type: 'title', itemName: '百战老兵' },
+    ],
     stages: [
       { threshold: 10, description: '赢得10场', rewards: [{ type: 'coins', amount: 100 }] },
       { threshold: 50, description: '赢得50场', rewards: [{ type: 'coins', amount: 500 }] },
-      { threshold: 100, description: '赢得100场', rewards: [{ type: 'coins', amount: 1000 }, { type: 'title', itemName: '百战老兵' }] },
+      {
+        threshold: 100,
+        description: '赢得100场',
+        rewards: [
+          { type: 'coins', amount: 1000 },
+          { type: 'title', itemName: '百战老兵' },
+        ],
+      },
     ],
     category: '战斗',
     sortOrder: 3,
@@ -180,7 +193,9 @@ const MOCK_ACHIEVEMENTS: Achievement[] = [
     type: 'normal',
     rarity: 'uncommon',
     points: 25,
-    conditions: [{ type: 'total_coins', target: 10000, unit: '金币', description: '累计获得10000金币' }],
+    conditions: [
+      { type: 'total_coins', target: 10000, unit: '金币', description: '累计获得10000金币' },
+    ],
     rewards: [{ type: 'diamonds', amount: 50 }],
     category: '收集',
     sortOrder: 4,
@@ -197,7 +212,10 @@ const MOCK_ACHIEVEMENTS: Achievement[] = [
     rarity: 'legendary',
     points: 200,
     conditions: [{ type: 'max_level', target: 100, unit: '级', description: '达到100级' }],
-    rewards: [{ type: 'avatar', itemId: 'legendary_avatar', itemName: '传奇头像' }, { type: 'frame', itemId: 'golden_frame', itemName: '金色边框' }],
+    rewards: [
+      { type: 'avatar', itemId: 'legendary_avatar', itemName: '传奇头像' },
+      { type: 'frame', itemId: 'golden_frame', itemName: '金色边框' },
+    ],
     hidden: true,
     category: '成长',
     sortOrder: 5,
@@ -214,7 +232,10 @@ const MOCK_ACHIEVEMENTS: Achievement[] = [
     rarity: 'epic',
     points: 150,
     conditions: [{ type: 'season_rank', target: 1, description: '赛季排名第一' }],
-    rewards: [{ type: 'title', itemName: 'S1王者' }, { type: 'diamonds', amount: 500 }],
+    rewards: [
+      { type: 'title', itemName: 'S1王者' },
+      { type: 'diamonds', amount: 500 },
+    ],
     limited: {
       startAt: Date.now() - 30 * 86400000,
       endAt: Date.now() + 60 * 86400000,
@@ -233,8 +254,13 @@ const MOCK_ACHIEVEMENTS: Achievement[] = [
     type: 'normal',
     rarity: 'rare',
     points: 80,
-    conditions: [{ type: 'collect_characters', target: 20, unit: '个', description: '收集20个角色' }],
-    rewards: [{ type: 'diamonds', amount: 200 }, { type: 'item', itemId: 'rare_ticket', itemName: '稀有抽卡券' }],
+    conditions: [
+      { type: 'collect_characters', target: 20, unit: '个', description: '收集20个角色' },
+    ],
+    rewards: [
+      { type: 'diamonds', amount: 200 },
+      { type: 'item', itemId: 'rare_ticket', itemName: '稀有抽卡券' },
+    ],
     category: '收集',
     sortOrder: 7,
     isActive: true,
@@ -417,7 +443,9 @@ export class AchievementLeaderboardService {
     return this.achievements.get(achievementId);
   }
 
-  async createAchievement(options: Omit<Achievement, 'id' | 'createdAt' | 'updatedAt'>): Promise<Achievement> {
+  async createAchievement(
+    options: Omit<Achievement, 'id' | 'createdAt' | 'updatedAt'>
+  ): Promise<Achievement> {
     const achievement: Achievement = {
       ...options,
       id: `ach-${randomUUID().slice(0, 8)}`,
@@ -430,7 +458,10 @@ export class AchievementLeaderboardService {
     return achievement;
   }
 
-  async updateAchievement(achievementId: string, updates: Partial<Achievement>): Promise<Achievement | null> {
+  async updateAchievement(
+    achievementId: string,
+    updates: Partial<Achievement>
+  ): Promise<Achievement | null> {
     const achievement = this.achievements.get(achievementId);
     if (!achievement) return null;
 
@@ -454,7 +485,10 @@ export class AchievementLeaderboardService {
     return Array.from(this.userProgress.get(userId)!.values());
   }
 
-  async getUserAchievement(userId: string, achievementId: string): Promise<UserAchievementProgress | null> {
+  async getUserAchievement(
+    userId: string,
+    achievementId: string
+  ): Promise<UserAchievementProgress | null> {
     if (!this.userProgress.has(userId)) {
       this.generateMockUserProgress(userId);
     }
@@ -491,7 +525,7 @@ export class AchievementLeaderboardService {
   async updateAchievementProgress(
     userId: string,
     achievementId: string,
-    progress: number,
+    progress: number
   ): Promise<UserAchievementProgress | null> {
     const achievement = this.achievements.get(achievementId);
     if (!achievement) return null;
@@ -520,7 +554,9 @@ export class AchievementLeaderboardService {
     userAch.lastUpdated = Date.now();
 
     if (achievement.stages) {
-      userAch.currentStage = achievement.stages.filter((s) => userAch!.progress >= s.threshold).length;
+      userAch.currentStage = achievement.stages.filter(
+        (s) => userAch!.progress >= s.threshold
+      ).length;
     }
 
     if (!userAch.unlocked && userAch.progress >= userAch.total) {
@@ -540,7 +576,10 @@ export class AchievementLeaderboardService {
     return userAch;
   }
 
-  async unlockAchievement(userId: string, achievementId: string): Promise<{ success: boolean; achievement?: UserAchievementProgress }> {
+  async unlockAchievement(
+    userId: string,
+    achievementId: string
+  ): Promise<{ success: boolean; achievement?: UserAchievementProgress }> {
     const achievement = this.achievements.get(achievementId);
     if (!achievement) return { success: false };
 
@@ -634,7 +673,9 @@ export class AchievementLeaderboardService {
     return this.leaderboards.get(leaderboardId);
   }
 
-  async createLeaderboard(options: Omit<LeaderboardConfig, 'id' | 'createdAt' | 'updatedAt'>): Promise<LeaderboardConfig> {
+  async createLeaderboard(
+    options: Omit<LeaderboardConfig, 'id' | 'createdAt' | 'updatedAt'>
+  ): Promise<LeaderboardConfig> {
     const leaderboard: LeaderboardConfig = {
       ...options,
       id: `lb-${randomUUID().slice(0, 8)}`,
@@ -647,7 +688,10 @@ export class AchievementLeaderboardService {
     return leaderboard;
   }
 
-  async updateLeaderboard(leaderboardId: string, updates: Partial<LeaderboardConfig>): Promise<LeaderboardConfig | null> {
+  async updateLeaderboard(
+    leaderboardId: string,
+    updates: Partial<LeaderboardConfig>
+  ): Promise<LeaderboardConfig | null> {
     const leaderboard = this.leaderboards.get(leaderboardId);
     if (!leaderboard) return null;
 
@@ -668,7 +712,7 @@ export class AchievementLeaderboardService {
 
   async getLeaderboard(
     leaderboardId: string,
-    options?: { page?: number; pageSize?: number },
+    options?: { page?: number; pageSize?: number }
   ): Promise<{ entries: LeaderboardEntry[]; total: number } | null> {
     const config = this.leaderboards.get(leaderboardId);
     if (!config) return null;
@@ -690,16 +734,26 @@ export class AchievementLeaderboardService {
   private generateMockLeaderboardData(leaderboardId: string, config: LeaderboardConfig): void {
     const entries: LeaderboardEntry[] = [];
     const names = [
-      '战神归来', '不败神话', '风云再起', '游戏达人', '王者之姿',
-      '闪电侠', '星辰大海', '月下独酌', '风清扬', '独孤求败',
-      '剑指天涯', '梦回唐朝', '乱世英雄', '一代宗师', '武林盟主',
+      '战神归来',
+      '不败神话',
+      '风云再起',
+      '游戏达人',
+      '王者之姿',
+      '闪电侠',
+      '星辰大海',
+      '月下独酌',
+      '风清扬',
+      '独孤求败',
+      '剑指天涯',
+      '梦回唐朝',
+      '乱世英雄',
+      '一代宗师',
+      '武林盟主',
     ];
 
     const count = Math.min(100, config.maxEntries);
     for (let i = 0; i < count; i++) {
-      const baseScore = config.order === 'desc'
-        ? 10000 - i * 150
-        : 60 + i * 5;
+      const baseScore = config.order === 'desc' ? 10000 - i * 150 : 60 + i * 5;
 
       entries.push({
         rank: i + 1,
@@ -724,7 +778,7 @@ export class AchievementLeaderboardService {
     playerName: string,
     score: number,
     playerAvatar?: string,
-    extraData?: Record<string, unknown>,
+    extraData?: Record<string, unknown>
   ): Promise<PlayerRankInfo | null> {
     const config = this.leaderboards.get(leaderboardId);
     if (!config) return null;
@@ -743,9 +797,7 @@ export class AchievementLeaderboardService {
     const previousRank = existing?.rank;
 
     if (existing) {
-      const isBetter = config.order === 'desc'
-        ? score > existing.score
-        : score < existing.score;
+      const isBetter = config.order === 'desc' ? score > existing.score : score < existing.score;
 
       if (isBetter) {
         existing.score = score;
@@ -813,9 +865,7 @@ export class AchievementLeaderboardService {
     const entries = this.leaderboardData.get(leaderboardId) ?? [];
     const entry = entries.find((e) => e.playerId === playerId);
 
-    return entry
-      ? { rank: entry.rank, score: entry.score }
-      : null;
+    return entry ? { rank: entry.rank, score: entry.score } : null;
   }
 
   async getTopN(leaderboardId: string, n: number): Promise<LeaderboardEntry[]> {
@@ -826,8 +876,22 @@ export class AchievementLeaderboardService {
   async getLeaderboardRewards(leaderboardId: string): Promise<LeaderboardReward[]> {
     if (!this.leaderboardRewards.has(leaderboardId)) {
       const rewards: LeaderboardReward[] = [
-        { leaderboardId, rankRange: [1, 1], rewards: [{ type: 'diamonds', amount: 1000 }, { type: 'title', itemName: '排行榜冠军' }] },
-        { leaderboardId, rankRange: [2, 3], rewards: [{ type: 'diamonds', amount: 500 }, { type: 'title', itemName: '排行榜季军' }] },
+        {
+          leaderboardId,
+          rankRange: [1, 1],
+          rewards: [
+            { type: 'diamonds', amount: 1000 },
+            { type: 'title', itemName: '排行榜冠军' },
+          ],
+        },
+        {
+          leaderboardId,
+          rankRange: [2, 3],
+          rewards: [
+            { type: 'diamonds', amount: 500 },
+            { type: 'title', itemName: '排行榜季军' },
+          ],
+        },
         { leaderboardId, rankRange: [4, 10], rewards: [{ type: 'diamonds', amount: 200 }] },
         { leaderboardId, rankRange: [11, 50], rewards: [{ type: 'coins', amount: 1000 }] },
         { leaderboardId, rankRange: [51, 100], rewards: [{ type: 'coins', amount: 500 }] },
@@ -837,7 +901,10 @@ export class AchievementLeaderboardService {
     return this.leaderboardRewards.get(leaderboardId) ?? [];
   }
 
-  async setLeaderboardRewards(leaderboardId: string, rewards: LeaderboardReward[]): Promise<boolean> {
+  async setLeaderboardRewards(
+    leaderboardId: string,
+    rewards: LeaderboardReward[]
+  ): Promise<boolean> {
     const config = this.leaderboards.get(leaderboardId);
     if (!config) return false;
 

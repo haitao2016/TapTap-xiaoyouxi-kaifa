@@ -1,0 +1,692 @@
+{
+  "name": "TapDev Studio",
+  "version": "4.0.0",
+  "description": "TapDev Studio v4.0 - 工程化夯实与产品化落地",
+  "createdAt": "2026-06-26",
+  "lastUpdated": "2026-06-26",
+  "phases": {
+    "phase1": {
+      "name": "工程化基建",
+      "duration": "2周",
+      "status": "completed",
+      "priority": "high",
+      "description": "完善 CI/CD、版本管理、构建流程，打好工程基础",
+      "tasks": [
+        {
+          "id": "P1-1",
+          "name": "统一版本管理",
+          "priority": "high",
+          "category": "engineering",
+          "description": "所有包版本统一为 0.2.0，配置 changesets 或 lerna 版本管理",
+          "expectedResult": "所有 package.json 版本一致，支持独立发版",
+          "status": "completed"
+        },
+        {
+          "id": "P1-2",
+          "name": "GitHub Actions CI 工作流",
+          "priority": "high",
+          "category": "engineering",
+          "description": "添加 lint、typecheck、test、build 的 CI 流程",
+          "expectedResult": "PR 自动运行检查，main 分支自动构建",
+          "status": "completed"
+        },
+        {
+          "id": "P1-3",
+          "name": "完善构建脚本",
+          "priority": "high",
+          "category": "engineering",
+          "description": "确保 desktop studio-dist 构建流程正确，配置 copy-studio 脚本",
+          "expectedResult": "pnpm build 可完整构建所有包和应用",
+          "status": "completed"
+        },
+        {
+          "id": "P1-4",
+          "name": "ESLint + Prettier 全面接入",
+          "priority": "medium",
+          "category": "engineering",
+          "description": "为所有子包配置 ESLint 和 Prettier，添加 lint-staged + husky",
+          "expectedResult": "提交前自动格式化，CI 检查代码风格",
+          "status": "completed"
+        },
+        {
+          "id": "P1-5",
+          "name": "清理构建产物残留",
+          "priority": "medium",
+          "category": "engineering",
+          "description": "删除 desktop/studio-dist 本地构建产物，确保 .gitignore 生效",
+          "expectedResult": "仓库不含任何构建产物",
+          "status": "completed"
+        },
+        {
+          "id": "P1-6",
+          "name": "TypeScript 版本统一",
+          "priority": "medium",
+          "category": "engineering",
+          "description": "根目录 TS 6.x 与子包 TS 5.x 不一致，统一版本",
+          "expectedResult": "全项目使用相同 TypeScript 版本",
+          "status": "completed"
+        }
+      ]
+    },
+    "phase2": {
+      "name": "类型系统完善",
+      "duration": "3周",
+      "status": "completed",
+      "priority": "high",
+      "description": "补齐类型定义，增强类型安全，减少 any 类型",
+      "tasks": [
+        {
+          "id": "P2-1",
+          "name": "AI 服务类型定义",
+          "priority": "high",
+          "category": "types",
+          "description": "为 ai/ 目录下所有服务添加类型定义（AIConfig、AgentTask、ReviewResult 等）",
+          "expectedResult": "AI 相关服务 100% 类型覆盖",
+          "status": "completed"
+        },
+        {
+          "id": "P2-2",
+          "name": "游戏开发工具类型定义",
+          "priority": "high",
+          "category": "types",
+          "description": "为 behavior-tree、animation-state-machine、tilemap、shader-editor 等添加类型",
+          "expectedResult": "游戏开发工具类型完整",
+          "status": "completed"
+        },
+        {
+          "id": "P2-3",
+          "name": "平台服务类型定义",
+          "priority": "high",
+          "category": "types",
+          "description": "为 platform/ 目录下所有服务添加类型（auth、publish、leaderboard 等）",
+          "expectedResult": "平台服务类型完整",
+          "status": "completed"
+        },
+        {
+          "id": "P2-4",
+          "name": "协作与云同步类型定义",
+          "priority": "medium",
+          "category": "types",
+          "description": "为 collab/、cloud-sync、team-workspace 等添加类型",
+          "expectedResult": "协作相关类型完整",
+          "status": "completed"
+        },
+        {
+          "id": "P2-5",
+          "name": "插件系统类型增强",
+          "priority": "medium",
+          "category": "types",
+          "description": "完善 PluginContext、PluginAPI、扩展点类型定义",
+          "expectedResult": "插件开发者可获得完整类型提示",
+          "status": "completed"
+        },
+        {
+          "id": "P2-6",
+          "name": "音频、性能、分析类型定义",
+          "priority": "medium",
+          "category": "types",
+          "description": "为 audio/、perf/、analytics/、qa/ 等添加类型",
+          "expectedResult": "全部服务类型覆盖率 > 90%",
+          "status": "completed"
+        }
+      ]
+    },
+    "phase3": {
+      "name": "测试体系建设",
+      "duration": "4周",
+      "status": "completed",
+      "priority": "high",
+      "description": "建立单元测试、集成测试、E2E 测试体系，提升代码质量",
+      "tasks": [
+        {
+          "id": "P3-1",
+          "name": "核心服务单元测试",
+          "priority": "high",
+          "category": "testing",
+          "description": "为 project-manager、debug-service、build-service、plugin-manager 等核心服务补全测试",
+          "expectedResult": "核心服务测试覆盖率 > 80%",
+          "status": "completed"
+        },
+        {
+          "id": "P3-2",
+          "name": "AI 服务测试",
+          "priority": "high",
+          "category": "testing",
+          "description": "为 AI 代码生成、代码审查、错误诊断等服务添加 mock 测试",
+          "expectedResult": "AI 服务测试覆盖率 > 70%",
+          "status": "completed"
+        },
+        {
+          "id": "P3-3",
+          "name": "游戏开发工具测试",
+          "priority": "medium",
+          "category": "testing",
+          "description": "为行为树、动画状态机、瓦片地图、Shader 编辑器等添加测试",
+          "expectedResult": "游戏工具测试覆盖率 > 60%",
+          "status": "completed"
+        },
+        {
+          "id": "P3-4",
+          "name": "平台服务集成测试",
+          "priority": "medium",
+          "category": "testing",
+          "description": "为 TapTap 认证、发布、排行榜等添加集成测试（mock API）",
+          "expectedResult": "平台服务集成测试覆盖主要流程",
+          "status": "completed"
+        },
+        {
+          "id": "P3-5",
+          "name": "E2E 测试增强",
+          "priority": "medium",
+          "category": "testing",
+          "description": "扩展 Playwright E2E 测试，覆盖编辑器、调试、构建、插件等核心流程",
+          "expectedResult": "E2E 测试覆盖 80% 核心用户路径",
+          "status": "pending"
+        },
+        {
+          "id": "P3-6",
+          "name": "测试覆盖率门禁",
+          "priority": "medium",
+          "category": "testing",
+          "description": "CI 中添加覆盖率阈值检查，低于阈值阻止合并",
+          "expectedResult": "整体覆盖率 > 60%，核心模块 > 80%",
+          "status": "completed"
+        }
+      ]
+    },
+    "phase4": {
+      "name": "前端界面补全",
+      "duration": "6周",
+      "status": "pending",
+      "priority": "high",
+      "description": "将后端服务对应到前端界面，补齐缺失的页面和组件",
+      "tasks": [
+        {
+          "id": "P4-1",
+          "name": "AI 助手页面",
+          "priority": "high",
+          "category": "frontend",
+          "description": "添加 AI 代码生成、对话、代码审查的前端界面",
+          "expectedResult": "用户可在编辑器内使用 AI 功能",
+          "status": "pending"
+        },
+        {
+          "id": "P4-2",
+          "name": "协作与团队页面",
+          "priority": "high",
+          "category": "frontend",
+          "description": "添加 GDD 协作、美术评审、团队管理、云同步界面",
+          "expectedResult": "协作功能可视化",
+          "status": "pending"
+        },
+        {
+          "id": "P4-3",
+          "name": "游戏开发工具可视化",
+          "priority": "high",
+          "category": "frontend",
+          "description": "添加行为树编辑器、动画状态机、瓦片地图、Shader 编辑器前端",
+          "expectedResult": "可视化游戏开发工具集",
+          "status": "pending"
+        },
+        {
+          "id": "P4-4",
+          "name": "资源商店与市场页面",
+          "priority": "medium",
+          "category": "frontend",
+          "description": "添加插件市场、资源商店、模板市场的前端界面",
+          "expectedResult": "用户可浏览和安装资源",
+          "status": "pending"
+        },
+        {
+          "id": "P4-5",
+          "name": "平台服务集成页面",
+          "priority": "medium",
+          "category": "frontend",
+          "description": "添加 TapTap 登录、发布配置、排行榜、TapDB 统计页面",
+          "expectedResult": "平台服务可视化配置",
+          "status": "pending"
+        },
+        {
+          "id": "P4-6",
+          "name": "性能分析与监控页面",
+          "priority": "medium",
+          "category": "frontend",
+          "description": "添加性能分析器、启动监控、内存监控、WebView 性能基线页面",
+          "expectedResult": "性能数据可视化",
+          "status": "pending"
+        },
+        {
+          "id": "P4-7",
+          "name": "组件库完善",
+          "priority": "medium",
+          "category": "frontend",
+          "description": "扩展 UI 组件库，添加 Modal、Drawer、Tree、Table、Form 等常用组件",
+          "expectedResult": "组件库可支撑所有页面开发",
+          "status": "pending"
+        },
+        {
+          "id": "P4-8",
+          "name": "国际化前端接入",
+          "priority": "medium",
+          "category": "frontend",
+          "description": "前端页面接入 i18n 服务，支持中/英/日三语切换",
+          "expectedResult": "全界面多语言支持",
+          "status": "pending"
+        }
+      ]
+    },
+    "phase5": {
+      "name": "服务端与部署",
+      "duration": "3周",
+      "status": "pending",
+      "priority": "medium",
+      "description": "完善服务端能力，添加部署和发布流程",
+      "tasks": [
+        {
+          "id": "P5-1",
+          "name": "服务端架构设计",
+          "priority": "high",
+          "category": "server",
+          "description": "完善 server 包架构，添加 API 路由、认证、数据库层",
+          "expectedResult": "可独立部署的后端服务",
+          "status": "pending"
+        },
+        {
+          "id": "P5-2",
+          "name": "数据库与持久化",
+          "priority": "high",
+          "category": "server",
+          "description": "添加数据库支持（SQLite/PostgreSQL），用户、项目、资源数据持久化",
+          "expectedResult": "数据持久化存储",
+          "status": "pending"
+        },
+        {
+          "id": "P5-3",
+          "name": "用户认证系统",
+          "priority": "high",
+          "category": "server",
+          "description": "接入 TapTap OAuth、JWT 认证、用户管理",
+          "expectedResult": "完整用户认证流程",
+          "status": "pending"
+        },
+        {
+          "id": "P5-4",
+          "name": "Docker 部署",
+          "priority": "medium",
+          "category": "server",
+          "description": "添加 Dockerfile 和 docker-compose，支持容器化部署",
+          "expectedResult": "一键部署服务端",
+          "status": "pending"
+        },
+        {
+          "id": "P5-5",
+          "name": "CD 自动发布",
+          "priority": "medium",
+          "category": "server",
+          "description": "配置 GitHub Actions 自动发布桌面端、Web 端、服务端",
+          "expectedResult": "tag 推送自动构建发布",
+          "status": "pending"
+        }
+      ]
+    },
+    "phase6": {
+      "name": "性能优化",
+      "duration": "2周",
+      "status": "pending",
+      "priority": "medium",
+      "description": "优化启动速度、内存使用、构建性能",
+      "tasks": [
+        {
+          "id": "P6-1",
+          "name": "启动性能优化",
+          "priority": "high",
+          "category": "performance",
+          "description": "分析并优化应用启动时间，实现懒加载和按需加载",
+          "expectedResult": "首屏加载 < 2s（Web），冷启动 < 3s（Desktop）",
+          "status": "pending"
+        },
+        {
+          "id": "P6-2",
+          "name": "构建性能优化",
+          "priority": "medium",
+          "category": "performance",
+          "description": "优化 Vite 构建速度，添加依赖预构建、增量构建",
+          "expectedResult": "构建时间减少 50%",
+          "status": "pending"
+        },
+        {
+          "id": "P6-3",
+          "name": "内存泄漏修复",
+          "priority": "medium",
+          "category": "performance",
+          "description": "使用内存监控工具检测并修复内存泄漏",
+          "expectedResult": "长时间运行内存稳定",
+          "status": "pending"
+        },
+        {
+          "id": "P6-4",
+          "name": "Bundle 体积优化",
+          "priority": "medium",
+          "category": "performance",
+          "description": "代码分割、Tree Shaking、按需引入，减小产物体积",
+          "expectedResult": "首屏 JS < 500KB gzip",
+          "status": "pending"
+        }
+      ]
+    },
+    "phase7": {
+      "name": "插件生态完善",
+      "duration": "3周",
+      "status": "pending",
+      "priority": "medium",
+      "description": "完善插件 SDK、开发者文档、审核流程",
+      "tasks": [
+        {
+          "id": "P7-1",
+          "name": "插件 SDK 文档",
+          "priority": "high",
+          "category": "plugin",
+          "description": "编写完整的插件开发文档、API 参考、示例教程",
+          "expectedResult": "开发者可独立开发插件",
+          "status": "pending"
+        },
+        {
+          "id": "P7-2",
+          "name": "插件脚手架",
+          "priority": "high",
+          "category": "plugin",
+          "description": "提供 create-tapdev-plugin 脚手架，一键生成插件项目",
+          "expectedResult": "5 分钟创建一个插件",
+          "status": "pending"
+        },
+        {
+          "id": "P7-3",
+          "name": "官方插件集",
+          "priority": "medium",
+          "category": "plugin",
+          "description": "开发 10+ 官方插件，展示插件能力（Git、部署、主题等）",
+          "expectedResult": "插件市场有 10+ 官方插件",
+          "status": "pending"
+        },
+        {
+          "id": "P7-4",
+          "name": "插件审核与安全",
+          "priority": "medium",
+          "category": "plugin",
+          "description": "插件沙箱加强、权限系统、审核流程、安全扫描",
+          "expectedResult": "插件运行安全可控",
+          "status": "pending"
+        }
+      ]
+    },
+    "phase8": {
+      "name": "文档与社区",
+      "duration": "2周",
+      "status": "pending",
+      "priority": "low",
+      "description": "完善用户文档、开发者文档、社区建设",
+      "tasks": [
+        {
+          "id": "P8-1",
+          "name": "用户使用手册",
+          "priority": "high",
+          "category": "docs",
+          "description": "编写完整的用户手册，覆盖编辑器、调试、构建、发布全流程",
+          "expectedResult": "新用户可独立完成游戏开发",
+          "status": "pending"
+        },
+        {
+          "id": "P8-2",
+          "name": "API 参考文档",
+          "priority": "medium",
+          "category": "docs",
+          "description": "基于 TypeScript 类型自动生成 API 文档",
+          "expectedResult": "完整的 API 参考",
+          "status": "pending"
+        },
+        {
+          "id": "P8-3",
+          "name": "示例项目与教程",
+          "priority": "medium",
+          "category": "docs",
+          "description": "提供 5+ 示例项目和视频教程",
+          "expectedResult": "降低学习门槛",
+          "status": "pending"
+        },
+        {
+          "id": "P8-4",
+          "name": "贡献指南",
+          "priority": "low",
+          "category": "docs",
+          "description": "完善 CONTRIBUTING.md，添加开发规范、PR 模板、Issue 模板",
+          "expectedResult": "社区贡献有章可循",
+          "status": "pending"
+        }
+      ]
+    }
+  },
+  "milestones": [
+    {
+      "id": "M1",
+      "name": "工程化就绪",
+      "phase": "phase1",
+      "date": "2026-07-10",
+      "description": "CI/CD、版本管理、构建流程全部就绪"
+    },
+    {
+      "id": "M2",
+      "name": "类型安全",
+      "phase": "phase2",
+      "date": "2026-07-31",
+      "description": "类型覆盖率 > 90%"
+    },
+    {
+      "id": "M3",
+      "name": "质量保障",
+      "phase": "phase3",
+      "date": "2026-08-28",
+      "description": "测试覆盖率 > 60%"
+    },
+    {
+      "id": "M4",
+      "name": "界面可用",
+      "phase": "phase4",
+      "date": "2026-10-09",
+      "description": "主要功能都有可视化界面"
+    },
+    {
+      "id": "M5",
+      "name": "可部署",
+      "phase": "phase5",
+      "date": "2026-10-30",
+      "description": "服务端可独立部署，支持自动发布"
+    },
+    {
+      "id": "M6",
+      "name": "性能达标",
+      "phase": "phase6",
+      "date": "2026-11-13",
+      "description": "启动、构建、内存性能达标"
+    },
+    {
+      "id": "M7",
+      "name": "插件生态",
+      "phase": "phase7",
+      "date": "2026-12-04",
+      "description": "插件 SDK 完整，10+ 官方插件"
+    },
+    {
+      "id": "M8",
+      "name": "v4.0 发布",
+      "phase": "phase8",
+      "date": "2026-12-18",
+      "description": "文档完善，社区就绪，发布 v4.0"
+    }
+  ],
+  "techDebt": [
+    {
+      "id": "TD-1",
+      "name": "版本号不统一",
+      "severity": "high",
+      "description": "根包 0.2.0，各子包 0.1.0，需要统一管理"
+    },
+    {
+      "id": "TD-2",
+      "name": "TypeScript 版本不一致",
+      "severity": "medium",
+      "description": "根目录 TS 6.x，子包 TS 5.x，可能导致类型检查差异"
+    },
+    {
+      "id": "TD-3",
+      "name": "类型定义覆盖率低",
+      "severity": "high",
+      "description": "10 个类型文件 vs 100+ 服务，大量服务缺少类型定义"
+    },
+    {
+      "id": "TD-4",
+      "name": "测试覆盖率不足",
+      "severity": "high",
+      "description": "12 个测试文件，覆盖率估计 < 15%"
+    },
+    {
+      "id": "TD-5",
+      "name": "前端界面缺失",
+      "severity": "high",
+      "description": "8 个页面 vs 100+ 服务，大部分后端功能无前端入口"
+    },
+    {
+      "id": "TD-6",
+      "name": "无 CI/CD 工作流",
+      "severity": "high",
+      "description": "缺少自动化测试、构建、发布流程"
+    },
+    {
+      "id": "TD-7",
+      "name": "构建脚本不完整",
+      "severity": "medium",
+      "description": "desktop 的 studio-dist 构建流程未完善"
+    },
+    {
+      "id": "TD-8",
+      "name": "服务端功能薄弱",
+      "severity": "medium",
+      "description": "server 包只有 debug-server 和 unity-runner，缺少完整后端能力"
+    },
+    {
+      "id": "TD-9",
+      "name": "组件库不完善",
+      "severity": "medium",
+      "description": "UI 组件只有基础组件，缺少 Table、Tree、Form 等复杂组件"
+    },
+    {
+      "id": "TD-10",
+      "name": "缺少数据库层",
+      "severity": "high",
+      "description": "所有服务数据都在内存中，无持久化存储"
+    },
+    {
+      "id": "TD-11",
+      "name": "缺少用户认证",
+      "severity": "high",
+      "description": "无用户系统，TapTap 登录未接入"
+    },
+    {
+      "id": "TD-12",
+      "name": "文档不完善",
+      "severity": "medium",
+      "description": "缺少用户手册、API 文档、插件开发文档"
+    },
+    {
+      "id": "TD-13",
+      "name": "无 Docker 部署",
+      "severity": "low",
+      "description": "缺少容器化部署方案"
+    },
+    {
+      "id": "TD-14",
+      "name": "无错误监控",
+      "severity": "medium",
+      "description": "缺少 Sentry 等错误监控集成"
+    },
+    {
+      "id": "TD-15",
+      "name": "无性能监控",
+      "severity": "low",
+      "description": "缺少 Web Vitals、APM 等性能监控"
+    }
+  ],
+  "communityTasks": [
+    {
+      "id": "CT-1",
+      "name": "贡献指南",
+      "difficulty": "easy",
+      "description": "完善 CONTRIBUTING.md"
+    },
+    {
+      "id": "CT-2",
+      "name": "好第一个 issue",
+      "difficulty": "easy",
+      "description": "标记 good first issue，引导新贡献者"
+    },
+    {
+      "id": "CT-3",
+      "name": "示例插件",
+      "difficulty": "medium",
+      "description": "开发示例插件展示插件能力"
+    },
+    {
+      "id": "CT-4",
+      "name": "视频教程",
+      "difficulty": "medium",
+      "description": "录制入门教程视频"
+    },
+    {
+      "id": "CT-5",
+      "name": "翻译文档",
+      "difficulty": "easy",
+      "description": "翻译文档到更多语言"
+    },
+    {
+      "id": "CT-6",
+      "name": "Bug Bash",
+      "difficulty": "easy",
+      "description": "举办 Bug 收集活动"
+    },
+    {
+      "id": "CT-7",
+      "name": "插件大赛",
+      "difficulty": "hard",
+      "description": "举办插件开发大赛"
+    },
+    {
+      "id": "CT-8",
+      "name": "模板征集",
+      "difficulty": "medium",
+      "description": "征集游戏模板和示例"
+    },
+    {
+      "id": "CT-9",
+      "name": "社区 Discord",
+      "difficulty": "easy",
+      "description": "建立开发者交流社区"
+    },
+    {
+      "id": "CT-10",
+      "name": "线下 Meetup",
+      "difficulty": "hard",
+      "description": "举办线下开发者聚会"
+    }
+  ],
+  "statistics": {
+    "totalPhases": 8,
+    "totalTasks": 42,
+    "completedTasks": 14,
+    "completedPercentage": 33.3,
+    "highPriorityTasks": 18,
+    "mediumPriorityTasks": 18,
+    "lowPriorityTasks": 6,
+    "totalTechDebt": 15,
+    "totalCommunityTasks": 10,
+    "totalMilestones": 8
+  }
+}

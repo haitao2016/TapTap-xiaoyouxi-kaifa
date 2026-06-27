@@ -1,6 +1,15 @@
 import { globalEventBus } from './event-bus';
 
-export type PortType = 'any' | 'number' | 'string' | 'boolean' | 'array' | 'object' | 'function' | 'event' | 'flow';
+export type PortType =
+  | 'any'
+  | 'number'
+  | 'string'
+  | 'boolean'
+  | 'array'
+  | 'object'
+  | 'function'
+  | 'event'
+  | 'flow';
 export type NodeCategory = 'event' | 'condition' | 'action' | 'variable' | 'loop' | 'debug';
 export type VariableType = 'number' | 'string' | 'boolean' | 'array' | 'object';
 export type VariableScope = 'global' | 'local';
@@ -473,10 +482,34 @@ export class VisualLogicService {
           },
         ],
         connections: [
-          { id: 'conn-1', fromNodeId: 'node-1', fromPortId: 'port-1', toNodeId: 'node-5', toPortId: 'port-8' },
-          { id: 'conn-2', fromNodeId: 'node-2', fromPortId: 'port-3', toNodeId: 'node-4', toPortId: 'port-5' },
-          { id: 'conn-3', fromNodeId: 'node-3', fromPortId: 'port-4', toNodeId: 'node-4', toPortId: 'port-6' },
-          { id: 'conn-4', fromNodeId: 'node-4', fromPortId: 'port-7', toNodeId: 'node-5', toPortId: 'port-9' },
+          {
+            id: 'conn-1',
+            fromNodeId: 'node-1',
+            fromPortId: 'port-1',
+            toNodeId: 'node-5',
+            toPortId: 'port-8',
+          },
+          {
+            id: 'conn-2',
+            fromNodeId: 'node-2',
+            fromPortId: 'port-3',
+            toNodeId: 'node-4',
+            toPortId: 'port-5',
+          },
+          {
+            id: 'conn-3',
+            fromNodeId: 'node-3',
+            fromPortId: 'port-4',
+            toNodeId: 'node-4',
+            toPortId: 'port-6',
+          },
+          {
+            id: 'conn-4',
+            fromNodeId: 'node-4',
+            fromPortId: 'port-7',
+            toNodeId: 'node-5',
+            toPortId: 'port-9',
+          },
         ],
         variables: [
           {
@@ -544,9 +577,27 @@ export class VisualLogicService {
           },
         ],
         connections: [
-          { id: 'conn-1', fromNodeId: 'node-1', fromPortId: 'port-1', toNodeId: 'node-2', toPortId: 'port-2' },
-          { id: 'conn-2', fromNodeId: 'node-2', fromPortId: 'port-3', toNodeId: 'node-4', toPortId: 'port-6' },
-          { id: 'conn-3', fromNodeId: 'node-3', fromPortId: 'port-5', toNodeId: 'node-4', toPortId: 'port-7' },
+          {
+            id: 'conn-1',
+            fromNodeId: 'node-1',
+            fromPortId: 'port-1',
+            toNodeId: 'node-2',
+            toPortId: 'port-2',
+          },
+          {
+            id: 'conn-2',
+            fromNodeId: 'node-2',
+            fromPortId: 'port-3',
+            toNodeId: 'node-4',
+            toPortId: 'port-6',
+          },
+          {
+            id: 'conn-3',
+            fromNodeId: 'node-3',
+            fromPortId: 'port-5',
+            toNodeId: 'node-4',
+            toPortId: 'port-7',
+          },
         ],
         variables: [],
         createdAt: new Date().toISOString(),
@@ -608,7 +659,10 @@ export class VisualLogicService {
     return true;
   }
 
-  updateGraph(id: string, updates: Partial<Omit<LogicGraph, 'id' | 'createdAt'>>): LogicGraph | undefined {
+  updateGraph(
+    id: string,
+    updates: Partial<Omit<LogicGraph, 'id' | 'createdAt'>>
+  ): LogicGraph | undefined {
     const graph = this.graphs.get(id);
     if (!graph) return undefined;
     const updated: LogicGraph = {
@@ -956,7 +1010,10 @@ export class VisualLogicService {
     return false;
   }
 
-  generateCode(graphId: string, options: CodeGenerationOptions = { language: 'javascript', includeComments: true }): string {
+  generateCode(
+    graphId: string,
+    options: CodeGenerationOptions = { language: 'javascript', includeComments: true }
+  ): string {
     const graph = this.graphs.get(graphId);
     if (!graph) return '';
 
@@ -1009,18 +1066,30 @@ export class VisualLogicService {
 
   private mapVariableType(type: VariableType): string {
     switch (type) {
-      case 'number': return 'number';
-      case 'string': return 'string';
-      case 'boolean': return 'boolean';
-      case 'array': return 'any[]';
-      case 'object': return 'Record<string, any>';
-      default: return 'any';
+      case 'number':
+        return 'number';
+      case 'string':
+        return 'string';
+      case 'boolean':
+        return 'boolean';
+      case 'array':
+        return 'any[]';
+      case 'object':
+        return 'Record<string, any>';
+      default:
+        return 'any';
     }
   }
 
   private formatValue(value: unknown, type: VariableType): string {
     if (value === null || value === undefined) {
-      return type === 'string' ? "''" : type === 'boolean' ? 'false' : type === 'number' ? '0' : 'null';
+      return type === 'string'
+        ? "''"
+        : type === 'boolean'
+          ? 'false'
+          : type === 'number'
+            ? '0'
+            : 'null';
     }
     if (type === 'string') return `'${value}'`;
     if (type === 'object' || type === 'array') return JSON.stringify(value);

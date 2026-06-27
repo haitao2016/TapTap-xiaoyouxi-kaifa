@@ -74,4 +74,43 @@ contextBridge.exposeInMainWorld('electronAPI', {
       return () => ipcRenderer.removeListener('native:game-disconnected', handler);
     },
   },
+
+  llm: {
+    initialize: () => ipcRenderer.invoke('llm:initialize') as Promise<{ success: boolean; error?: string }>,
+    loadModel: (config: {
+      modelPath: string;
+      contextWindow?: number;
+      gpu?: boolean;
+      batchSize?: number;
+    }) => ipcRenderer.invoke('llm:loadModel', config) as Promise<{ success: boolean; error?: string }>,
+    complete: (prompt: string, options?: {
+      temperature?: number;
+      maxTokens?: number;
+      stop?: string[];
+    }) => ipcRenderer.invoke('llm:complete', { prompt, ...options }) as Promise<{
+      text: string;
+      done: boolean;
+      timing?: { promptEvalTime: number; evalTime: number; totalTime: number };
+    }>,
+    completeStream: (prompt: string, options?: {
+      temperature?: number;
+      maxTokens?: number;
+      stop?: string[];
+    }) => {
+      ipcRenderer.invoke('llm:completeStream', { prompt, ...options });
+    },
+    onStreamChunk: (cb: (chunk: { token: string }) => void) => {
+      const handler = (_: unknown, chunk: { token: string }) => cb(chunk);
+      ipcRenderer.on('llm:streamChunk', handler);
+      return () => ipcRenderer.removeListener('llm:streamChunk', handler);
+    },
+    onStreamEnd: (cb: () => void) => {
+      const handler = () => cb();
+      ipcRenderer.on('llm:streamEnd', handler);
+      return () => ipcRenderer.removeListener('llm:streamEnd', handler);
+    },
+    getModelInfo: () => ipcRenderer.invoke('llm:getModelInfo') as Promise<any>,
+    unloadModel: () => ipcRenderer.invoke('llm:unloadModel') as Promise<{ success: boolean }>,
+    getStatus: () => ipcRenderer.invoke('llm:status') as Promise<{ initialized: boolean; modelLoaded: boolean }>,
+  },
 });

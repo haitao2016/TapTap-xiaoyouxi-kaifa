@@ -1,7 +1,14 @@
-import type { BuildConfig, BuildTask, BuildResult, BuildStep, BuildPlatformConfig, BuildCacheInfo } from '@tapdev/types';
+import type {
+  BuildConfig,
+  BuildTask,
+  BuildResult,
+  BuildStep,
+  BuildPlatformConfig,
+  BuildCacheInfo,
+} from '@tapdev/types';
 import { globalEventBus } from './event-bus';
 import { getNativeBridge } from './debug-service';
-import { randomUUID, createHash } from 'node:crypto';
+import { randomUUID, generateHash } from './utils/crypto-utils';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -111,9 +118,7 @@ export class BuildService {
    * @returns 按开始时间降序排列的任务列表
    */
   getAllTasks(): BuildTask[] {
-    return [...this.tasks.values()].sort(
-      (a, b) => (b.startedAt ?? 0) - (a.startedAt ?? 0)
-    );
+    return [...this.tasks.values()].sort((a, b) => (b.startedAt ?? 0) - (a.startedAt ?? 0));
   }
 
   /**
@@ -121,7 +126,7 @@ export class BuildService {
    * @returns 当前活跃任务，如果没有则返回 null
    */
   getActiveTask(): BuildTask | null {
-    return this.activeTaskId ? this.tasks.get(this.activeTaskId) ?? null : null;
+    return this.activeTaskId ? (this.tasks.get(this.activeTaskId) ?? null) : null;
   }
 
   /**
@@ -150,9 +155,10 @@ export class BuildService {
   async getBuildHistory(projectId?: string): Promise<BuildResult[]> {
     try {
       const history: BuildResult[] = [];
-      const dirs = fs.readdirSync(this.historyDir, { withFileTypes: true })
-        .filter(d => d.isDirectory())
-        .map(d => d.name)
+      const dirs = fs
+        .readdirSync(this.historyDir, { withFileTypes: true })
+        .filter((d) => d.isDirectory())
+        .map((d) => d.name)
         .sort((a, b) => Number(b) - Number(a));
 
       for (const dir of dirs) {
@@ -160,17 +166,17 @@ export class BuildService {
         if (fs.existsSync(filePath)) {
           const content = fs.readFileSync(filePath, 'utf-8');
           const result = JSON.parse(content) as BuildResult;
-          
+
           if (!projectId || result.projectId === projectId) {
             history.push(result);
           }
-          
+
           if (history.length >= this.maxHistoryItems) {
             break;
           }
         }
       }
-      
+
       return history;
     } catch {
       return [];
@@ -212,7 +218,7 @@ export class BuildService {
   async clearBuildHistory(projectId?: string): Promise<void> {
     if (projectId) {
       const history = await this.getBuildHistory(projectId);
-      history.forEach(result => {
+      history.forEach((result) => {
         this.deleteBuildHistory(result.id);
       });
     } else {
@@ -230,22 +236,21 @@ export class BuildService {
   async compareBuilds(buildId1: string, buildId2: string): Promise<BuildComparison | null> {
     const build1 = await this.getBuildResultById(buildId1);
     const build2 = await this.getBuildResultById(buildId2);
-    
+
     if (!build1 || !build2) {
       return null;
     }
 
     const durationDiff = build2.duration - build1.duration;
-    const durationPercent = build1.duration > 0 
-      ? ((durationDiff / build1.duration) * 100).toFixed(2) 
-      : 'N/A';
+    const durationPercent =
+      build1.duration > 0 ? ((durationDiff / build1.duration) * 100).toFixed(2) : 'N/A';
 
     const errorsAdded = build2.errors.length - build1.errors.length;
     const warningsAdded = build2.warnings.length - build1.warnings.length;
 
-    const filesAdded = build2.outputFiles.filter(f => !build1.outputFiles.includes(f));
-    const filesRemoved = build1.outputFiles.filter(f => !build2.outputFiles.includes(f));
-    const filesCommon = build1.outputFiles.filter(f => build2.outputFiles.includes(f));
+    const filesAdded = build2.outputFiles.filter((f) => !build1.outputFiles.includes(f));
+    const filesRemoved = build1.outputFiles.filter((f) => !build2.outputFiles.includes(f));
+    const filesCommon = build1.outputFiles.filter((f) => build2.outputFiles.includes(f));
 
     const cacheHitDiff = (build2.cacheInfo?.hit ? 1 : 0) - (build1.cacheInfo?.hit ? 1 : 0);
 
@@ -314,32 +319,38 @@ export class BuildService {
         task.status = 'failed';
         task.finishedAt = Date.now();
         this.activeTaskId = null;
-        globalEventBus.emit({ type: 'build:complete', payload: {
-          id: randomUUID(),
-          projectId: task.config.projectId,
-          success: false,
-          outputFiles: [],
-          duration: task.finishedAt - (task.startedAt || Date.now()),
-          errors: ['构建失败'],
-          warnings: [],
-          timestamp: Date.now(),
-        } satisfies BuildResult });
+        globalEventBus.emit({
+          type: 'build:complete',
+          payload: {
+            id: randomUUID(),
+            projectId: task.config.projectId,
+            success: false,
+            outputFiles: [],
+            duration: task.finishedAt - (task.startedAt || Date.now()),
+            errors: ['构建失败'],
+            warnings: [],
+            timestamp: Date.now(),
+          } satisfies BuildResult,
+        });
       });
     } else {
       this.runSimulatedBuild(task).catch(() => {
         task.status = 'failed';
         task.finishedAt = Date.now();
         this.activeTaskId = null;
-        globalEventBus.emit({ type: 'build:complete', payload: {
-          id: randomUUID(),
-          projectId: task.config.projectId,
-          success: false,
-          outputFiles: [],
-          duration: task.finishedAt - (task.startedAt || Date.now()),
-          errors: ['构建失败'],
-          warnings: [],
-          timestamp: Date.now(),
-        } satisfies BuildResult });
+        globalEventBus.emit({
+          type: 'build:complete',
+          payload: {
+            id: randomUUID(),
+            projectId: task.config.projectId,
+            success: false,
+            outputFiles: [],
+            duration: task.finishedAt - (task.startedAt || Date.now()),
+            errors: ['构建失败'],
+            warnings: [],
+            timestamp: Date.now(),
+          } satisfies BuildResult,
+        });
       });
     }
 
@@ -380,7 +391,9 @@ export class BuildService {
    * @param result 构建结果
    */
   handleNativeComplete(result: BuildResult): void {
-    const task = [...this.tasks.values()].find((t) => t.config.projectId === result.projectId && t.status === 'running');
+    const task = [...this.tasks.values()].find(
+      (t) => t.config.projectId === result.projectId && t.status === 'running'
+    );
     if (!task) return;
     task.result = result;
     task.status = result.success ? 'success' : 'failed';
@@ -433,7 +446,7 @@ export class BuildService {
     try {
       const stats = fs.statSync(cachePath);
       const cacheFile = path.join(cachePath, 'cache.json');
-      
+
       if (fs.existsSync(cacheFile)) {
         const content = fs.readFileSync(cacheFile, 'utf-8');
         const cacheInfo = JSON.parse(content) as BuildCacheInfo;
@@ -478,11 +491,13 @@ export class BuildService {
     if (config.projectPath) {
       try {
         const projectFiles = this.getProjectFiles(config.projectPath);
-        hashContent += JSON.stringify(projectFiles.map(f => ({
-          name: f.name,
-          size: f.size,
-          mtime: f.mtime,
-        })));
+        hashContent += JSON.stringify(
+          projectFiles.map((f) => ({
+            name: f.name,
+            size: f.size,
+            mtime: f.mtime,
+          }))
+        );
       } catch {
         // Ignore errors when reading project files
       }
@@ -494,16 +509,16 @@ export class BuildService {
   private getProjectFiles(dir: string): Array<{ name: string; size: number; mtime: number }> {
     const files: Array<{ name: string; size: number; mtime: number }> = [];
     const excludeDirs = ['node_modules', '.git', 'Library', 'Temp', 'obj', 'bin', '.tapdev'];
-    
+
     const walk = (currentDir: string, relativePath: string = '') => {
       const entries = fs.readdirSync(currentDir, { withFileTypes: true });
-      
+
       for (const entry of entries) {
         if (excludeDirs.includes(entry.name)) continue;
-        
+
         const fullPath = path.join(currentDir, entry.name);
         const relPath = relativePath ? path.join(relativePath, entry.name) : entry.name;
-        
+
         if (entry.isDirectory()) {
           walk(fullPath, relPath);
         } else {
@@ -516,13 +531,13 @@ export class BuildService {
         }
       }
     };
-    
+
     walk(dir);
     return files;
   }
 
   private sha256(str: string): string {
-    return createHash('sha256').update(str).digest('hex');
+    return generateHash('sha256').update(str).digest('hex');
   }
 
   private rmdirSync(dir: string): void {
@@ -535,7 +550,10 @@ export class BuildService {
     }
   }
 
-  private async runNativeBuild(task: BuildTask, bridge: NonNullable<ReturnType<typeof getNativeBridge>>): Promise<void> {
+  private async runNativeBuild(
+    task: BuildTask,
+    bridge: NonNullable<ReturnType<typeof getNativeBridge>>
+  ): Promise<void> {
     task.status = 'running';
 
     const { taskId } = await bridge.startUnityBuild(task.config);
@@ -562,22 +580,22 @@ export class BuildService {
 
   private async runSimulatedBuild(task: BuildTask): Promise<void> {
     task.status = 'running';
-    
+
     const useCache = task.cacheInfo?.enabled ?? true;
     let cacheHit = false;
     const skippedSteps: string[] = [];
     const buildHash = await this.generateBuildHash(task.config);
-    
+
     if (useCache) {
       const cacheInfo = await this.getCacheInfo(task.config.projectId);
       if (cacheInfo && cacheInfo.hash === buildHash && cacheInfo.valid) {
         cacheHit = true;
-        skippedSteps.push(...BUILD_STEPS.filter(s => s.cacheable).map(s => s.name));
+        skippedSteps.push(...BUILD_STEPS.filter((s) => s.cacheable).map((s) => s.name));
         task.progressMessage = '使用缓存构建';
         await this.delay(500);
       }
     }
-    
+
     task.cacheInfo = {
       enabled: useCache,
       hit: cacheHit,
@@ -585,7 +603,7 @@ export class BuildService {
       hash: buildHash,
     };
 
-    const steps = cacheHit ? BUILD_STEPS.filter(s => !s.cacheable) : BUILD_STEPS;
+    const steps = cacheHit ? BUILD_STEPS.filter((s) => !s.cacheable) : BUILD_STEPS;
 
     let progress = 0;
     const warnings: string[] = [
@@ -599,14 +617,14 @@ export class BuildService {
     for (const step of steps) {
       const current = this.tasks.get(task.id);
       if (current?.status === 'cancelled') return;
-      
+
       task.progressMessage = step.name;
       await this.delay(400 + Math.random() * 600);
       progress += step.weight ?? 0;
       task.progress = Math.min(progress, 100);
-      globalEventBus.emit({ 
-        type: 'build:progress', 
-        payload: { taskId: task.id, progress: task.progress, message: step.name } 
+      globalEventBus.emit({
+        type: 'build:progress',
+        payload: { taskId: task.id, progress: task.progress, message: step.name },
       });
     }
 
@@ -655,9 +673,9 @@ export class BuildService {
     try {
       const historyPath = path.join(this.historyDir, result.id);
       fs.mkdirSync(historyPath, { recursive: true });
-      
+
       fs.writeFileSync(path.join(historyPath, 'result.json'), JSON.stringify(result, null, 2));
-      
+
       this.cleanupOldHistory();
     } catch {
       // Ignore errors
@@ -666,14 +684,15 @@ export class BuildService {
 
   private cleanupOldHistory(): void {
     try {
-      const dirs = fs.readdirSync(this.historyDir, { withFileTypes: true })
-        .filter(d => d.isDirectory())
-        .map(d => ({ name: d.name, path: path.join(this.historyDir, d.name) }))
+      const dirs = fs
+        .readdirSync(this.historyDir, { withFileTypes: true })
+        .filter((d) => d.isDirectory())
+        .map((d) => ({ name: d.name, path: path.join(this.historyDir, d.name) }))
         .sort((a, b) => Number(b.name) - Number(a.name));
 
       if (dirs.length > this.maxHistoryItems) {
         const toDelete = dirs.slice(this.maxHistoryItems);
-        toDelete.forEach(dir => {
+        toDelete.forEach((dir) => {
           this.rmdirSync(dir.path);
         });
       }
@@ -686,7 +705,7 @@ export class BuildService {
     try {
       const cachePath = this.getCachePath(projectId);
       fs.mkdirSync(cachePath, { recursive: true });
-      
+
       const cacheInfo: BuildCacheInfo = {
         enabled: true,
         hit: false,
@@ -695,7 +714,7 @@ export class BuildService {
         valid: true,
         hitCount: 0,
       };
-      
+
       fs.writeFileSync(path.join(cachePath, 'cache.json'), JSON.stringify(cacheInfo, null, 2));
     } catch {
       // Ignore cache save errors

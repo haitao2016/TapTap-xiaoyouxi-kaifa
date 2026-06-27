@@ -24,10 +24,13 @@ export interface LocalizedError {
   retryable: boolean;
 }
 
-const ERRORS: Record<string, Omit<LocalizedError, 'code' | 'title' | 'description' | 'steps'> & {
-  messages: Record<Locale, { title: string; description: string; steps: string[] }>;
-}> = {
-  'E1001': {
+const ERRORS: Record<
+  string,
+  Omit<LocalizedError, 'code' | 'title' | 'description' | 'steps'> & {
+    messages: Record<Locale, { title: string; description: string; steps: string[] }>;
+  }
+> = {
+  E1001: {
     severity: 'error',
     retryable: false,
     docsUrl: 'https://developer.taptap.cn/minigameapidoc/',
@@ -45,7 +48,11 @@ const ERRORS: Record<string, Omit<LocalizedError, 'code' | 'title' | 'descriptio
       'en-US': {
         title: 'Project path not found',
         description: 'The specified project path does not exist or is not accessible',
-        steps: ['Check the project path', 'Verify the folder exists', 'Check read/write permissions'],
+        steps: [
+          'Check the project path',
+          'Verify the folder exists',
+          'Check read/write permissions',
+        ],
       },
       'ja-JP': {
         title: 'プロジェクトパスが見つかりません',
@@ -59,7 +66,7 @@ const ERRORS: Record<string, Omit<LocalizedError, 'code' | 'title' | 'descriptio
       },
     },
   },
-  'E2001': {
+  E2001: {
     severity: 'error',
     retryable: true,
     messages: {
@@ -115,7 +122,7 @@ const ERRORS: Record<string, Omit<LocalizedError, 'code' | 'title' | 'descriptio
       },
     },
   },
-  'E3001': {
+  E3001: {
     severity: 'warning',
     retryable: true,
     messages: {
@@ -137,7 +144,11 @@ const ERRORS: Record<string, Omit<LocalizedError, 'code' | 'title' | 'descriptio
       'ja-JP': {
         title: 'ネットワーク接続が不安定',
         description: 'ネットワークの遅延やパケット損失が検出されました',
-        steps: ['ネットワーク接続を確認', 'プロキシを使用する場合はHTTPS_PROXYを設定', '後で再試行'],
+        steps: [
+          'ネットワーク接続を確認',
+          'プロキシを使用する場合はHTTPS_PROXYを設定',
+          '後で再試行',
+        ],
       },
       'ko-KR': {
         title: '네트워크 연결 불안정',
@@ -146,7 +157,7 @@ const ERRORS: Record<string, Omit<LocalizedError, 'code' | 'title' | 'descriptio
       },
     },
   },
-  'E4001': {
+  E4001: {
     severity: 'error',
     retryable: false,
     messages: {
@@ -223,7 +234,13 @@ export class ErrorLocalizer {
     };
   }
 
-  registerError(error: { code: string; severity: LocalizedError['severity']; retryable: boolean; docsUrl?: string; messages: Record<Locale, { title: string; description: string; steps: string[] }> }): void {
+  registerError(error: {
+    code: string;
+    severity: LocalizedError['severity'];
+    retryable: boolean;
+    docsUrl?: string;
+    messages: Record<Locale, { title: string; description: string; steps: string[] }>;
+  }): void {
     ERRORS[error.code] = error;
   }
 
