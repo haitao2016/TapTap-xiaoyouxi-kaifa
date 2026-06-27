@@ -55,7 +55,8 @@
         { "target": "nsis", "arch": ["x64"] },
         { "target": "zip", "arch": ["x64"] }
       ],
-      "artifactName": "${productName}-${version}-win-${arch}.${ext}"
+      "artifactName": "${productName}-${version}-win-${arch}.${ext}",
+      "signAndEditExecutable": false
     },
     "nsis": {
       "oneClick": false,
