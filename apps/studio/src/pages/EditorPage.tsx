@@ -5,6 +5,7 @@ import Editor, { useMonaco } from '@monaco-editor/react';
 import * as monaco from 'monaco-editor';
 import type { FileNode, Snippet } from '@tapdev/types';
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { registerSnippets } from '../lib/monaco-snippets';
 
 export function EditorPage() {
   const {
@@ -34,22 +35,21 @@ export function EditorPage() {
 
   useEffect(() => {
     if (monacoInstance) {
+      registerSnippets(monacoInstance);
+
       monacoInstance.editor.defineTheme('tapdev-dark', {
         base: 'vs-dark',
         inherit: true,
         rules: [],
         colors: {
-          'editor.background': '#1e1e1e',
-          'editor.foreground': '#d4d4d4',
+          'editor.background': '#0d0d0f',
+          'editor.foreground': '#f0f0f5',
           'editor.selectionBackground': '#264f78',
-          'editor.cursorForeground': '#aeafad',
-          'editor.inactiveSelectionBackground': '#1e3a5f',
-          'editor.lineHighlightBackground': '#2a2a2a',
-          'editorLineNumber.foreground': '#6b6b6b',
-          'editorLineNumber.activeForeground': '#c6c6c6',
-          'editorWhitespace.foreground': '#3b3b3b',
-          'editorCursor.foreground': '#aeafad',
-          'editorCursor.background': '#aeafad',
+          'editor.lineHighlightBackground': '#16161a',
+          'editorCursor.foreground': '#ff6b00',
+          'editorWhitespace.foreground': '#2e2e38',
+          'editorIndentGuide.background': '#2e2e38',
+          'editorIndentGuide.activeBackground': '#6b6b7b',
         },
       });
     }
@@ -388,6 +388,8 @@ export function EditorPage() {
                 folding: true,
                 foldingHighlight: true,
                 bracketPairColorization: { enabled: true },
+                fixedOverflowWidgets: true,
+                snippetSuggestions: 'inline',
                 quickSuggestions: {
                   other: true,
                   comments: true,
@@ -395,8 +397,8 @@ export function EditorPage() {
                 },
                 suggestOnTriggerCharacters: true,
                 acceptSuggestionOnEnter: 'on',
-                formatOnPaste: false,
-                formatOnType: false,
+                formatOnPaste: true,
+                formatOnType: true,
               }}
             />
             <div className="flex items-center justify-between border-t border-border px-3 py-1 text-xs text-text-muted bg-surface-1">
@@ -514,27 +516,83 @@ function FileTreeNode({
   const isDir = node.type === 'directory';
   const expanded = expandedDirs.has(node.path);
 
+  const getFileIcon = (ext?: string) => {
+    switch (ext) {
+      case 'ts':
+      case 'tsx':
+        return 'typescript';
+      case 'js':
+      case 'jsx':
+        return 'javascript';
+      case 'cs':
+        return 'csharp';
+      case 'json':
+        return 'json';
+      case 'css':
+        return 'css';
+      case 'html':
+        return 'html';
+      case 'md':
+        return 'markdown';
+      case 'png':
+      case 'jpg':
+      case 'jpeg':
+      case 'gif':
+      case 'svg':
+        return 'image';
+      default:
+        return 'file';
+    }
+  };
+
+  const getIconColor = (ext?: string) => {
+    switch (ext) {
+      case 'ts':
+      case 'tsx':
+        return 'text-blue-400';
+      case 'js':
+      case 'jsx':
+        return 'text-yellow-400';
+      case 'cs':
+        return 'text-purple-400';
+      case 'json':
+        return 'text-orange-300';
+      case 'css':
+        return 'text-blue-300';
+      case 'html':
+        return 'text-orange-400';
+      case 'md':
+        return 'text-text-muted';
+      default:
+        return 'text-text-muted';
+    }
+  };
+
   return (
     <>
       <button
         onClick={() => (isDir ? onToggle(node.path) : onOpen(node.path))}
-        className="flex w-full items-center gap-1 rounded px-1 py-1 text-xs hover:bg-surface-2"
-        style={{ paddingLeft: `${depth * 12 + 4}px` }}
+        className="flex w-full items-center gap-1.5 rounded px-2 py-1 text-xs transition-colors hover:bg-surface-2"
+        style={{ paddingLeft: `${depth * 12 + 8}px` }}
         title={node.path}
       >
-        {isDir && (
+        {isDir ? (
           <Icon
             name="chevron"
-            size={12}
+            size={10}
             className={`text-text-muted transition-transform ${expanded ? 'rotate-90' : ''}`}
           />
+        ) : (
+          <div className="w-2.5" />
         )}
         <Icon
-          name={isDir ? (expanded ? 'folder-open' : 'folder') : 'file'}
+          name={isDir ? (expanded ? 'folder-open' : 'folder') : getFileIcon(node.extension)}
           size={14}
-          className="text-text-muted"
+          className={isDir ? 'text-tap-orange' : getIconColor(node.extension)}
         />
-        <span className="truncate">{node.name}</span>
+        <span className={`truncate ${isDir ? 'font-medium' : 'text-text-secondary'}`}>
+          {node.name}
+        </span>
       </button>
       {isDir &&
         expanded &&

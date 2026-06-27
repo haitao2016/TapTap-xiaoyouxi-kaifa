@@ -1,7 +1,7 @@
-export { DebugServer, debugServer } from './debug-server';
+export { DebugServer, debugServer } from './debug-server.js';
 export {
   UnityBuildRunner,
   UnityDetector,
   unityBuildRunner,
   unityDetector,
-} from './unity-build-runner';
+} from './unity-build-runner.js';

@@ -84,20 +84,37 @@ export function DashboardPage() {
     }
   };
 
-  const handleNewProject = () => {
+  const handleNewProject = async () => {
     try {
-      createProject('Demo TapTap Game', './projects/demo-game', 'unity');
+      let projectPath = './projects/demo-game';
+      
+      // If native bridge is available, let user pick a directory
+      if (window.electronAPI?.openDirectory) {
+        const picked = await window.electronAPI.openDirectory();
+        if (!picked) return;
+        projectPath = picked;
+      }
+
+      await createProject('新 TapTap 项目', projectPath, 'unity');
       navigate('/editor');
     } catch (err) {
       setError(err instanceof Error ? err.message : '创建项目失败');
     }
   };
 
-  const handleOpenDemo = async () => {
+  const handleOpenProject = async () => {
     try {
       setLoading(true);
       setError(null);
-      await openProject('./projects/demo-game');
+      
+      let projectPath = './projects/demo-game';
+      if (window.electronAPI?.openDirectory) {
+        const picked = await window.electronAPI.openDirectory();
+        if (!picked) return;
+        projectPath = picked;
+      }
+      
+      await openProject(projectPath);
       navigate('/editor');
     } catch (err) {
       setError(err instanceof Error ? err.message : '打开项目失败');
@@ -204,7 +221,7 @@ export function DashboardPage() {
           icon="folder"
           title="打开项目"
           description="打开已有项目"
-          onClick={handleOpenDemo}
+          onClick={handleOpenProject}
           color="blue"
         />
         <ActionCard
