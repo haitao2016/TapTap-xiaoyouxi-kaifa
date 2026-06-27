@@ -5,11 +5,14 @@
  * It tracks AI model interactions, performance metrics, and user interactions.
  */
 
-import Raindrop from 'raindrop-ai';
-
 const RAINDROP_WRITE_KEY = process.env.RAINDROP_WRITE_KEY;
 
-let raindropClient: Raindrop | null = null;
+type RaindropClient = {
+  track: (data: unknown) => Promise<void>;
+  flush?: () => Promise<void>;
+};
+
+let raindropClient: RaindropClient | null = null;
 
 export interface RaindropConfig {
   writeKey?: string;
@@ -25,21 +28,32 @@ export interface AIInstrumentationOptions {
   operationName?: string;
 }
 
-export function getRaindropClient(): Raindrop | null {
-  if (!raindropClient && RAINDROP_WRITE_KEY) {
-    try {
-      raindropClient = new Raindrop({
-        writeKey: RAINDROP_WRITE_KEY,
-      });
-    } catch (error) {
-      console.error('[Raindrop] Failed to initialize:', error);
-    }
+async function loadRaindrop(): Promise<RaindropClient | null> {
+  if (typeof window !== 'undefined') {
+    return null;
+  }
+  try {
+    const mod = await import('raindrop-ai');
+    const Raindrop = mod.default || mod;
+    return new Raindrop({
+      writeKey: RAINDROP_WRITE_KEY,
+    }) as RaindropClient;
+  } catch (error) {
+    console.error('[Raindrop] Failed to initialize:', error);
+    return null;
+  }
+}
+
+export async function getRaindropClient(): Promise<RaindropClient | null> {
+  if (!RAINDROP_WRITE_KEY) return null;
+  if (!raindropClient) {
+    raindropClient = await loadRaindrop();
   }
   return raindropClient;
 }
 
 export function isRaindropEnabled(): boolean {
-  return !!RAINDROP_WRITE_KEY && !!getRaindropClient();
+  return !!RAINDROP_WRITE_KEY;
 }
 
 export async function trackAIEvent(
@@ -54,7 +68,7 @@ export async function trackAIEvent(
     metadata?: Record<string, unknown>;
   }
 ): Promise<void> {
-  const client = getRaindropClient();
+  const client = await getRaindropClient();
   if (!client) return;
 
   try {
@@ -71,7 +85,7 @@ export async function trackAIEvent(
 }
 
 export async function trackAIStreamStart(options: AIInstrumentationOptions): Promise<string | null> {
-  const client = getRaindropClient();
+  const client = await getRaindropClient();
   if (!client) return null;
 
   try {
@@ -106,7 +120,7 @@ export async function trackAIStreamComplete(
     error?: string;
   }
 ): Promise<void> {
-  const client = getRaindropClient();
+  const client = await getRaindropClient();
   if (!client) return;
 
   try {
@@ -211,7 +225,7 @@ export async function trackAIModelSwitch(
 }
 
 export async function flushRaindrop(): Promise<void> {
-  const client = getRaindropClient();
+  const client = await getRaindropClient();
   if (client && typeof client.flush === 'function') {
     await client.flush();
   }
