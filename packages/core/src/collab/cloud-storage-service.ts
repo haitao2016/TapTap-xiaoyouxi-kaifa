@@ -6,7 +6,8 @@
  * - 项目分享链接
  */
 import { globalEventBus } from '../event-bus';
-import { createHash, randomUUID } from 'node:crypto';
+import { createHash } from 'node:crypto';
+import { generateId as randomUUID } from '../utils/uuid';
 
 export interface CloudProject {
   id: string;

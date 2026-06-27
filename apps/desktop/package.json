@@ -36,6 +36,7 @@
       "output": "release",
       "buildResources": "assets"
     },
+    "icon": "assets/icon.png",
     "files": [
       "dist/**/*",
       "studio-dist/**/*",

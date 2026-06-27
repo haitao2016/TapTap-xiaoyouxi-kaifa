@@ -1,8 +1,10 @@
 node_modules/
 .pnpm-store/
 dist/
-build/
 out/
+build/win-unpacked/
+build-output/
+build-output-new/
 *.local
 .env
 .env.*

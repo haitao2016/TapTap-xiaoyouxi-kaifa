@@ -6,7 +6,7 @@
  * - 一键应用补丁
  */
 import { globalEventBus } from '../event-bus';
-import { randomUUID } from 'node:crypto';
+import { generateId as randomUUID } from '../utils/uuid';
 
 export interface ErrorContext {
   /** 错误消息 */

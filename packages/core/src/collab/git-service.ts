@@ -7,7 +7,7 @@
  */
 import { globalEventBus } from '../event-bus';
 import { spawn } from 'child_process';
-import { randomUUID } from 'node:crypto';
+import { generateId as randomUUID } from '../utils/uuid';
 
 export interface GitStatus {
   branch: string;

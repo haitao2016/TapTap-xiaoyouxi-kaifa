@@ -6,7 +6,7 @@ import type {
   AppSettings,
 } from '@tapdev/types';
 import { globalEventBus } from './event-bus';
-import { randomUUID } from 'node:crypto';
+import { generateId as randomUUID } from './utils/uuid';
 import { existsSync } from 'node:fs';
 
 const DEFAULT_SETTINGS: AppSettings = {

@@ -1,8 +1,9 @@
 const { cpSync, rmSync, existsSync, mkdirSync } = require('fs');
 const { join } = require('path');
 
-const studioDist = join(__dirname, '../../studio/dist');
-const target = join(__dirname, '../studio-dist');
+const repoRoot = join(__dirname, '../../..');
+const studioDist = join(repoRoot, 'apps/studio/dist');
+const target = join(repoRoot, 'apps/desktop/studio-dist');
 
 if (!existsSync(studioDist)) {
   console.error('Studio dist not found. Run: pnpm --filter @tapdev/studio build');

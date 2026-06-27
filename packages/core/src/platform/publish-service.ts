@@ -7,7 +7,7 @@
  * - 进度跟踪
  */
 import { globalEventBus } from '../event-bus';
-import { randomUUID } from 'node:crypto';
+import { generateId as randomUUID } from '../utils/uuid';
 import * as fs from 'fs';
 import * as path from 'path';
 import { tapTapAuthService } from './taptap-auth-service';

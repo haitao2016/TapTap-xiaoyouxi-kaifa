@@ -5,7 +5,7 @@
  * - 角色权限（owner / developer / viewer）
  */
 import { globalEventBus } from '../event-bus';
-import { randomUUID } from 'node:crypto';
+import { generateId as randomUUID } from '../utils/uuid';
 
 export type TeamRole = 'owner' | 'admin' | 'developer' | 'viewer';
 

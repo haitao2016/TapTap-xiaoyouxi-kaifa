@@ -1,6 +1,6 @@
 import type { PerformanceMetrics, MonitorAlert, MonitorStats, MonitorThresholds, NetworkRequestInfo } from '@tapdev/types';
 import { globalEventBus } from './event-bus';
-import { randomUUID } from 'node:crypto';
+import { generateId as randomUUID } from './utils/uuid';
 
 const DEFAULT_THRESHOLDS: MonitorThresholds = {
   fps: 30,

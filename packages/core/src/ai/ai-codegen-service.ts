@@ -6,7 +6,7 @@
  * - Diff 预览
  */
 import { globalEventBus } from '../event-bus';
-import { randomUUID } from 'node:crypto';
+import { generateId as randomUUID } from '../utils/uuid';
 
 export type CodeGenAction = 'generate' | 'refactor' | 'comment' | 'test' | 'document';
 

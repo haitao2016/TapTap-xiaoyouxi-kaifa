@@ -6,7 +6,7 @@
  * - API Key 配置管理
  */
 import { globalEventBus } from '../event-bus';
-import { randomUUID } from 'node:crypto';
+import { generateId as randomUUID } from '../utils/uuid';
 
 export type AIProvider = 'openai' | 'claude' | 'ollama' | 'mock';
 

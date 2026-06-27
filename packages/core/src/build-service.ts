@@ -1,7 +1,8 @@
 import type { BuildConfig, BuildTask, BuildResult, BuildStep, BuildPlatformConfig, BuildCacheInfo } from '@tapdev/types';
 import { globalEventBus } from './event-bus';
 import { getNativeBridge } from './debug-service';
-import { randomUUID, createHash } from 'node:crypto';
+import { createHash } from 'node:crypto';
+import { generateId as randomUUID } from './utils/uuid';
 import * as fs from 'fs';
 import * as path from 'path';
 

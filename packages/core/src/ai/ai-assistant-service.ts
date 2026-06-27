@@ -6,7 +6,7 @@
  * - 多会话管理
  */
 import { globalEventBus } from '../event-bus';
-import { randomUUID } from 'node:crypto';
+import { generateId as randomUUID } from '../utils/uuid';
 
 export type ChatRole = 'user' | 'assistant' | 'system';
 

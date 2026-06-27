@@ -1,6 +1,6 @@
 import type { DebugSession } from '@tapdev/types';
 import { globalEventBus } from './event-bus';
-import { randomUUID } from 'node:crypto';
+import { generateId as randomUUID } from './utils/uuid';
 
 export interface WatchVariable {
   id: string;
