@@ -40,7 +40,8 @@ describe('Phase 7: AI Services', () => {
           cursor: { line: 0, column: 8 },
         },
       });
-      expect(result.text).toBeTruthy();
+      expect(result.items.length).toBeGreaterThan(0);
+      expect(result.items[0]!.text).toBeTruthy();
     });
   });
 
@@ -79,18 +80,17 @@ describe('Phase 7: AI Services', () => {
 
   describe('AICodeGenService', () => {
     it('should generate code from description', async () => {
-      const result = await aiCodeGenService.generate({
+      const result = await aiCodeGenService.generateCode({
         id: 'g1',
         action: 'generate',
         prompt: 'Create a function that returns hello world',
         language: 'typescript',
       });
       expect(result.code.length).toBeGreaterThan(0);
-      expect(result.action).toBe('generate');
     });
 
     it('should generate test code', async () => {
-      const result = await aiCodeGenService.generate({
+      const result = await aiCodeGenService.generateCode({
         id: 'g2',
         action: 'test',
         prompt: '',
@@ -102,7 +102,7 @@ describe('Phase 7: AI Services', () => {
     });
 
     it('should produce diffs for refactor', async () => {
-      const result = await aiCodeGenService.generate({
+      const result = await aiCodeGenService.generateCode({
         id: 'g3',
         action: 'refactor',
         prompt: 'Use arrow functions',

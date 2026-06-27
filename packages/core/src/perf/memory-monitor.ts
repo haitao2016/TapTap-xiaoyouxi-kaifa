@@ -60,7 +60,9 @@ export class MemoryMonitor {
   }
 
   sample(): MemorySample {
-    const mem = (performance as unknown as { memory?: { usedJSHeapSize: number; totalJSHeapSize: number } }).memory;
+    const mem = (
+      performance as unknown as { memory?: { usedJSHeapSize: number; totalJSHeapSize: number } }
+    ).memory;
     const doc = typeof document !== 'undefined' ? document : null;
     const sample: MemorySample = {
       timestamp: Date.now(),
@@ -124,10 +126,14 @@ export class MemoryMonitor {
 
   private getMetricValue(metric: string, sample: MemorySample): number {
     switch (metric) {
-      case 'heap.used': return sample.heapUsedMB;
-      case 'rss': return sample.rssMB;
-      case 'dom.nodes': return sample.domNodes;
-      default: return 0;
+      case 'heap.used':
+        return sample.heapUsedMB;
+      case 'rss':
+        return sample.rssMB;
+      case 'dom.nodes':
+        return sample.domNodes;
+      default:
+        return 0;
     }
   }
 

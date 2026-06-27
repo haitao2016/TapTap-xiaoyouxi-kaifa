@@ -1,13 +1,22 @@
 // 代码库理解与索引系统
 // 支持符号解析、依赖关系分析、代码语义检索
 
-import { globalEventBus } from '../core/event-bus';
+import { globalEventBus } from '../event-bus';
 
 // 代码符号
 export interface CodeSymbol {
   id: string;
   name: string;
-  kind: 'function' | 'class' | 'interface' | 'variable' | 'type' | 'enum' | 'module' | 'property' | 'method';
+  kind:
+    | 'function'
+    | 'class'
+    | 'interface'
+    | 'variable'
+    | 'type'
+    | 'enum'
+    | 'module'
+    | 'property'
+    | 'method';
   filePath: string;
   startLine: number;
   endLine: number;
@@ -52,7 +61,10 @@ class CodeIndexService {
   private isIndexing = false;
 
   // 索引项目
-  async indexProject(files: { path: string; content: string }[], onProgress?: (p: number) => void): Promise<void> {
+  async indexProject(
+    files: { path: string; content: string }[],
+    onProgress?: (p: number) => void
+  ): Promise<void> {
     if (this.isIndexing) return;
     this.isIndexing = true;
 
@@ -65,7 +77,10 @@ class CodeIndexService {
         for (const l of this.indexListeners) l(progress);
       }
       this.buildDependencyGraph();
-      globalEventBus.emit('code-index:completed', { fileCount: files.length, symbolCount: this.symbolsById.size });
+      globalEventBus.emit('code-index:completed', {
+        fileCount: files.length,
+        symbolCount: this.symbolsById.size,
+      });
     } finally {
       this.isIndexing = false;
     }
@@ -87,7 +102,7 @@ class CodeIndexService {
       symbols,
       imports,
       exports,
-      dependencies: imports.map(i => i.from)
+      dependencies: imports.map((i) => i.from),
     };
 
     // 清理旧符号
@@ -157,7 +172,7 @@ class CodeIndexService {
           isExported: line.includes('export'),
           isAsync: line.includes('async'),
           language: 'typescript',
-          references: []
+          references: [],
         });
         continue;
       }
@@ -178,7 +193,7 @@ class CodeIndexService {
           isExported: line.includes('export'),
           isAsync: false,
           language: 'typescript',
-          references: []
+          references: [],
         });
 
         // 提取类方法
@@ -202,7 +217,7 @@ class CodeIndexService {
           isExported: line.includes('export'),
           isAsync: false,
           language: 'typescript',
-          references: []
+          references: [],
         });
         continue;
       }
@@ -221,7 +236,7 @@ class CodeIndexService {
           isExported: line.includes('export'),
           isAsync: false,
           language: 'typescript',
-          references: []
+          references: [],
         });
       }
 
@@ -240,18 +255,27 @@ class CodeIndexService {
           isExported: line.includes('export'),
           isAsync: false,
           language: 'typescript',
-          references: []
+          references: [],
         });
       }
     }
   }
 
   // 类方法提取
-  private extractClassMethods(path: string, lines: string[], startLine: number, endLine: number, className: string, symbols: CodeSymbol[]): void {
+  private extractClassMethods(
+    path: string,
+    lines: string[],
+    startLine: number,
+    endLine: number,
+    className: string,
+    symbols: CodeSymbol[]
+  ): void {
     const fileId = this.getFileKey(path);
     for (let i = startLine + 1; i < endLine; i++) {
       const line = lines[i];
-      const methodMatch = line.match(^\s*(public\s+|private\s+|protected\s+)?(static\s+)?(async\s+)?(\w+)\s*\(([^)]*)\)\s*[:{]/);
+      const methodMatch = line.match(
+        /^\s*(public\s+|private\s+|protected\s+)?(static\s+)?(async\s+)?(\w+)\s*\(([^)]*)\)\s*[:{]/
+      );
       if (methodMatch && methodMatch[4] !== 'constructor') {
         const visibility = (methodMatch[1]?.trim() as any) || 'public';
         const isStatic = !!methodMatch[2];
@@ -271,7 +295,7 @@ class CodeIndexService {
           isAsync,
           language: 'typescript',
           parent: `${fileId}:class:${className}`,
-          references: []
+          references: [],
         });
       }
     }
@@ -282,7 +306,9 @@ class CodeIndexService {
     const fileId = this.getFileKey(path);
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
-      const compMatch = line.match(/(?:export\s+)?(?:const|function)\s+(\w+)\s*[:=]\s*(?:React\.)?(?:FC|FunctionComponent|memo|forwardRef)/);
+      const compMatch = line.match(
+        /(?:export\s+)?(?:const|function)\s+(\w+)\s*[:=]\s*(?:React\.)?(?:FC|FunctionComponent|memo|forwardRef)/
+      );
       if (compMatch) {
         symbols.push({
           id: `${fileId}:component:${compMatch[1]}:${i + 1}`,
@@ -296,7 +322,7 @@ class CodeIndexService {
           isExported: line.includes('export'),
           isAsync: false,
           language: 'tsx',
-          references: []
+          references: [],
         });
       }
     }
@@ -323,7 +349,7 @@ class CodeIndexService {
           isExported: !line.startsWith('_'),
           isAsync: line.includes('async def'),
           language: 'python',
-          references: []
+          references: [],
         });
       }
       const classMatch = line.match(/^class\s+(\w+)/);
@@ -342,7 +368,7 @@ class CodeIndexService {
           isExported: true,
           isAsync: false,
           language: 'python',
-          references: []
+          references: [],
         });
       }
     }
@@ -354,8 +380,10 @@ class CodeIndexService {
     let foundFirstBrace = false;
     for (let i = startLine; i < lines.length; i++) {
       for (const ch of lines[i]) {
-        if (ch === '{') { braceCount++; foundFirstBrace = true; }
-        else if (ch === '}') {
+        if (ch === '{') {
+          braceCount++;
+          foundFirstBrace = true;
+        } else if (ch === '}') {
           braceCount--;
           if (foundFirstBrace && braceCount === 0) return i + 1;
         }
@@ -381,7 +409,11 @@ class CodeIndexService {
     const importRegex = /import\s+(?:\{([^}]+)\}\s+from\s+)?(?:(\w+)\s+from\s+)?['"]([^'"]+)['"]/g;
     let match;
     while ((match = importRegex.exec(content))) {
-      const symbols = match[1] ? match[1].split(',').map(s => s.trim()) : match[2] ? [match[2]] : [];
+      const symbols = match[1]
+        ? match[1].split(',').map((s) => s.trim())
+        : match[2]
+          ? [match[2]]
+          : [];
       imports.push({ from: match[3], symbols });
     }
     return imports;
@@ -390,7 +422,8 @@ class CodeIndexService {
   // 提取 exports
   private extractExports(content: string, language: string): string[] {
     const exports: string[] = [];
-    const exportRegex = /export\s+(?:default\s+)?(?:const|let|var|function|class|interface|type|enum)\s+(\w+)/g;
+    const exportRegex =
+      /export\s+(?:default\s+)?(?:const|let|var|function|class|interface|type|enum)\s+(\w+)/g;
     let match;
     while ((match = exportRegex.exec(content))) {
       exports.push(match[1]);
@@ -416,7 +449,10 @@ class CodeIndexService {
   }
 
   // 搜索符号
-  searchSymbols(query: string, options?: { kind?: CodeSymbol['kind']; limit?: number }): SearchResult[] {
+  searchSymbols(
+    query: string,
+    options?: { kind?: CodeSymbol['kind']; limit?: number }
+  ): SearchResult[] {
     const results: SearchResult[] = [];
     const limit = options?.limit || 20;
     const lowerQuery = query.toLowerCase();
@@ -433,7 +469,7 @@ class CodeIndexService {
             file,
             relevance: 100,
             context: sym.signature || sym.name,
-            highlight: []
+            highlight: [],
           });
         }
       }
@@ -445,8 +481,11 @@ class CodeIndexService {
         if (name.toLowerCase().includes(lowerQuery)) {
           for (const id of ids) {
             const sym = this.symbolsById.get(id);
-            if (sym && !results.find(r => r.symbol.id === sym.id) &&
-                (!options?.kind || sym.kind === options.kind)) {
+            if (
+              sym &&
+              !results.find((r) => r.symbol.id === sym.id) &&
+              (!options?.kind || sym.kind === options.kind)
+            ) {
               const file = this.fileIndex.get(sym.filePath);
               if (file) {
                 results.push({
@@ -454,7 +493,7 @@ class CodeIndexService {
                   file,
                   relevance: name.toLowerCase() === lowerQuery ? 80 : 50,
                   context: sym.signature || sym.name,
-                  highlight: []
+                  highlight: [],
                 });
               }
             }
@@ -470,7 +509,9 @@ class CodeIndexService {
   findDefinition(name: string): CodeSymbol[] {
     const ids = this.symbolsByName.get(name);
     if (!ids) return [];
-    return Array.from(ids).map(id => this.symbolsById.get(id)!).filter(Boolean);
+    return Array.from(ids)
+      .map((id) => this.symbolsById.get(id)!)
+      .filter(Boolean);
   }
 
   // 查找引用
@@ -482,7 +523,7 @@ class CodeIndexService {
     for (const file of this.fileIndex.values()) {
       const lines = file.path === sym.filePath ? [] : [];
       // 简单扫描：实际应读取文件内容
-      refs.push(...lines.map(l => ({ file: file.path, line: 0, text: l })));
+      refs.push(...lines.map((l) => ({ file: file.path, line: 0, text: l })));
     }
     return refs;
   }
@@ -495,7 +536,7 @@ class CodeIndexService {
   // 列出所有文件
   listFiles(filter?: { language?: string }): FileIndex[] {
     const files = Array.from(this.fileIndex.values());
-    if (filter?.language) return files.filter(f => f.language === filter.language);
+    if (filter?.language) return files.filter((f) => f.language === filter.language);
     return files;
   }
 
@@ -508,7 +549,7 @@ class CodeIndexService {
     return {
       files: this.fileIndex.size,
       symbols: this.symbolsById.size,
-      languages
+      languages,
     };
   }
 
@@ -516,12 +557,28 @@ class CodeIndexService {
   private detectLanguage(path: string): string {
     const ext = path.split('.').pop()?.toLowerCase() || '';
     const map: Record<string, string> = {
-      'ts': 'typescript', 'tsx': 'tsx', 'js': 'javascript', 'jsx': 'jsx',
-      'py': 'python', 'java': 'java', 'cpp': 'cpp', 'c': 'c',
-      'cs': 'csharp', 'go': 'go', 'rs': 'rust', 'rb': 'ruby',
-      'php': 'php', 'swift': 'swift', 'kt': 'kotlin',
-      'glsl': 'glsl', 'shader': 'shader', 'json': 'json',
-      'html': 'html', 'css': 'css', 'scss': 'scss', 'md': 'markdown'
+      ts: 'typescript',
+      tsx: 'tsx',
+      js: 'javascript',
+      jsx: 'jsx',
+      py: 'python',
+      java: 'java',
+      cpp: 'cpp',
+      c: 'c',
+      cs: 'csharp',
+      go: 'go',
+      rs: 'rust',
+      rb: 'ruby',
+      php: 'php',
+      swift: 'swift',
+      kt: 'kotlin',
+      glsl: 'glsl',
+      shader: 'shader',
+      json: 'json',
+      html: 'html',
+      css: 'css',
+      scss: 'scss',
+      md: 'markdown',
     };
     return map[ext] || 'plaintext';
   }
@@ -531,11 +588,14 @@ class CodeIndexService {
     if (typeof crypto !== 'undefined' && crypto.subtle) {
       const buffer = new TextEncoder().encode(content);
       const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
-      return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('').slice(0, 16);
+      return Array.from(new Uint8Array(hashBuffer))
+        .map((b) => b.toString(16).padStart(2, '0'))
+        .join('')
+        .slice(0, 16);
     }
     let hash = 0;
     for (let i = 0; i < content.length; i++) {
-      hash = ((hash << 5) - hash) + content.charCodeAt(i);
+      hash = (hash << 5) - hash + content.charCodeAt(i);
       hash |= 0;
     }
     return Math.abs(hash).toString(16);
@@ -552,7 +612,9 @@ class CodeIndexService {
   // 订阅索引进度
   subscribeIndex(listener: (progress: number) => void): () => void {
     this.indexListeners.add(listener);
-    return () => { this.indexListeners.delete(listener); };
+    return () => {
+      this.indexListeners.delete(listener);
+    };
   }
 
   // 清空索引

@@ -108,4 +108,7 @@ export default {
   userOnline: '{count} 位用户在线',
   notification: '{count} 条通知',
   message: '{count} 条消息',
+  'app.welcome': '欢迎使用',
+  'app.goodbye': '再见',
+  'app.loading': '加载中',
 } as const;

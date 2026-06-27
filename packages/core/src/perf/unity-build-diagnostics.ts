@@ -30,11 +30,7 @@ const ERROR_KB: Array<{
     error: {
       severity: 'error',
       category: 'compile',
-      fixes: [
-        '检查方法名拼写',
-        '确认 using 指令是否引入正确的命名空间',
-        '检查命名空间冲突',
-      ],
+      fixes: ['检查方法名拼写', '确认 using 指令是否引入正确的命名空间', '检查命名空间冲突'],
     },
   },
   {
@@ -91,11 +87,7 @@ const ERROR_KB: Array<{
     error: {
       severity: 'error',
       category: 'network',
-      fixes: [
-        '检查网络连接',
-        '如果使用代理，配置 HTTPS_PROXY 环境变量',
-        '尝试切换到国内 npm 镜像',
-      ],
+      fixes: ['检查网络连接', '如果使用代理，配置 HTTPS_PROXY 环境变量', '尝试切换到国内 npm 镜像'],
     },
   },
 ];
@@ -124,7 +116,11 @@ export class UnityBuildDiagnostics {
           category: kbMatch?.category ?? 'compile',
           fixes: kbMatch?.fixes ?? ['请查看 Unity 官方文档'],
           docsUrl: kbMatch?.docsUrl,
-          location: { file: file ?? '', line: parseInt(lineNum ?? '0', 10), column: parseInt(col ?? '0', 10) },
+          location: {
+            file: file ?? '',
+            line: parseInt(lineNum ?? '0', 10),
+            column: parseInt(col ?? '0', 10),
+          },
         });
         i++;
         continue;

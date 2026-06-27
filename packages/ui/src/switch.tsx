@@ -7,7 +7,13 @@ interface SwitchProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'onC
   disabled?: boolean;
 }
 
-export function Switch({ checked = false, onCheckedChange, disabled, className, ...props }: SwitchProps) {
+export function Switch({
+  checked = false,
+  onCheckedChange,
+  disabled,
+  className,
+  ...props
+}: SwitchProps) {
   return (
     <button
       type="button"

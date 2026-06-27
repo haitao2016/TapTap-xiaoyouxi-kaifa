@@ -11,6 +11,59 @@ import { globalEventBus } from '../event-bus';
 import type { Namespace } from './i18n/index';
 import { NAMESPACES, defaultTranslations } from './i18n/index';
 
+// 静态加载所有 locales 的所有 namespaces
+import enCommon from './i18n/locales/en-US/common';
+import enEditor from './i18n/locales/en-US/editor';
+import enDebug from './i18n/locales/en-US/debug';
+import enBuild from './i18n/locales/en-US/build';
+import enSettings from './i18n/locales/en-US/settings';
+import enPlugins from './i18n/locales/en-US/plugins';
+import enDashboard from './i18n/locales/en-US/dashboard';
+import enCollab from './i18n/locales/en-US/collab';
+import enAi from './i18n/locales/en-US/ai';
+import enPlatform from './i18n/locales/en-US/platform';
+
+import jaCommon from './i18n/locales/ja-JP/common';
+import jaEditor from './i18n/locales/ja-JP/editor';
+import jaDebug from './i18n/locales/ja-JP/debug';
+import jaBuild from './i18n/locales/ja-JP/build';
+import jaSettings from './i18n/locales/ja-JP/settings';
+import jaPlugins from './i18n/locales/ja-JP/plugins';
+import jaDashboard from './i18n/locales/ja-JP/dashboard';
+import jaCollab from './i18n/locales/ja-JP/collab';
+import jaAi from './i18n/locales/ja-JP/ai';
+import jaPlatform from './i18n/locales/ja-JP/platform';
+
+const STATIC_TRANSLATIONS: Record<Locale, Record<Namespace, TranslationDict>> = {
+  'en-US': {
+    common: enCommon as TranslationDict,
+    editor: enEditor as TranslationDict,
+    debug: enDebug as TranslationDict,
+    build: enBuild as TranslationDict,
+    settings: enSettings as TranslationDict,
+    plugins: enPlugins as TranslationDict,
+    dashboard: enDashboard as TranslationDict,
+    collab: enCollab as TranslationDict,
+    ai: enAi as TranslationDict,
+    platform: enPlatform as TranslationDict,
+  },
+  'ja-JP': {
+    common: jaCommon as TranslationDict,
+    editor: jaEditor as TranslationDict,
+    debug: jaDebug as TranslationDict,
+    build: jaBuild as TranslationDict,
+    settings: jaSettings as TranslationDict,
+    plugins: jaPlugins as TranslationDict,
+    dashboard: jaDashboard as TranslationDict,
+    collab: jaCollab as TranslationDict,
+    ai: jaAi as TranslationDict,
+    platform: jaPlatform as TranslationDict,
+  },
+  'zh-CN': defaultTranslations as unknown as Record<Namespace, TranslationDict>,
+  'zh-TW': {} as Record<Namespace, TranslationDict>,
+  'ko-KR': {} as Record<Namespace, TranslationDict>,
+};
+
 export type Locale = 'zh-CN' | 'en-US' | 'ja-JP' | 'zh-TW' | 'ko-KR';
 
 export type TranslationKey = string;
@@ -61,42 +114,54 @@ const DEFAULT_CONFIG: I18nConfig = {
 
 const loadedNamespaces = new Set<string>();
 
-const namespaceLoaders: Record<Locale, Partial<Record<Namespace, () => Promise<TranslationDict>>>> = {
+const namespaceLoaders: Record<
+  Locale,
+  Partial<Record<Namespace, () => Promise<TranslationDict>>>
+> = {
   'zh-CN': {
     common: () => import('./i18n/locales/zh-CN/common').then((m) => m.default as TranslationDict),
     editor: () => import('./i18n/locales/zh-CN/editor').then((m) => m.default as TranslationDict),
     debug: () => import('./i18n/locales/zh-CN/debug').then((m) => m.default as TranslationDict),
     build: () => import('./i18n/locales/zh-CN/build').then((m) => m.default as TranslationDict),
-    settings: () => import('./i18n/locales/zh-CN/settings').then((m) => m.default as TranslationDict),
+    settings: () =>
+      import('./i18n/locales/zh-CN/settings').then((m) => m.default as TranslationDict),
     plugins: () => import('./i18n/locales/zh-CN/plugins').then((m) => m.default as TranslationDict),
-    dashboard: () => import('./i18n/locales/zh-CN/dashboard').then((m) => m.default as TranslationDict),
+    dashboard: () =>
+      import('./i18n/locales/zh-CN/dashboard').then((m) => m.default as TranslationDict),
     collab: () => import('./i18n/locales/zh-CN/collab').then((m) => m.default as TranslationDict),
     ai: () => import('./i18n/locales/zh-CN/ai').then((m) => m.default as TranslationDict),
-    platform: () => import('./i18n/locales/zh-CN/platform').then((m) => m.default as TranslationDict),
+    platform: () =>
+      import('./i18n/locales/zh-CN/platform').then((m) => m.default as TranslationDict),
   },
   'en-US': {
     common: () => import('./i18n/locales/en-US/common').then((m) => m.default as TranslationDict),
     editor: () => import('./i18n/locales/en-US/editor').then((m) => m.default as TranslationDict),
     debug: () => import('./i18n/locales/en-US/debug').then((m) => m.default as TranslationDict),
     build: () => import('./i18n/locales/en-US/build').then((m) => m.default as TranslationDict),
-    settings: () => import('./i18n/locales/en-US/settings').then((m) => m.default as TranslationDict),
+    settings: () =>
+      import('./i18n/locales/en-US/settings').then((m) => m.default as TranslationDict),
     plugins: () => import('./i18n/locales/en-US/plugins').then((m) => m.default as TranslationDict),
-    dashboard: () => import('./i18n/locales/en-US/dashboard').then((m) => m.default as TranslationDict),
+    dashboard: () =>
+      import('./i18n/locales/en-US/dashboard').then((m) => m.default as TranslationDict),
     collab: () => import('./i18n/locales/en-US/collab').then((m) => m.default as TranslationDict),
     ai: () => import('./i18n/locales/en-US/ai').then((m) => m.default as TranslationDict),
-    platform: () => import('./i18n/locales/en-US/platform').then((m) => m.default as TranslationDict),
+    platform: () =>
+      import('./i18n/locales/en-US/platform').then((m) => m.default as TranslationDict),
   },
   'ja-JP': {
     common: () => import('./i18n/locales/ja-JP/common').then((m) => m.default as TranslationDict),
     editor: () => import('./i18n/locales/ja-JP/editor').then((m) => m.default as TranslationDict),
     debug: () => import('./i18n/locales/ja-JP/debug').then((m) => m.default as TranslationDict),
     build: () => import('./i18n/locales/ja-JP/build').then((m) => m.default as TranslationDict),
-    settings: () => import('./i18n/locales/ja-JP/settings').then((m) => m.default as TranslationDict),
+    settings: () =>
+      import('./i18n/locales/ja-JP/settings').then((m) => m.default as TranslationDict),
     plugins: () => import('./i18n/locales/ja-JP/plugins').then((m) => m.default as TranslationDict),
-    dashboard: () => import('./i18n/locales/ja-JP/dashboard').then((m) => m.default as TranslationDict),
+    dashboard: () =>
+      import('./i18n/locales/ja-JP/dashboard').then((m) => m.default as TranslationDict),
     collab: () => import('./i18n/locales/ja-JP/collab').then((m) => m.default as TranslationDict),
     ai: () => import('./i18n/locales/ja-JP/ai').then((m) => m.default as TranslationDict),
-    platform: () => import('./i18n/locales/ja-JP/platform').then((m) => m.default as TranslationDict),
+    platform: () =>
+      import('./i18n/locales/ja-JP/platform').then((m) => m.default as TranslationDict),
   },
   'zh-TW': {},
   'ko-KR': {},
@@ -105,11 +170,7 @@ const namespaceLoaders: Record<Locale, Partial<Record<Namespace, () => Promise<T
 function buildInitialTranslations(): Translations {
   const translations: Translations = {} as Translations;
   for (const locale of DEFAULT_CONFIG.available) {
-    translations[locale] = {};
-  }
-  translations['zh-CN'] = defaultTranslations as NamespaceTranslations;
-  for (const ns of NAMESPACES) {
-    loadedNamespaces.add(`zh-CN:${ns}`);
+    translations[locale] = STATIC_TRANSLATIONS[locale] ?? {};
   }
   return translations;
 }
@@ -198,17 +259,23 @@ export class I18nService {
     loadedNamespaces.add(`${locale}:${namespace}`);
   }
 
-  t(key: TranslationKey, params?: Record<string, string | number>, options?: { ns?: Namespace; locale?: Locale }): string {
-    const ns = options?.ns ?? this.config.defaultNS;
-    const locale = options?.locale ?? this.currentLocale;
-    const resolvedKey = key.includes(':') ? key : `${ns}:${key}`;
+  t(
+    key: TranslationKey,
+    params?: Record<string, string | number>,
+    options?: { ns?: Namespace; locale?: Locale }
+  ): string {
+    // 如果 key 已经包含 namespace 前缀（冒号或点），直接使用
+    const hasNamespace = key.includes(':') || this.hasNamespacePrefix(key);
+    const resolvedKey = hasNamespace ? key : `${this.config.defaultNS}:${key}`;
     const [namespace, actualKey] = this.parseKey(resolvedKey);
+    const locale = options?.locale ?? this.currentLocale;
 
-    const text = this.lookup(locale, namespace, actualKey)
-      ?? this.lookup(this.config.fallbackLocale, namespace, actualKey)
-      ?? this.lookup(this.config.defaultLocale, namespace, actualKey)
-      ?? this.lookup(this.config.defaultLocale, this.config.fallbackNS, actualKey)
-      ?? actualKey;
+    const text =
+      this.lookup(locale, namespace, actualKey) ??
+      this.lookup(this.config.fallbackLocale, namespace, actualKey) ??
+      this.lookup(this.config.defaultLocale, namespace, actualKey) ??
+      this.lookup(this.config.defaultLocale, this.config.fallbackNS, actualKey) ??
+      actualKey;
 
     if (text === actualKey && this.config.warnOnMissingKey) {
       this.warnMissingKey(resolvedKey, locale);
@@ -218,10 +285,21 @@ export class I18nService {
     return this.interpolate(text, params);
   }
 
+  private hasNamespacePrefix(key: string): boolean {
+    const firstPart = key.split(/[:.]/)[0];
+    return NAMESPACES.includes(firstPart as Namespace);
+  }
+
   private parseKey(key: string): [Namespace, string] {
-    const parts = key.split(':');
-    if (parts.length >= 2 && NAMESPACES.includes(parts[0] as Namespace)) {
-      return [parts[0] as Namespace, parts.slice(1).join(':')];
+    // 优先尝试冒号分隔: namespace:key
+    const colonParts = key.split(':');
+    if (colonParts.length >= 2 && NAMESPACES.includes(colonParts[0] as Namespace)) {
+      return [colonParts[0] as Namespace, colonParts.slice(1).join(':')];
+    }
+    // 点分隔: namespace.key（namespace 是 NAMESPACES 中的一员）
+    const dotParts = key.split('.');
+    if (dotParts.length >= 2 && NAMESPACES.includes(dotParts[0] as Namespace)) {
+      return [dotParts[0] as Namespace, dotParts.slice(1).join('.')];
     }
     return [this.config.defaultNS, key];
   }
@@ -234,7 +312,7 @@ export class I18nService {
   private interpolate(text: string, params: Record<string, string | number>): string {
     return Object.entries(params).reduce(
       (acc, [k, v]) => acc.replace(new RegExp(`\\{${k}\\}`, 'g'), String(v)),
-      text,
+      text
     );
   }
 
@@ -246,22 +324,29 @@ export class I18nService {
     }
   }
 
-  plural(key: TranslationKey, count: number, params?: Record<string, string | number>, options?: { ns?: Namespace; locale?: Locale }): string {
+  plural(
+    key: TranslationKey,
+    count: number,
+    params?: Record<string, string | number>,
+    options?: { ns?: Namespace; locale?: Locale }
+  ): string {
     const ns = options?.ns ?? this.config.defaultNS;
     const locale = options?.locale ?? this.currentLocale;
     const resolvedKey = key.includes(':') ? key : `${ns}:${key}`;
     const [namespace, actualKey] = this.parseKey(resolvedKey);
 
-    const baseText = this.lookup(locale, namespace, actualKey)
-      ?? this.lookup(this.config.fallbackLocale, namespace, actualKey)
-      ?? this.lookup(this.config.defaultLocale, namespace, actualKey)
-      ?? actualKey;
+    const baseText =
+      this.lookup(locale, namespace, actualKey) ??
+      this.lookup(this.config.fallbackLocale, namespace, actualKey) ??
+      this.lookup(this.config.defaultLocale, namespace, actualKey) ??
+      actualKey;
 
     const pluralIndex = this.getPluralIndex(locale, count);
     const pluralKey = `${actualKey}_${pluralIndex}`;
-    const pluralText = this.lookup(locale, namespace, pluralKey)
-      ?? this.lookup(this.config.fallbackLocale, namespace, pluralKey)
-      ?? this.lookup(this.config.defaultLocale, namespace, pluralKey);
+    const pluralText =
+      this.lookup(locale, namespace, pluralKey) ??
+      this.lookup(this.config.fallbackLocale, namespace, pluralKey) ??
+      this.lookup(this.config.defaultLocale, namespace, pluralKey);
 
     const finalText = pluralText ?? baseText;
     return this.interpolate(finalText, { ...params, count });
@@ -280,16 +365,22 @@ export class I18nService {
     }
   }
 
-  gender(key: TranslationKey, gender: Gender, params?: Record<string, string | number>, options?: { ns?: Namespace; locale?: Locale }): string {
+  gender(
+    key: TranslationKey,
+    gender: Gender,
+    params?: Record<string, string | number>,
+    options?: { ns?: Namespace; locale?: Locale }
+  ): string {
     const ns = options?.ns ?? this.config.defaultNS;
     const locale = options?.locale ?? this.currentLocale;
     const resolvedKey = key.includes(':') ? key : `${ns}:${key}`;
     const [namespace, actualKey] = this.parseKey(resolvedKey);
 
     const genderKey = `${actualKey}_${gender}`;
-    const genderText = this.lookup(locale, namespace, genderKey)
-      ?? this.lookup(this.config.fallbackLocale, namespace, genderKey)
-      ?? this.lookup(this.config.defaultLocale, namespace, genderKey);
+    const genderText =
+      this.lookup(locale, namespace, genderKey) ??
+      this.lookup(this.config.fallbackLocale, namespace, genderKey) ??
+      this.lookup(this.config.defaultLocale, namespace, genderKey);
 
     const finalText = genderText ?? this.t(resolvedKey, undefined, { ns, locale });
     return this.interpolate(finalText, params ?? {});
@@ -299,7 +390,15 @@ export class I18nService {
     return new Intl.NumberFormat(this.currentLocale, options).format(value);
   }
 
-  formatCurrency(value: number, options?: { currency?: string; currencyDisplay?: 'symbol' | 'code' | 'name'; minimumFractionDigits?: number; maximumFractionDigits?: number }): string {
+  formatCurrency(
+    value: number,
+    options?: {
+      currency?: string;
+      currencyDisplay?: 'symbol' | 'code' | 'name';
+      minimumFractionDigits?: number;
+      maximumFractionDigits?: number;
+    }
+  ): string {
     const currency = options?.currency ?? LOCALE_CURRENCY[this.currentLocale] ?? 'USD';
     return new Intl.NumberFormat(this.currentLocale, {
       style: 'currency',

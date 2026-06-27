@@ -139,8 +139,22 @@ export class SceneEditorService {
       layers: [
         { id: 'layer-default', name: '默认', order: 0, visible: true, locked: false, opacity: 1 },
         { id: 'layer-ui', name: 'UI', order: 1, visible: true, locked: false, opacity: 1 },
-        { id: 'layer-foreground', name: '前景', order: 2, visible: true, locked: false, opacity: 1 },
-        { id: 'layer-background', name: '背景', order: -1, visible: true, locked: false, opacity: 1 },
+        {
+          id: 'layer-foreground',
+          name: '前景',
+          order: 2,
+          visible: true,
+          locked: false,
+          opacity: 1,
+        },
+        {
+          id: 'layer-background',
+          name: '背景',
+          order: -1,
+          visible: true,
+          locked: false,
+          opacity: 1,
+        },
       ],
       grid: {
         enabled: true,
@@ -222,7 +236,12 @@ export class SceneEditorService {
     return newScene;
   }
 
-  addObject(sceneId: string, type: SceneObjectType, name: string, position?: Partial<Vector3>): SceneObject {
+  addObject(
+    sceneId: string,
+    type: SceneObjectType,
+    name: string,
+    position?: Partial<Vector3>
+  ): SceneObject {
     const scene = this.scenes.get(sceneId);
     if (!scene) {
       throw new Error(`场景不存在: ${sceneId}`);
@@ -275,14 +294,14 @@ export class SceneEditorService {
     if (object.parentId) {
       const parent = scene.objects.get(object.parentId);
       if (parent) {
-        parent.childrenIds = parent.childrenIds.filter(id => id !== objectId);
+        parent.childrenIds = parent.childrenIds.filter((id) => id !== objectId);
       }
     }
 
     const removeChildren = (objId: string) => {
       const obj = scene.objects.get(objId);
       if (obj) {
-        obj.childrenIds.forEach(childId => removeChildren(childId));
+        obj.childrenIds.forEach((childId) => removeChildren(childId));
         scene.objects.delete(objId);
       }
     };
@@ -290,7 +309,7 @@ export class SceneEditorService {
 
     scene.updatedAt = Date.now();
 
-    this.selection.objectIds = this.selection.objectIds.filter(id => id !== objectId);
+    this.selection.objectIds = this.selection.objectIds.filter((id) => id !== objectId);
     if (this.selection.activeId === objectId) {
       this.selection.activeId = undefined;
     }
@@ -340,14 +359,20 @@ export class SceneEditorService {
   }
 
   getObjectsByType(sceneId: string, type: SceneObjectType): SceneObject[] {
-    return this.getObjects(sceneId).filter(obj => obj.type === type);
+    return this.getObjects(sceneId).filter((obj) => obj.type === type);
   }
 
   getObjectsByLayer(sceneId: string, layer: number): SceneObject[] {
-    return this.getObjects(sceneId).filter(obj => obj.layer === layer);
+    return this.getObjects(sceneId).filter((obj) => obj.layer === layer);
   }
 
-  addComponent(sceneId: string, objectId: string, type: string, name: string, properties?: Record<string, unknown>): SceneComponent {
+  addComponent(
+    sceneId: string,
+    objectId: string,
+    type: string,
+    name: string,
+    properties?: Record<string, unknown>
+  ): SceneComponent {
     const scene = this.scenes.get(sceneId);
     if (!scene) {
       throw new Error(`场景不存在: ${sceneId}`);
@@ -391,7 +416,7 @@ export class SceneEditorService {
     }
 
     this.saveHistory(sceneId);
-    object.components = object.components.filter(c => c.id !== componentId);
+    object.components = object.components.filter((c) => c.id !== componentId);
     object.updatedAt = Date.now();
     scene.updatedAt = Date.now();
 
@@ -401,7 +426,12 @@ export class SceneEditorService {
     });
   }
 
-  updateComponent(sceneId: string, objectId: string, componentId: string, updates: Partial<SceneComponent>): SceneComponent {
+  updateComponent(
+    sceneId: string,
+    objectId: string,
+    componentId: string,
+    updates: Partial<SceneComponent>
+  ): SceneComponent {
     const scene = this.scenes.get(sceneId);
     if (!scene) {
       throw new Error(`场景不存在: ${sceneId}`);
@@ -412,7 +442,7 @@ export class SceneEditorService {
       throw new Error(`对象不存在: ${objectId}`);
     }
 
-    const component = object.components.find(c => c.id === componentId);
+    const component = object.components.find((c) => c.id === componentId);
     if (!component) {
       throw new Error(`组件不存在: ${componentId}`);
     }
@@ -459,7 +489,7 @@ export class SceneEditorService {
     const scene = this.getActiveScene();
     if (!scene) return;
 
-    this.selection.objectIds = objectIds.filter(id => scene.objects.has(id));
+    this.selection.objectIds = objectIds.filter((id) => scene.objects.has(id));
     this.selection.activeId = this.selection.objectIds[0];
 
     globalEventBus.emit({
@@ -501,7 +531,7 @@ export class SceneEditorService {
 
     this.saveHistory(sceneId);
 
-    this.selection.objectIds.forEach(oldId => {
+    this.selection.objectIds.forEach((oldId) => {
       const source = scene.objects.get(oldId);
       if (source) {
         const newObj: SceneObject = JSON.parse(JSON.stringify(source));
@@ -516,21 +546,21 @@ export class SceneEditorService {
       }
     });
 
-    newObjects.forEach(obj => {
+    newObjects.forEach((obj) => {
       if (obj.parentId && idMap.has(obj.parentId)) {
         obj.parentId = idMap.get(obj.parentId);
       }
       scene.objects.set(obj.id, obj);
     });
 
-    newObjects.forEach(obj => {
+    newObjects.forEach((obj) => {
       obj.childrenIds = obj.childrenIds
-        .map(childId => idMap.get(childId))
+        .map((childId) => idMap.get(childId))
         .filter((id): id is string => id !== undefined);
     });
 
     scene.updatedAt = Date.now();
-    this.selection.objectIds = newObjects.map(o => o.id);
+    this.selection.objectIds = newObjects.map((o) => o.id);
     this.selection.activeId = newObjects[0]?.id;
 
     globalEventBus.emit({
@@ -542,7 +572,7 @@ export class SceneEditorService {
   }
 
   deleteSelection(sceneId: string): void {
-    this.selection.objectIds.forEach(objectId => {
+    this.selection.objectIds.forEach((objectId) => {
       this.removeObject(sceneId, objectId);
     });
   }
@@ -554,14 +584,17 @@ export class SceneEditorService {
     }
 
     const selectedObjects = this.selection.objectIds
-      .map(id => scene.objects.get(id))
+      .map((id) => scene.objects.get(id))
       .filter((o): o is SceneObject => o !== undefined && !o.locked);
 
     if (selectedObjects.length < 2) return;
 
     this.saveHistory(sceneId);
 
-    let refX = 0, refY = 0, refW = 0, refH = 0;
+    let refX = 0,
+      refY = 0,
+      refW = 0,
+      refH = 0;
 
     if (options.reference === 'scene') {
       refX = 0;
@@ -569,16 +602,17 @@ export class SceneEditorService {
       refW = scene.width;
       refH = scene.height;
     } else {
-      const refObj = options.reference === 'last' 
-        ? selectedObjects[selectedObjects.length - 1] 
-        : selectedObjects[0];
+      const refObj =
+        options.reference === 'last'
+          ? selectedObjects[selectedObjects.length - 1]
+          : selectedObjects[0];
       refX = refObj.position.x;
       refY = refObj.position.y;
       refW = (refObj.properties.width as number) || 100;
       refH = (refObj.properties.height as number) || 100;
     }
 
-    selectedObjects.forEach(obj => {
+    selectedObjects.forEach((obj) => {
       const w = (obj.properties.width as number) || 100;
       const h = (obj.properties.height as number) || 100;
 
@@ -624,7 +658,7 @@ export class SceneEditorService {
       throw new Error(`场景不存在: ${sceneId}`);
     }
 
-    const maxOrder = Math.max(...scene.layers.map(l => l.order), 0);
+    const maxOrder = Math.max(...scene.layers.map((l) => l.order), 0);
     const layer: SceneLayer = {
       id: this.generateId(),
       name,
@@ -652,13 +686,13 @@ export class SceneEditorService {
       throw new Error(`场景不存在: ${sceneId}`);
     }
 
-    const layerIndex = scene.layers.findIndex(l => l.id === layerId);
+    const layerIndex = scene.layers.findIndex((l) => l.id === layerId);
     if (layerIndex === -1) {
       throw new Error(`图层不存在: ${layerId}`);
     }
 
     const layer = scene.layers[layerIndex];
-    scene.objects.forEach(obj => {
+    scene.objects.forEach((obj) => {
       if (obj.layer === layer.order) {
         obj.layer = 0;
       }
@@ -680,7 +714,7 @@ export class SceneEditorService {
       throw new Error(`场景不存在: ${sceneId}`);
     }
 
-    const layer = scene.layers.find(l => l.id === layerId);
+    const layer = scene.layers.find((l) => l.id === layerId);
     if (!layer) {
       throw new Error(`图层不存在: ${layerId}`);
     }
@@ -703,7 +737,7 @@ export class SceneEditorService {
       throw new Error(`场景不存在: ${sceneId}`);
     }
 
-    const layer = scene.layers.find(l => l.id === layerId);
+    const layer = scene.layers.find((l) => l.id === layerId);
     if (!layer) {
       throw new Error(`图层不存在: ${layerId}`);
     }
@@ -727,7 +761,7 @@ export class SceneEditorService {
     }
 
     const layers = [...scene.layers].sort((a, b) => a.order - b.order);
-    const index = layers.findIndex(l => l.id === layerId);
+    const index = layers.findIndex((l) => l.id === layerId);
     if (index === -1) {
       throw new Error(`图层不存在: ${layerId}`);
     }
@@ -797,7 +831,7 @@ export class SceneEditorService {
       backgroundColor: scene.backgroundColor,
       grid: scene.grid,
       layers: scene.layers,
-      objects: Array.from(scene.objects.values()).map(obj => ({
+      objects: Array.from(scene.objects.values()).map((obj) => ({
         ...obj,
         components: options?.includeComponents !== false ? obj.components : undefined,
       })),
@@ -805,9 +839,7 @@ export class SceneEditorService {
 
     const format = options?.format || 'json';
     if (format === 'json') {
-      return options?.pretty 
-        ? JSON.stringify(sceneData, null, 2) 
-        : JSON.stringify(sceneData);
+      return options?.pretty ? JSON.stringify(sceneData, null, 2) : JSON.stringify(sceneData);
     }
 
     throw new Error(`不支持的格式: ${format}`);
@@ -867,7 +899,7 @@ export class SceneEditorService {
     if (object.parentId) {
       const oldParent = scene.objects.get(object.parentId);
       if (oldParent) {
-        oldParent.childrenIds = oldParent.childrenIds.filter(id => id !== objectId);
+        oldParent.childrenIds = oldParent.childrenIds.filter((id) => id !== objectId);
       }
     }
 
@@ -937,7 +969,7 @@ export class SceneEditorService {
 
   private loadMockScenes(): void {
     const scene = this.createScene('MainScene', 1920, 1080);
-    
+
     const bg = this.addObject(scene.id, 'sprite', 'Background', { x: 0, y: 0, z: -10 });
     bg.layer = -1;
     bg.properties.width = 1920;

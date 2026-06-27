@@ -24,11 +24,11 @@ export class OfficialPluginsService {
   }
 
   getOfficialPluginsByCategory(category: string): OfficialPlugin[] {
-    return this.officialPlugins.filter(p => p.category === category);
+    return this.officialPlugins.filter((p) => p.category === category);
   }
 
   getPluginById(id: string): OfficialPlugin | undefined {
-    return this.officialPlugins.find(p => p.id === id);
+    return this.officialPlugins.find((p) => p.id === id);
   }
 
   async installOfficialPlugin(pluginId: string): Promise<boolean> {
@@ -39,7 +39,7 @@ export class OfficialPluginsService {
 
     try {
       await pluginManager.loadPlugin(pluginId);
-      
+
       if (plugin.dependencies) {
         for (const dep of plugin.dependencies) {
           await pluginManager.loadPlugin(dep);
@@ -69,14 +69,14 @@ export class OfficialPluginsService {
   }
 
   async installAllDefaultPlugins(): Promise<void> {
-    const defaultPlugins = this.officialPlugins.filter(p => p.enabledByDefault);
+    const defaultPlugins = this.officialPlugins.filter((p) => p.enabledByDefault);
     for (const plugin of defaultPlugins) {
       await this.installOfficialPlugin(plugin.id);
     }
   }
 
   isOfficialPlugin(pluginId: string): boolean {
-    return this.officialPlugins.some(p => p.id === pluginId);
+    return this.officialPlugins.some((p) => p.id === pluginId);
   }
 
   private registerOfficialPlugins(): void {

@@ -6,7 +6,7 @@
  * - 桌面端自动更新
  */
 import { globalEventBus } from '../event-bus';
-import { randomUUID } from 'node:crypto';
+import { randomUUID } from '../utils/crypto-utils';
 
 export type Platform = 'windows' | 'macos' | 'linux' | 'android' | 'ios' | 'web';
 
@@ -93,7 +93,17 @@ export class ReleasePipeline {
       list.push(c);
       groups.set(c.type, list);
     }
-    const order: ConventionalCommit['type'][] = ['breaking', 'feat', 'fix', 'perf', 'refactor', 'docs', 'test', 'chore', 'style'];
+    const order: ConventionalCommit['type'][] = [
+      'breaking',
+      'feat',
+      'fix',
+      'perf',
+      'refactor',
+      'docs',
+      'test',
+      'chore',
+      'style',
+    ];
     const lines: string[] = [`# ${version}\n`];
     for (const type of order) {
       const items = groups.get(type);
@@ -191,12 +201,18 @@ export class ReleasePipeline {
 
   private ext(p: Platform): string {
     switch (p) {
-      case 'windows': return 'exe';
-      case 'macos': return 'dmg';
-      case 'linux': return 'AppImage';
-      case 'android': return 'apk';
-      case 'ios': return 'ipa';
-      case 'web': return 'zip';
+      case 'windows':
+        return 'exe';
+      case 'macos':
+        return 'dmg';
+      case 'linux':
+        return 'AppImage';
+      case 'android':
+        return 'apk';
+      case 'ios':
+        return 'ipa';
+      case 'web':
+        return 'zip';
     }
   }
 }

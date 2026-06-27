@@ -93,11 +93,11 @@ export class ThemePlugin {
   }
 
   applyPreset(presetId: string): void {
-    const preset = PRESET_THEMES.find(p => p.id === presetId);
+    const preset = PRESET_THEMES.find((p) => p.id === presetId);
     if (!preset) {
       throw new Error(`主题不存在: ${presetId}`);
     }
-    
+
     const currentTheme = themeService.getTheme();
     const newTheme: Theme = {
       ...currentTheme,
@@ -160,42 +160,54 @@ export const themePlugin = new ThemePlugin();
 export function activate(ctx: PluginContext): void {
   const plugin = themePlugin;
 
-  ctx.registerCommand('apply-theme-preset', async () => {
-    const presets = plugin.getPresets();
-    if (presets.length > 0) {
-      plugin.applyPreset(presets[0].id);
-      ctx.showNotification(`已应用主题: ${presets[0].name}`, 'success');
+  ctx.registerCommand(
+    'apply-theme-preset',
+    async () => {
+      const presets = plugin.getPresets();
+      if (presets.length > 0) {
+        plugin.applyPreset(presets[0].id);
+        ctx.showNotification(`已应用主题: ${presets[0].name}`, 'success');
+      }
+    },
+    {
+      id: 'apply-theme-preset',
+      title: '应用主题预设',
+      description: '快速应用预设主题',
+      icon: 'palette',
+      category: '主题',
     }
-  }, {
-    id: 'apply-theme-preset',
-    title: '应用主题预设',
-    description: '快速应用预设主题',
-    icon: 'palette',
-    category: '主题',
-  });
+  );
 
-  ctx.registerCommand('toggle-dark-mode', async () => {
-    plugin.toggleDarkMode();
-    ctx.showNotification('已切换深色/浅色模式', 'info');
-  }, {
-    id: 'toggle-dark-mode',
-    title: '切换深色模式',
-    description: '在浅色和深色模式之间切换',
-    icon: 'moon',
-    shortcut: 'Ctrl+Shift+M',
-    category: '主题',
-  });
+  ctx.registerCommand(
+    'toggle-dark-mode',
+    async () => {
+      plugin.toggleDarkMode();
+      ctx.showNotification('已切换深色/浅色模式', 'info');
+    },
+    {
+      id: 'toggle-dark-mode',
+      title: '切换深色模式',
+      description: '在浅色和深色模式之间切换',
+      icon: 'moon',
+      shortcut: 'Ctrl+Shift+M',
+      category: '主题',
+    }
+  );
 
-  ctx.registerCommand('reset-theme', async () => {
-    plugin.resetTheme();
-    ctx.showNotification('主题已重置为默认', 'info');
-  }, {
-    id: 'reset-theme',
-    title: '重置主题',
-    description: '恢复到默认主题设置',
-    icon: 'rotate-ccw',
-    category: '主题',
-  });
+  ctx.registerCommand(
+    'reset-theme',
+    async () => {
+      plugin.resetTheme();
+      ctx.showNotification('主题已重置为默认', 'info');
+    },
+    {
+      id: 'reset-theme',
+      title: '重置主题',
+      description: '恢复到默认主题设置',
+      icon: 'rotate-ccw',
+      category: '主题',
+    }
+  );
 
   ctx.registerPanel('theme-manager', {
     id: 'theme-manager',

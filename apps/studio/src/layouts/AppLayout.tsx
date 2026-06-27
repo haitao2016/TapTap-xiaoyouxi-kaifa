@@ -6,6 +6,9 @@ import { platformService } from '@tapdev/core';
 const NAV_ITEMS = [
   { id: 'dashboard', label: '工作台', icon: 'home', path: '/' },
   { id: 'editor', label: '编辑器', icon: 'code', path: '/editor' },
+  { id: 'ai', label: 'AI 助手', icon: 'sparkles', path: '/ai' },
+  { id: 'game-tools', label: '游戏工具', icon: 'gamepad', path: '/game-tools' },
+  { id: 'collab', label: '协作', icon: 'users', path: '/collab' },
   { id: 'debug', label: '调试', icon: 'bug', path: '/debug' },
   { id: 'monitor', label: '监控', icon: 'chart', path: '/monitor' },
   { id: 'build', label: '构建', icon: 'build', path: '/build' },

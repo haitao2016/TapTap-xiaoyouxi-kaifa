@@ -5,7 +5,7 @@ import type {
   WSMessage,
   BreakpointSyncPayload,
 } from '@tapdev/types';
-import { randomUUID } from 'node:crypto';
+import { randomUUID } from './utils/crypto-utils';
 
 export type DebugClientEvents = {
   onLog: (entry: DebugLogEntry) => void;
@@ -106,7 +106,10 @@ export class DebugWebSocketClient {
   private handleMessage(msg: WSMessage): void {
     switch (msg.type) {
       case 'connected': {
-        const payload = msg.payload as { sessionId?: string; status?: { url: string; wsUrl: string } };
+        const payload = msg.payload as {
+          sessionId?: string;
+          status?: { url: string; wsUrl: string };
+        };
         this.events.onSessionUpdate?.({
           id: payload.sessionId,
           qrCodeUrl: payload.status?.url,

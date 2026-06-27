@@ -1,7 +1,7 @@
 // 动画状态机编辑器
 // 角色动画状态机可视化编辑
 
-import { globalEventBus } from '../core/event-bus';
+import { globalEventBus } from '../event-bus';
 
 // 动画状态
 export interface AnimationState {
@@ -72,15 +72,17 @@ class AnimationStateMachineService {
       id: `sm-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       name,
       parameters: [],
-      layers: [{
-        name: 'Base Layer',
-        weight: 1.0,
-        blendingMode: 'override',
-        stateMachine: { states: [], transitions: [] }
-      }],
+      layers: [
+        {
+          name: 'Base Layer',
+          weight: 1.0,
+          blendingMode: 'override',
+          stateMachine: { states: [], transitions: [] },
+        },
+      ],
       defaultLayer: 'Base Layer',
       anyStateTransitions: [],
-      entryTransitions: []
+      entryTransitions: [],
     };
     this.stateMachines.set(sm.id, sm);
     this.notify('state-machine:created', sm);
@@ -88,15 +90,19 @@ class AnimationStateMachineService {
   }
 
   // 添加状态
-  addState(stateMachineId: string, layerName: string, state: Omit<AnimationState, 'id'>): AnimationState {
+  addState(
+    stateMachineId: string,
+    layerName: string,
+    state: Omit<AnimationState, 'id'>
+  ): AnimationState {
     const sm = this.stateMachines.get(stateMachineId);
     if (!sm) throw new Error('状态机不存在');
-    const layer = sm.layers.find(l => l.name === layerName);
+    const layer = sm.layers.find((l) => l.name === layerName);
     if (!layer) throw new Error('图层不存在');
 
     const newState: AnimationState = {
       ...state,
-      id: `state-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`
+      id: `state-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
     };
     layer.stateMachine.states.push(newState);
     this.notify('state:added', { stateMachineId, layerName, state: newState });
@@ -104,15 +110,19 @@ class AnimationStateMachineService {
   }
 
   // 添加过渡
-  addTransition(stateMachineId: string, layerName: string, transition: Omit<AnimationTransition, 'id'>): AnimationTransition {
+  addTransition(
+    stateMachineId: string,
+    layerName: string,
+    transition: Omit<AnimationTransition, 'id'>
+  ): AnimationTransition {
     const sm = this.stateMachines.get(stateMachineId);
     if (!sm) throw new Error('状态机不存在');
-    const layer = sm.layers.find(l => l.name === layerName);
+    const layer = sm.layers.find((l) => l.name === layerName);
     if (!layer) throw new Error('图层不存在');
 
     const newTransition: AnimationTransition = {
       ...transition,
-      id: `trans-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`
+      id: `trans-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
     };
     layer.stateMachine.transitions.push(newTransition);
     this.notify('transition:added', { stateMachineId, layerName, transition: newTransition });
@@ -124,7 +134,7 @@ class AnimationStateMachineService {
     const sm = this.stateMachines.get(stateMachineId);
     if (!sm) throw new Error('状态机不存在');
     sm.parameters.push(parameter);
-    this.currentValues.set(parameter.name, parameter.defaultValue);
+    this.currentValues.set(`${stateMachineId}.${parameter.name}`, parameter.defaultValue);
     this.notify('parameter:added', { stateMachineId, parameter });
   }
 
@@ -142,8 +152,8 @@ class AnimationStateMachineService {
   // 评估条件
   evaluateCondition(condition: string, stateMachineId: string): boolean {
     // 简单条件评估器，支持 "paramName > value" 等
-    const conditions = condition.split('&&').map(c => c.trim());
-    return conditions.every(c => this.evaluateSingle(c, stateMachineId));
+    const conditions = condition.split('&&').map((c) => c.trim());
+    return conditions.every((c) => this.evaluateSingle(c, stateMachineId));
   }
 
   private evaluateSingle(condition: string, stateMachineId: string): boolean {
@@ -151,16 +161,23 @@ class AnimationStateMachineService {
     const ops = ['>=', '<=', '==', '!=', '>', '<'];
     for (const op of ops) {
       if (condition.includes(op)) {
-        const [left, right] = condition.split(op).map(s => s.trim());
-        const leftVal = this.getParameter(stateMachineId, left);
-        const rightVal = this.parseValue(right);
+        const [left, ...rest] = condition.split(op);
+        const right = rest.join(op);
+        const leftVal = this.getParameter(stateMachineId, left.trim());
+        const rightVal = this.parseValue(right.trim());
         switch (op) {
-          case '>=': return leftVal >= rightVal;
-          case '<=': return leftVal <= rightVal;
-          case '==': return leftVal === rightVal;
-          case '!=': return leftVal !== rightVal;
-          case '>': return leftVal > rightVal;
-          case '<': return leftVal < rightVal;
+          case '>=':
+            return leftVal >= rightVal;
+          case '<=':
+            return leftVal <= rightVal;
+          case '==':
+            return leftVal === rightVal;
+          case '!=':
+            return leftVal !== rightVal;
+          case '>':
+            return leftVal > rightVal;
+          case '<':
+            return leftVal < rightVal;
         }
       }
     }
@@ -178,13 +195,16 @@ class AnimationStateMachineService {
   }
 
   // 添加 Any State 过渡
-  addAnyStateTransition(stateMachineId: string, transition: Omit<AnimationTransition, 'id' | 'fromState'>): AnimationTransition {
+  addAnyStateTransition(
+    stateMachineId: string,
+    transition: Omit<AnimationTransition, 'id' | 'fromState'>
+  ): AnimationTransition {
     const sm = this.stateMachines.get(stateMachineId);
     if (!sm) throw new Error('状态机不存在');
     const newTrans: AnimationTransition = {
       ...transition,
       id: `anytrans-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
-      fromState: 'AnyState'
+      fromState: 'AnyState',
     };
     sm.anyStateTransitions.push(newTrans);
     return newTrans;
@@ -204,7 +224,7 @@ class AnimationStateMachineService {
       hasExitTime: false,
       exitTime: 0,
       interruptionSource: 'none',
-      canTransitionToSelf: false
+      canTransitionToSelf: false,
     };
     sm.entryTransitions.push(newTrans);
     return newTrans;
@@ -214,10 +234,12 @@ class AnimationStateMachineService {
   removeState(stateMachineId: string, layerName: string, stateId: string): void {
     const sm = this.stateMachines.get(stateMachineId);
     if (!sm) return;
-    const layer = sm.layers.find(l => l.name === layerName);
+    const layer = sm.layers.find((l) => l.name === layerName);
     if (!layer) return;
-    layer.stateMachine.states = layer.stateMachine.states.filter(s => s.id !== stateId);
-    layer.stateMachine.transitions = layer.stateMachine.transitions.filter(t => t.fromState !== stateId && t.toState !== stateId);
+    layer.stateMachine.states = layer.stateMachine.states.filter((s) => s.id !== stateId);
+    layer.stateMachine.transitions = layer.stateMachine.transitions.filter(
+      (t) => t.fromState !== stateId && t.toState !== stateId
+    );
     this.notify('state:removed', { stateMachineId, layerName, stateId });
   }
 
@@ -225,9 +247,11 @@ class AnimationStateMachineService {
   removeTransition(stateMachineId: string, layerName: string, transitionId: string): void {
     const sm = this.stateMachines.get(stateMachineId);
     if (!sm) return;
-    const layer = sm.layers.find(l => l.name === layerName);
+    const layer = sm.layers.find((l) => l.name === layerName);
     if (!layer) return;
-    layer.stateMachine.transitions = layer.stateMachine.transitions.filter(t => t.id !== transitionId);
+    layer.stateMachine.transitions = layer.stateMachine.transitions.filter(
+      (t) => t.id !== transitionId
+    );
     this.notify('transition:removed', { stateMachineId, layerName, transitionId });
   }
 
@@ -239,7 +263,10 @@ class AnimationStateMachineService {
   }
 
   // 编译为代码
-  compile(stateMachineId: string, language: 'typescript' | 'csharp' | 'gdscript' = 'typescript'): string {
+  compile(
+    stateMachineId: string,
+    language: 'typescript' | 'csharp' | 'gdscript' = 'typescript'
+  ): string {
     const sm = this.stateMachines.get(stateMachineId);
     if (!sm) return '';
 
@@ -259,7 +286,9 @@ class AnimationStateMachineService {
     lines.push('');
     lines.push(`  constructor() {`);
     for (const param of sm.parameters) {
-      lines.push(`    this.parameters.set('${param.name}', ${JSON.stringify(param.defaultValue)});`);
+      lines.push(
+        `    this.parameters.set('${param.name}', ${JSON.stringify(param.defaultValue)});`
+      );
     }
     lines.push(`  }`);
     lines.push('');
@@ -272,7 +301,9 @@ class AnimationStateMachineService {
     lines.push(`    let nextState = this.currentState;`);
     lines.push(`    for (const layer of this.layers) {`);
     lines.push(`      for (const trans of layer.transitions) {`);
-    lines.push(`        if (trans.fromState === this.currentState && this.checkCondition(trans.condition)) {`);
+    lines.push(
+      `        if (trans.fromState === this.currentState && this.checkCondition(trans.condition)) {`
+    );
     lines.push(`          nextState = trans.toState;`);
     lines.push(`          break;`);
     lines.push(`        }`);
@@ -314,7 +345,10 @@ class AnimationStateMachineService {
   }
 
   private toPascalCase(str: string): string {
-    return str.split(/[\s_-]+/).map(w => w.charAt(0).toUpperCase() + w.slice(1)).join('');
+    return str
+      .split(/[\s_-]+/)
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join('');
   }
 
   // 获取状态机
@@ -330,7 +364,9 @@ class AnimationStateMachineService {
   // 订阅
   subscribe(listener: (event: string, data: any) => void): () => void {
     this.listeners.add(listener);
-    return () => { this.listeners.delete(listener); };
+    return () => {
+      this.listeners.delete(listener);
+    };
   }
 
   private notify(event: string, data: any): void {

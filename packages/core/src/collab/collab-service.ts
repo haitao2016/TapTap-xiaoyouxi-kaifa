@@ -9,7 +9,7 @@
  * - 模拟协作者
  */
 import { globalEventBus } from '../event-bus';
-import { randomUUID } from 'node:crypto';
+import { randomUUID } from '../utils/crypto-utils';
 
 export interface CRDTDocument {
   id: string;
@@ -100,12 +100,17 @@ export class CollabService {
   private conflicts: ConflictInfo[] = [];
   private maxHistorySize = 100;
   private lamportClock = 0;
-  private mockCollaborators: Map<string, { nextOpTimer?: ReturnType<typeof setTimeout> }> = new Map();
+  private mockCollaborators: Map<string, { nextOpTimer?: ReturnType<typeof setTimeout> }> =
+    new Map();
 
   /**
    * 加入协作项目
    */
-  joinProject(projectId: string, userName: string, role: Collaborator['role'] = 'editor'): Collaborator {
+  joinProject(
+    projectId: string,
+    userName: string,
+    role: Collaborator['role'] = 'editor'
+  ): Collaborator {
     if (!this.project) {
       this.project = {
         projectId,
@@ -245,7 +250,10 @@ export class CollabService {
   /**
    * 生成邀请链接
    */
-  generateInviteLink(role: Collaborator['role'], expiresInHours = 24): { url: string; token: string; expiresAt: number } {
+  generateInviteLink(
+    role: Collaborator['role'],
+    expiresInHours = 24
+  ): { url: string; token: string; expiresAt: number } {
     const token = randomUUID();
     const expiresAt = Date.now() + expiresInHours * 3600_000;
     return {
@@ -258,7 +266,12 @@ export class CollabService {
   /**
    * 应用本地操作（CRDT insert/delete）
    */
-  applyLocalOp(filePath: string, op: 'insert' | 'delete', pos: number, text?: string): Operation | null {
+  applyLocalOp(
+    filePath: string,
+    op: 'insert' | 'delete',
+    pos: number,
+    text?: string
+  ): Operation | null {
     if (!this.project) return null;
     this.incrementClock();
     let doc = this.project.documents.get(filePath);
@@ -344,7 +357,10 @@ export class CollabService {
         timestamp: Date.now(),
       };
     } else {
-      const deletedText = currentContent.slice(op.pos, op.pos + (op.length ?? op.text?.length ?? 1));
+      const deletedText = currentContent.slice(
+        op.pos,
+        op.pos + (op.length ?? op.text?.length ?? 1)
+      );
       return {
         ...op,
         id: randomUUID(),
@@ -387,7 +403,7 @@ export class CollabService {
       (entry) =>
         entry.operation.filePath === op.filePath &&
         entry.operation.clientId !== op.clientId &&
-        entry.operation.lamportClock < op.lamportClock,
+        entry.operation.lamportClock < op.lamportClock
     );
     for (const entry of recentOps) {
       const prevOp = entry.operation;
@@ -419,7 +435,11 @@ export class CollabService {
   /**
    * 手动解决冲突
    */
-  resolveConflict(conflictId: string, resolution: 'local' | 'remote' | 'merge', mergedContent?: string): boolean {
+  resolveConflict(
+    conflictId: string,
+    resolution: 'local' | 'remote' | 'merge',
+    mergedContent?: string
+  ): boolean {
     const conflict = this.conflicts.find((c) => c.id === conflictId);
     if (!conflict || conflict.resolved) return false;
     conflict.resolved = true;
@@ -484,7 +504,12 @@ export class CollabService {
   /**
    * 广播本地光标位置
    */
-  broadcastCursor(filePath: string, line: number, column: number, selection?: { start: number; end: number }): void {
+  broadcastCursor(
+    filePath: string,
+    line: number,
+    column: number,
+    selection?: { start: number; end: number }
+  ): void {
     if (!this.project) return;
     const me = this.project.collaborators.get(this.localClientId);
     if (!me) return;

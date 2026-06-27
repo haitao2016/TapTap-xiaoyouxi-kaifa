@@ -4,10 +4,14 @@
     "module": "CommonJS",
     "moduleResolution": "node10",
     "outDir": "dist",
-    "rootDir": "src",
     "noEmit": false,
     "allowImportingTsExtensions": false,
 
+    "baseUrl": ".",
+    "paths": {
+      "@tapdev/server": ["../../packages/server/src"],
+      "@tapdev/types": ["../../packages/types/src"]
+    }
   },
   "include": ["src"]
 }

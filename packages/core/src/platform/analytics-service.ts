@@ -98,7 +98,7 @@ export interface RealtimeMetric {
 }
 
 const METRIC_LABELS: Record<MetricType, string> = {
-  dau: '日活跃用户',
+  dau: '日活',
   mau: '月活跃用户',
   new_users: '新增用户',
   retention_d1: '次日留存率',
@@ -262,7 +262,7 @@ export class AnalyticsService {
   generatePieChart(
     result: AnalyticsResult,
     metric: MetricType,
-    dimension: DimensionType,
+    dimension: DimensionType
   ): ChartData {
     const dimensionData = new Map<string, number>();
     for (const point of result.series) {
@@ -301,7 +301,7 @@ export class AnalyticsService {
   startRealtimeStream(
     appId: string,
     metrics: MetricType[],
-    callback: (metrics: RealtimeMetric[]) => void,
+    callback: (metrics: RealtimeMetric[]) => void
   ): () => void {
     const key = `${appId}-${metrics.join(',')}`;
     if (this.realtimeTimers.has(key)) {
@@ -313,7 +313,7 @@ export class AnalyticsService {
         const baseValue = this.getMockBaseValue(metric);
         const variation = baseValue * (Math.random() * 0.2 - 0.1);
         const value = Math.max(0, baseValue + variation);
-        const changePercent = (Math.random() * 20 - 10);
+        const changePercent = Math.random() * 20 - 10;
         return {
           metric,
           value: Math.round(value * 100) / 100,
@@ -357,7 +357,7 @@ export class AnalyticsService {
 
   private calculateAverages(
     series: DataPoint[],
-    metrics: MetricType[],
+    metrics: MetricType[]
   ): Partial<Record<MetricType, number>> {
     const averages: Partial<Record<MetricType, number>> = {};
     for (const m of metrics) {
@@ -371,7 +371,7 @@ export class AnalyticsService {
 
   private calculatePeaks(
     series: DataPoint[],
-    metrics: MetricType[],
+    metrics: MetricType[]
   ): Partial<Record<MetricType, { value: number; date: string }>> {
     const peaks: Partial<Record<MetricType, { value: number; date: string }>> = {};
     for (const m of metrics) {
@@ -429,9 +429,14 @@ export class AnalyticsService {
     const cursor = new Date(start);
     let day = 0;
 
-    const stepMs = q.granularity === 'hour' ? 3600_000 :
-      q.granularity === 'week' ? 7 * 86400_000 :
-      q.granularity === 'month' ? 30 * 86400_000 : 86400_000;
+    const stepMs =
+      q.granularity === 'hour'
+        ? 3600_000
+        : q.granularity === 'week'
+          ? 7 * 86400_000
+          : q.granularity === 'month'
+            ? 30 * 86400_000
+            : 86400_000;
 
     while (cursor <= end) {
       const baseDau = 1000 + Math.sin(day / 5) * 300 + day * 10;
@@ -458,9 +463,15 @@ export class AnalyticsService {
       granularity: q.granularity,
       series,
       changes: {
-        daily: Object.fromEntries(q.metrics.map((m) => [m, 0.12 + Math.random() * 0.05])) as Partial<Record<MetricType, number>>,
-        weekly: Object.fromEntries(q.metrics.map((m) => [m, 0.08 + Math.random() * 0.04])) as Partial<Record<MetricType, number>>,
-        monthly: Object.fromEntries(q.metrics.map((m) => [m, 0.15 + Math.random() * 0.06])) as Partial<Record<MetricType, number>>,
+        daily: Object.fromEntries(
+          q.metrics.map((m) => [m, 0.12 + Math.random() * 0.05])
+        ) as Partial<Record<MetricType, number>>,
+        weekly: Object.fromEntries(
+          q.metrics.map((m) => [m, 0.08 + Math.random() * 0.04])
+        ) as Partial<Record<MetricType, number>>,
+        monthly: Object.fromEntries(
+          q.metrics.map((m) => [m, 0.15 + Math.random() * 0.06])
+        ) as Partial<Record<MetricType, number>>,
       },
       totals,
       averages: this.calculateAverages(series, q.metrics),
@@ -471,34 +482,62 @@ export class AnalyticsService {
   private generateMockMetric(metric: MetricType, baseDau: number, day: number): number {
     const rand = () => 0.9 + Math.random() * 0.2;
     switch (metric) {
-      case 'dau': return Math.round(baseDau);
-      case 'mau': return Math.round(baseDau * 12);
-      case 'new_users': return Math.round(baseDau * 0.2);
-      case 'unique_devices': return Math.round(baseDau * 0.96);
-      case 'retention_d1': return 0.4 + Math.random() * 0.1;
-      case 'retention_d3': return 0.28 + Math.random() * 0.08;
-      case 'retention_d7': return 0.18 + Math.random() * 0.06;
-      case 'retention_d14': return 0.12 + Math.random() * 0.04;
-      case 'retention_d30': return 0.08 + Math.random() * 0.03;
-      case 'revenue': return Math.round(baseDau * 0.5 * rand());
-      case 'arppu': return 25 + Math.random() * 10;
-      case 'arpu': return 2 + Math.random() * 1;
-      case 'paying_users': return Math.round(baseDau * 0.03 * rand());
-      case 'pay_rate': return 0.03 + Math.random() * 0.01;
-      case 'crash_rate': return Math.random() * 0.015;
-      case 'anr_rate': return Math.random() * 0.008;
-      case 'session_duration': return 180 + Math.random() * 120;
-      case 'session_count': return Math.round(baseDau * 3 * rand());
-      case 'page_views': return Math.round(baseDau * 9 * rand());
-      case 'avg_online_time': return 25 + Math.random() * 15;
-      case 'level_completion_rate': return 0.6 + Math.random() * 0.15;
-      case 'tutorial_completion_rate': return 0.75 + Math.random() * 0.1;
-      case 'ad_impressions': return Math.round(baseDau * 16 * rand());
-      case 'ad_clicks': return Math.round(baseDau * 0.5 * rand());
-      case 'ad_revenue': return Math.round(baseDau * 0.6 * rand());
-      case 'share_count': return Math.round(baseDau * 0.09 * rand());
-      case 'invite_count': return Math.round(baseDau * 0.05 * rand());
-      default: return 0;
+      case 'dau':
+        return Math.round(baseDau);
+      case 'mau':
+        return Math.round(baseDau * 12);
+      case 'new_users':
+        return Math.round(baseDau * 0.2);
+      case 'unique_devices':
+        return Math.round(baseDau * 0.96);
+      case 'retention_d1':
+        return 0.4 + Math.random() * 0.1;
+      case 'retention_d3':
+        return 0.28 + Math.random() * 0.08;
+      case 'retention_d7':
+        return 0.18 + Math.random() * 0.06;
+      case 'retention_d14':
+        return 0.12 + Math.random() * 0.04;
+      case 'retention_d30':
+        return 0.08 + Math.random() * 0.03;
+      case 'revenue':
+        return Math.round(baseDau * 0.5 * rand());
+      case 'arppu':
+        return 25 + Math.random() * 10;
+      case 'arpu':
+        return 2 + Math.random() * 1;
+      case 'paying_users':
+        return Math.round(baseDau * 0.03 * rand());
+      case 'pay_rate':
+        return 0.03 + Math.random() * 0.01;
+      case 'crash_rate':
+        return Math.random() * 0.015;
+      case 'anr_rate':
+        return Math.random() * 0.008;
+      case 'session_duration':
+        return 180 + Math.random() * 120;
+      case 'session_count':
+        return Math.round(baseDau * 3 * rand());
+      case 'page_views':
+        return Math.round(baseDau * 9 * rand());
+      case 'avg_online_time':
+        return 25 + Math.random() * 15;
+      case 'level_completion_rate':
+        return 0.6 + Math.random() * 0.15;
+      case 'tutorial_completion_rate':
+        return 0.75 + Math.random() * 0.1;
+      case 'ad_impressions':
+        return Math.round(baseDau * 16 * rand());
+      case 'ad_clicks':
+        return Math.round(baseDau * 0.5 * rand());
+      case 'ad_revenue':
+        return Math.round(baseDau * 0.6 * rand());
+      case 'share_count':
+        return Math.round(baseDau * 0.09 * rand());
+      case 'invite_count':
+        return Math.round(baseDau * 0.05 * rand());
+      default:
+        return 0;
     }
   }
 }

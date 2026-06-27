@@ -11,7 +11,7 @@
  * - 预设模板：常用多人游戏模式配置
  */
 import { globalEventBus } from '../event-bus';
-import { randomUUID } from 'node:crypto';
+import { randomUUID } from '../utils/crypto-utils';
 
 export type RoomStatus = 'waiting' | 'playing' | 'full' | 'closed';
 export type PlayerStatus = 'idle' | 'ready' | 'playing' | 'offline';
@@ -38,6 +38,7 @@ export interface RoomSettings {
   gameMode: string;
   map: string;
   rules: Record<string, unknown>;
+  friendlyFire?: boolean;
 }
 
 export interface Room {
@@ -224,28 +225,180 @@ const MOCK_ROOMS: Room[] = [
 ];
 
 const MOCK_LEADERBOARDS: LeaderboardConfig[] = [
-  { id: 'score', name: '总分数榜', type: 'score', description: '全服总分数排名', resetPeriod: 'never', order: 'desc', maxEntries: 1000 },
-  { id: 'level', name: '等级榜', type: 'level', description: '玩家等级排名', resetPeriod: 'never', order: 'desc', maxEntries: 1000 },
-  { id: 'power', name: '战力榜', type: 'power', description: '角色战力排名', resetPeriod: 'weekly', order: 'desc', maxEntries: 500 },
-  { id: 'clear', name: '通关榜', type: 'clear', description: '最快通关记录', resetPeriod: 'monthly', order: 'asc', maxEntries: 100 },
-  { id: 'weekly_score', name: '周分数榜', type: 'score', description: '本周分数排名', resetPeriod: 'weekly', order: 'desc', maxEntries: 500 },
+  {
+    id: 'score',
+    name: '总分数榜',
+    type: 'score',
+    description: '全服总分数排名',
+    resetPeriod: 'never',
+    order: 'desc',
+    maxEntries: 1000,
+  },
+  {
+    id: 'level',
+    name: '等级榜',
+    type: 'level',
+    description: '玩家等级排名',
+    resetPeriod: 'never',
+    order: 'desc',
+    maxEntries: 1000,
+  },
+  {
+    id: 'power',
+    name: '战力榜',
+    type: 'power',
+    description: '角色战力排名',
+    resetPeriod: 'weekly',
+    order: 'desc',
+    maxEntries: 500,
+  },
+  {
+    id: 'clear',
+    name: '通关榜',
+    type: 'clear',
+    description: '最快通关记录',
+    resetPeriod: 'monthly',
+    order: 'asc',
+    maxEntries: 100,
+  },
+  {
+    id: 'weekly_score',
+    name: '周分数榜',
+    type: 'score',
+    description: '本周分数排名',
+    resetPeriod: 'weekly',
+    order: 'desc',
+    maxEntries: 500,
+  },
 ];
 
 const MOCK_ACHIEVEMENTS: AchievementDefinition[] = [
-  { id: 'first_win', name: '初出茅庐', description: '赢得第一场比赛', icon: '', type: 'normal', rarity: 'common', conditions: { wins: 1 }, rewards: { coins: 100 }, points: 10 },
-  { id: 'win_10', name: '小试牛刀', description: '累计赢得10场比赛', icon: '', type: 'normal', rarity: 'common', conditions: { wins: 10 }, rewards: { coins: 500 }, points: 20 },
-  { id: 'win_100', name: '百战百胜', description: '累计赢得100场比赛', icon: '', type: 'stage', rarity: 'rare', conditions: { wins: 100 }, rewards: { coins: 2000, avatar: 'champion' }, points: 50, stages: [{ threshold: 10, description: '赢得10场' }, { threshold: 50, description: '赢得50场' }, { threshold: 100, description: '赢得100场' }] },
-  { id: 'streak_5', name: '连胜达人', description: '连续赢得5场比赛', icon: '', type: 'normal', rarity: 'rare', conditions: { streak: 5 }, rewards: { coins: 300 }, points: 30 },
-  { id: 'legendary', name: '传奇玩家', description: '达到传奇段位', icon: '', type: 'hidden', rarity: 'legendary', conditions: { rank: 'legendary' }, rewards: { coins: 10000, title: '传奇' }, points: 200, hidden: true },
-  { id: 'season_champion', name: '赛季冠军', description: '获得赛季冠军', icon: '', type: 'limited', rarity: 'epic', conditions: { seasonRank: 1 }, rewards: { coins: 5000, frame: 'golden' }, points: 150, limited: { startAt: Date.now() - 86400000 * 30, endAt: Date.now() + 86400000 * 60 } },
+  {
+    id: 'first_win',
+    name: '初出茅庐',
+    description: '赢得第一场比赛',
+    icon: '',
+    type: 'normal',
+    rarity: 'common',
+    conditions: { wins: 1 },
+    rewards: { coins: 100 },
+    points: 10,
+  },
+  {
+    id: 'win_10',
+    name: '小试牛刀',
+    description: '累计赢得10场比赛',
+    icon: '',
+    type: 'normal',
+    rarity: 'common',
+    conditions: { wins: 10 },
+    rewards: { coins: 500 },
+    points: 20,
+  },
+  {
+    id: 'win_100',
+    name: '百战百胜',
+    description: '累计赢得100场比赛',
+    icon: '',
+    type: 'stage',
+    rarity: 'rare',
+    conditions: { wins: 100 },
+    rewards: { coins: 2000, avatar: 'champion' },
+    points: 50,
+    stages: [
+      { threshold: 10, description: '赢得10场' },
+      { threshold: 50, description: '赢得50场' },
+      { threshold: 100, description: '赢得100场' },
+    ],
+  },
+  {
+    id: 'streak_5',
+    name: '连胜达人',
+    description: '连续赢得5场比赛',
+    icon: '',
+    type: 'normal',
+    rarity: 'rare',
+    conditions: { streak: 5 },
+    rewards: { coins: 300 },
+    points: 30,
+  },
+  {
+    id: 'legendary',
+    name: '传奇玩家',
+    description: '达到传奇段位',
+    icon: '',
+    type: 'hidden',
+    rarity: 'legendary',
+    conditions: { rank: 'legendary' },
+    rewards: { coins: 10000, title: '传奇' },
+    points: 200,
+    hidden: true,
+  },
+  {
+    id: 'season_champion',
+    name: '赛季冠军',
+    description: '获得赛季冠军',
+    icon: '',
+    type: 'limited',
+    rarity: 'epic',
+    conditions: { seasonRank: 1 },
+    rewards: { coins: 5000, frame: 'golden' },
+    points: 150,
+    limited: { startAt: Date.now() - 86400000 * 30, endAt: Date.now() + 86400000 * 60 },
+  },
 ];
 
 const GAME_MODE_TEMPLATES: GameModeTemplate[] = [
-  { id: 'classic', name: '经典模式', description: '传统对战玩法', category: '对战', settings: { gameMode: 'classic', rules: { turnTime: 60 } }, minPlayers: 2, maxPlayers: 8, icon: '🎮' },
-  { id: 'ranked', name: '排位赛', description: '积分排位对战', category: '竞技', settings: { gameMode: 'ranked', allowSpectator: false, rules: { bestOf: 3, turnTime: 30 } }, minPlayers: 2, maxPlayers: 2, icon: '🏆' },
-  { id: 'coop', name: '合作模式', description: '组队共同挑战', category: '合作', settings: { gameMode: 'coop', friendlyFire: false }, minPlayers: 2, maxPlayers: 4, icon: '🤝' },
-  { id: 'battle_royale', name: '大逃杀', description: '多人生存竞技', category: '竞技', settings: { gameMode: 'battle_royale', rules: { shrinkZone: true } }, minPlayers: 10, maxPlayers: 100, icon: '🔫' },
-  { id: 'team_deathmatch', name: '团队死斗', description: '两队对战积分', category: '对战', settings: { gameMode: 'team_deathmatch', rules: { scoreLimit: 50, timeLimit: 300 } }, minPlayers: 4, maxPlayers: 16, icon: '⚔️' },
+  {
+    id: 'classic',
+    name: '经典模式',
+    description: '传统对战玩法',
+    category: '对战',
+    settings: { gameMode: 'classic', rules: { turnTime: 60 } },
+    minPlayers: 2,
+    maxPlayers: 8,
+    icon: '🎮',
+  },
+  {
+    id: 'ranked',
+    name: '排位赛',
+    description: '积分排位对战',
+    category: '竞技',
+    settings: { gameMode: 'ranked', allowSpectator: false, rules: { bestOf: 3, turnTime: 30 } },
+    minPlayers: 2,
+    maxPlayers: 2,
+    icon: '🏆',
+  },
+  {
+    id: 'coop',
+    name: '合作模式',
+    description: '组队共同挑战',
+    category: '合作',
+    settings: { gameMode: 'coop', friendlyFire: false },
+    minPlayers: 2,
+    maxPlayers: 4,
+    icon: '🤝',
+  },
+  {
+    id: 'battle_royale',
+    name: '大逃杀',
+    description: '多人生存竞技',
+    category: '竞技',
+    settings: { gameMode: 'battle_royale', rules: { shrinkZone: true } },
+    minPlayers: 10,
+    maxPlayers: 100,
+    icon: '🔫',
+  },
+  {
+    id: 'team_deathmatch',
+    name: '团队死斗',
+    description: '两队对战积分',
+    category: '对战',
+    settings: { gameMode: 'team_deathmatch', rules: { scoreLimit: 50, timeLimit: 300 } },
+    minPlayers: 4,
+    maxPlayers: 16,
+    icon: '⚔️',
+  },
 ];
 
 export class MultiplayerService {
@@ -357,7 +510,10 @@ export class MultiplayerService {
     }
 
     this.addSystemMessage(options.roomId, `${options.playerName} 加入了房间`);
-    globalEventBus.emit({ type: 'multiplayer:playerJoined', payload: { roomId: options.roomId, player } });
+    globalEventBus.emit({
+      type: 'multiplayer:playerJoined',
+      payload: { roomId: options.roomId, player },
+    });
 
     return { success: true, room };
   }
@@ -427,7 +583,11 @@ export class MultiplayerService {
     return this.rooms.get(roomId);
   }
 
-  async updateRoomSettings(roomId: string, playerId: string, settings: Partial<RoomSettings>): Promise<boolean> {
+  async updateRoomSettings(
+    roomId: string,
+    playerId: string,
+    settings: Partial<RoomSettings>
+  ): Promise<boolean> {
     const room = this.rooms.get(roomId);
     if (!room) return false;
     if (room.ownerId !== playerId) return false;
@@ -489,7 +649,11 @@ export class MultiplayerService {
     return true;
   }
 
-  async updatePlayerStatus(roomId: string, playerId: string, status: PlayerStatus): Promise<boolean> {
+  async updatePlayerStatus(
+    roomId: string,
+    playerId: string,
+    status: PlayerStatus
+  ): Promise<boolean> {
     const room = this.rooms.get(roomId);
     if (!room) return false;
 
@@ -497,12 +661,19 @@ export class MultiplayerService {
     if (!player) return false;
 
     player.status = status;
-    globalEventBus.emit({ type: 'multiplayer:playerStatusChanged', payload: { roomId, playerId, status } });
+    globalEventBus.emit({
+      type: 'multiplayer:playerStatusChanged',
+      payload: { roomId, playerId, status },
+    });
 
     return true;
   }
 
-  async updatePlayerProperties(roomId: string, playerId: string, properties: Record<string, unknown>): Promise<boolean> {
+  async updatePlayerProperties(
+    roomId: string,
+    playerId: string,
+    properties: Record<string, unknown>
+  ): Promise<boolean> {
     const room = this.rooms.get(roomId);
     if (!room) return false;
 
@@ -510,7 +681,10 @@ export class MultiplayerService {
     if (!player) return false;
 
     player.properties = { ...player.properties, ...properties };
-    globalEventBus.emit({ type: 'multiplayer:playerPropertiesChanged', payload: { roomId, playerId, properties } });
+    globalEventBus.emit({
+      type: 'multiplayer:playerPropertiesChanged',
+      payload: { roomId, playerId, properties },
+    });
 
     return true;
   }
@@ -584,9 +758,12 @@ export class MultiplayerService {
 
     this.matchQueue.set(request.id, request);
 
-    setTimeout(() => {
-      this.simulateMatch(request.id);
-    }, 2000 + Math.random() * 3000);
+    setTimeout(
+      () => {
+        this.simulateMatch(request.id);
+      },
+      2000 + Math.random() * 3000
+    );
 
     globalEventBus.emit({ type: 'multiplayer:matchQueued', payload: request });
     return request;
@@ -654,7 +831,10 @@ export class MultiplayerService {
     return Array.from(this.leaderboards.values());
   }
 
-  async getLeaderboard(leaderboardId: string, options?: { page?: number; pageSize?: number }): Promise<{ entries: LeaderboardEntry[]; total: number }> {
+  async getLeaderboard(
+    leaderboardId: string,
+    options?: { page?: number; pageSize?: number }
+  ): Promise<{ entries: LeaderboardEntry[]; total: number }> {
     if (!this.leaderboardData.has(leaderboardId)) {
       this.generateMockLeaderboardData(leaderboardId);
     }
@@ -669,7 +849,12 @@ export class MultiplayerService {
     return { entries, total };
   }
 
-  async submitScore(leaderboardId: string, playerId: string, playerName: string, score: number): Promise<LeaderboardEntry | null> {
+  async submitScore(
+    leaderboardId: string,
+    playerId: string,
+    playerName: string,
+    score: number
+  ): Promise<LeaderboardEntry | null> {
     const config = this.leaderboards.get(leaderboardId);
     if (!config) return null;
 
@@ -705,12 +890,18 @@ export class MultiplayerService {
     }
 
     this.leaderboardData.set(leaderboardId, entries);
-    globalEventBus.emit({ type: 'multiplayer:scoreSubmitted', payload: { leaderboardId, entry: existing } });
+    globalEventBus.emit({
+      type: 'multiplayer:scoreSubmitted',
+      payload: { leaderboardId, entry: existing },
+    });
 
     return existing;
   }
 
-  async getPlayerRank(leaderboardId: string, playerId: string): Promise<{ rank: number; score: number } | null> {
+  async getPlayerRank(
+    leaderboardId: string,
+    playerId: string
+  ): Promise<{ rank: number; score: number } | null> {
     if (!this.leaderboardData.has(leaderboardId)) {
       this.generateMockLeaderboardData(leaderboardId);
     }
@@ -722,7 +913,18 @@ export class MultiplayerService {
 
   private generateMockLeaderboardData(leaderboardId: string): void {
     const entries: LeaderboardEntry[] = [];
-    const names = ['战神归来', '不败神话', '风云再起', '游戏达人', '王者之姿', '闪电侠', '星辰大海', '月下独酌', '风清扬', '独孤求败'];
+    const names = [
+      '战神归来',
+      '不败神话',
+      '风云再起',
+      '游戏达人',
+      '王者之姿',
+      '闪电侠',
+      '星辰大海',
+      '月下独酌',
+      '风清扬',
+      '独孤求败',
+    ];
 
     for (let i = 0; i < 50; i++) {
       entries.push({
@@ -773,7 +975,10 @@ export class MultiplayerService {
     return this.userAchievements.get(userId) ?? [];
   }
 
-  async unlockAchievement(userId: string, achievementId: string): Promise<{ success: boolean; achievement?: UserAchievement }> {
+  async unlockAchievement(
+    userId: string,
+    achievementId: string
+  ): Promise<{ success: boolean; achievement?: UserAchievement }> {
     const userAchs = await this.getUserAchievements(userId);
     const ach = userAchs.find((a) => a.achievementId === achievementId);
 
@@ -790,11 +995,18 @@ export class MultiplayerService {
     ach.progress = ach.total;
     ach.percentage = 100;
 
-    globalEventBus.emit({ type: 'multiplayer:achievementUnlocked', payload: { userId, achievementId } });
+    globalEventBus.emit({
+      type: 'multiplayer:achievementUnlocked',
+      payload: { userId, achievementId },
+    });
     return { success: true, achievement: ach };
   }
 
-  async updateAchievementProgress(userId: string, achievementId: string, progress: number): Promise<UserAchievement | null> {
+  async updateAchievementProgress(
+    userId: string,
+    achievementId: string,
+    progress: number
+  ): Promise<UserAchievement | null> {
     const userAchs = await this.getUserAchievements(userId);
     const ach = userAchs.find((a) => a.achievementId === achievementId);
 
@@ -807,7 +1019,10 @@ export class MultiplayerService {
     if (ach.progress >= ach.total) {
       ach.unlocked = true;
       ach.unlockedAt = Date.now();
-      globalEventBus.emit({ type: 'multiplayer:achievementUnlocked', payload: { userId, achievementId } });
+      globalEventBus.emit({
+        type: 'multiplayer:achievementUnlocked',
+        payload: { userId, achievementId },
+      });
     }
 
     return ach;
@@ -822,8 +1037,10 @@ export class MultiplayerService {
   }
 
   listGameModeCategories(): string[] {
-    const categories = new Set(this.templates.values().map((t) => t.category));
-    return Array.from(categories);
+    const categories = new Set(
+      Array.from(this.templates.values()).map((t: GameModeTemplate) => t.category)
+    );
+    return Array.from(categories) as string[];
   }
 }
 

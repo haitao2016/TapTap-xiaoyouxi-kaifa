@@ -208,7 +208,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       compress: options?.compress ?? true,
       wasmSplit: options?.wasmSplit ?? true,
       development: false,
-      targetPlatform: (options?.platforms?.map((p) => p as any) ?? ['pc', 'mobile', 'tablet']),
+      targetPlatform: options?.platforms?.map((p) => p as any) ?? ['pc', 'mobile', 'tablet'],
       version: options?.version ?? '1.0.0',
       cdnUrl: project.config.cdnUrl,
       appId: project.config.appId,
@@ -275,8 +275,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   closeTab: (tabId) => {
     set((s) => {
       const tabs = s.editorTabs.filter((t) => t.id !== tabId);
-      const activeTabId =
-        s.activeTabId === tabId ? tabs.at(-1)?.id ?? null : s.activeTabId;
+      const activeTabId = s.activeTabId === tabId ? (tabs.at(-1)?.id ?? null) : s.activeTabId;
       return { editorTabs: tabs, activeTabId };
     });
   },
@@ -285,9 +284,7 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   updateTabContent: (tabId, content) => {
     set((s) => ({
-      editorTabs: s.editorTabs.map((t) =>
-        t.id === tabId ? { ...t, content, modified: true } : t
-      ),
+      editorTabs: s.editorTabs.map((t) => (t.id === tabId ? { ...t, content, modified: true } : t)),
     }));
   },
 

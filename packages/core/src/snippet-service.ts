@@ -23,7 +23,7 @@ class SnippetService {
             category: 'javascript',
             prefix: 'log',
             body: ['console.log(${1:message});'],
-            scope: 'javascript,typescript'
+            scope: 'javascript,typescript',
           },
           {
             id: 'js-console-error',
@@ -32,7 +32,7 @@ class SnippetService {
             category: 'javascript',
             prefix: 'error',
             body: ['console.error(${1:error});'],
-            scope: 'javascript,typescript'
+            scope: 'javascript,typescript',
           },
           {
             id: 'js-console-warning',
@@ -41,7 +41,7 @@ class SnippetService {
             category: 'javascript',
             prefix: 'warn',
             body: ['console.warn(${1:message});'],
-            scope: 'javascript,typescript'
+            scope: 'javascript,typescript',
           },
           {
             id: 'js-function',
@@ -49,12 +49,8 @@ class SnippetService {
             description: '创建函数',
             category: 'javascript',
             prefix: 'func',
-            body: [
-              'function ${1:functionName}(${2:params}) {',
-              '  ${3:// code}',
-              '}'
-            ],
-            scope: 'javascript,typescript'
+            body: ['function ${1:functionName}(${2:params}) {', '  ${3:// code}', '}'],
+            scope: 'javascript,typescript',
           },
           {
             id: 'js-arrow-function',
@@ -62,12 +58,8 @@ class SnippetService {
             description: '创建箭头函数',
             category: 'javascript',
             prefix: 'arrow',
-            body: [
-              'const ${1:functionName} = (${2:params}) => {',
-              '  ${3:// code}',
-              '};'
-            ],
-            scope: 'javascript,typescript'
+            body: ['const ${1:functionName} = (${2:params}) => {', '  ${3:// code}', '};'],
+            scope: 'javascript,typescript',
           },
           {
             id: 'js-async-function',
@@ -75,12 +67,8 @@ class SnippetService {
             description: '创建异步函数',
             category: 'javascript',
             prefix: 'async',
-            body: [
-              'async function ${1:functionName}(${2:params}) {',
-              '  ${3:// code}',
-              '}'
-            ],
-            scope: 'javascript,typescript'
+            body: ['async function ${1:functionName}(${2:params}) {', '  ${3:// code}', '}'],
+            scope: 'javascript,typescript',
           },
           {
             id: 'js-if',
@@ -88,12 +76,8 @@ class SnippetService {
             description: '条件判断',
             category: 'javascript',
             prefix: 'if',
-            body: [
-              'if (${1:condition}) {',
-              '  ${2:// code}',
-              '}'
-            ],
-            scope: 'javascript,typescript'
+            body: ['if (${1:condition}) {', '  ${2:// code}', '}'],
+            scope: 'javascript,typescript',
           },
           {
             id: 'js-if-else',
@@ -101,14 +85,8 @@ class SnippetService {
             description: '条件判断带else',
             category: 'javascript',
             prefix: 'ife',
-            body: [
-              'if (${1:condition}) {',
-              '  ${2:// code}',
-              '} else {',
-              '  ${3:// code}',
-              '}'
-            ],
-            scope: 'javascript,typescript'
+            body: ['if (${1:condition}) {', '  ${2:// code}', '} else {', '  ${3:// code}', '}'],
+            scope: 'javascript,typescript',
           },
           {
             id: 'js-for-loop',
@@ -116,12 +94,8 @@ class SnippetService {
             description: 'for循环',
             category: 'javascript',
             prefix: 'for',
-            body: [
-              'for (let ${1:i} = 0; ${1:i} < ${2:length}; ${1:i}++) {',
-              '  ${3:// code}',
-              '}'
-            ],
-            scope: 'javascript,typescript'
+            body: ['for (let ${1:i} = 0; ${1:i} < ${2:length}; ${1:i}++) {', '  ${3:// code}', '}'],
+            scope: 'javascript,typescript',
           },
           {
             id: 'js-for-each',
@@ -130,7 +104,7 @@ class SnippetService {
             category: 'javascript',
             prefix: 'forEach',
             body: ['${1:array}.forEach((${2:item}) => {', '  ${3:// code}', '});'],
-            scope: 'javascript,typescript'
+            scope: 'javascript,typescript',
           },
           {
             id: 'js-try-catch',
@@ -143,9 +117,9 @@ class SnippetService {
               '  ${1:// code}',
               '} catch (${2:error}) {',
               '  ${3:// handle error}',
-              '}'
+              '}',
             ],
-            scope: 'javascript,typescript'
+            scope: 'javascript,typescript',
           },
           {
             id: 'js-import',
@@ -154,7 +128,7 @@ class SnippetService {
             category: 'javascript',
             prefix: 'import',
             body: ["import ${1:module} from '${2:path}';"],
-            scope: 'javascript,typescript'
+            scope: 'javascript,typescript',
           },
           {
             id: 'js-export',
@@ -163,9 +137,9 @@ class SnippetService {
             category: 'javascript',
             prefix: 'export',
             body: ['export ${1:default} ${2:value};'],
-            scope: 'javascript,typescript'
-          }
-        ]
+            scope: 'javascript,typescript',
+          },
+        ],
       },
       {
         id: 'typescript',
@@ -178,12 +152,8 @@ class SnippetService {
             description: '创建接口',
             category: 'typescript',
             prefix: 'interface',
-            body: [
-              'interface ${1:InterfaceName} {',
-              '  ${2:// properties}',
-              '}'
-            ],
-            scope: 'typescript'
+            body: ['interface ${1:InterfaceName} {', '  ${2:// properties}', '}'],
+            scope: 'typescript',
           },
           {
             id: 'ts-type',
@@ -192,7 +162,7 @@ class SnippetService {
             category: 'typescript',
             prefix: 'type',
             body: ['type ${1:TypeName} = ${2:type};'],
-            scope: 'typescript'
+            scope: 'typescript',
           },
           {
             id: 'ts-class',
@@ -207,9 +177,9 @@ class SnippetService {
               '  constructor(${3:params}) {',
               '    ${4:// init}',
               '  }',
-              '}'
+              '}',
             ],
-            scope: 'typescript'
+            scope: 'typescript',
           },
           {
             id: 'ts-enum',
@@ -217,12 +187,8 @@ class SnippetService {
             description: '创建枚举',
             category: 'typescript',
             prefix: 'enum',
-            body: [
-              'enum ${1:EnumName} {',
-              '  ${2:Value} = ${3:0},',
-              '}'
-            ],
-            scope: 'typescript'
+            body: ['enum ${1:EnumName} {', '  ${2:Value} = ${3:0},', '}'],
+            scope: 'typescript',
           },
           {
             id: 'ts-generic',
@@ -233,11 +199,11 @@ class SnippetService {
             body: [
               'function ${1:functionName}<${2:T}>(${3:param}: ${2:T}): ${2:T} {',
               '  ${4:// code}',
-              '}'
+              '}',
             ],
-            scope: 'typescript'
-          }
-        ]
+            scope: 'typescript',
+          },
+        ],
       },
       {
         id: 'react',
@@ -251,7 +217,7 @@ class SnippetService {
             category: 'react',
             prefix: 'rc',
             body: [
-              'import React from \'react\';',
+              "import React from 'react';",
               '',
               'interface ${1:ComponentName}Props {',
               '  ${2:// props}',
@@ -263,9 +229,9 @@ class SnippetService {
               '      ${3:// content}',
               '    </div>',
               '  );',
-              '}'
+              '}',
             ],
-            scope: 'typescriptreact,jsx,tsx'
+            scope: 'typescriptreact,jsx,tsx',
           },
           {
             id: 'react-usestate',
@@ -273,8 +239,10 @@ class SnippetService {
             description: '状态钩子',
             category: 'react',
             prefix: 'usestate',
-            body: ['const [${1:state}, set${1/(.*)/${1:/capitalize}/}State] = React.useState(${2:initialValue});'],
-            scope: 'typescriptreact,jsx,tsx'
+            body: [
+              'const [${1:state}, set${1/(.*)/${1:/capitalize}/}State] = React.useState(${2:initialValue});',
+            ],
+            scope: 'typescriptreact,jsx,tsx',
           },
           {
             id: 'react-useeffect',
@@ -289,9 +257,9 @@ class SnippetService {
               '  return () => {',
               '    ${2:// cleanup}',
               '  };',
-              '}, [${3:dependencies}]);'
+              '}, [${3:dependencies}]);',
             ],
-            scope: 'typescriptreact,jsx,tsx'
+            scope: 'typescriptreact,jsx,tsx',
           },
           {
             id: 'react-usecallback',
@@ -299,8 +267,12 @@ class SnippetService {
             description: '回调钩子',
             category: 'react',
             prefix: 'usecallback',
-            body: ['const ${1:callback} = React.useCallback((${2:params}) => {', '  ${3:// code}', '}, [${4:dependencies}]);'],
-            scope: 'typescriptreact,jsx,tsx'
+            body: [
+              'const ${1:callback} = React.useCallback((${2:params}) => {',
+              '  ${3:// code}',
+              '}, [${4:dependencies}]);',
+            ],
+            scope: 'typescriptreact,jsx,tsx',
           },
           {
             id: 'react-usememo',
@@ -308,10 +280,14 @@ class SnippetService {
             description: '记忆钩子',
             category: 'react',
             prefix: 'usememo',
-            body: ['const ${1:value} = React.useMemo(() => {', '  ${2:// computation}', '}, [${3:dependencies}]);'],
-            scope: 'typescriptreact,jsx,tsx'
-          }
-        ]
+            body: [
+              'const ${1:value} = React.useMemo(() => {',
+              '  ${2:// computation}',
+              '}, [${3:dependencies}]);',
+            ],
+            scope: 'typescriptreact,jsx,tsx',
+          },
+        ],
       },
       {
         id: 'tapdev',
@@ -324,7 +300,7 @@ class SnippetService {
             description: '导入TapDev核心模块',
             category: 'tapdev',
             prefix: 'tapdev',
-            body: ["import { ${1:service} } from '@tapdev/core';"]
+            body: ["import { ${1:service} } from '@tapdev/core';"],
           },
           {
             id: 'tapdev-debug',
@@ -332,7 +308,7 @@ class SnippetService {
             description: '输出调试日志',
             category: 'tapdev',
             prefix: 'taplog',
-            body: ['debugService.log({ message: ${1:message}, level: \'${2:info}\' });']
+            body: ["debugService.log({ message: ${1:message}, level: '${2:info}' });"],
           },
           {
             id: 'tapdev-event',
@@ -340,7 +316,7 @@ class SnippetService {
             description: '监听全局事件',
             category: 'tapdev',
             prefix: 'taplisten',
-            body: ['globalEventBus.on(\'${1:event}\', (${2:data}) => {', '  ${3:// handler}', '});']
+            body: ["globalEventBus.on('${1:event}', (${2:data}) => {", '  ${3:// handler}', '});'],
           },
           {
             id: 'tapdev-monitor',
@@ -348,10 +324,19 @@ class SnippetService {
             description: '记录监控指标',
             category: 'tapdev',
             prefix: 'tapmonitor',
-            body: ['monitorService.recordNetworkRequest({', '  url: \'${1:url}\',', '  method: \'${2:GET}\',', '  status: ${3:200},', '  duration: ${4:100},', '  size: ${5:1024},', '  type: \'${6:fetch}\',', '});']
-          }
-        ]
-      }
+            body: [
+              'monitorService.recordNetworkRequest({',
+              "  url: '${1:url}',",
+              "  method: '${2:GET}',",
+              '  status: ${3:200},',
+              '  duration: ${4:100},',
+              '  size: ${5:1024},',
+              "  type: '${6:fetch}',",
+              '});',
+            ],
+          },
+        ],
+      },
     ];
 
     for (const category of builtinCategories) {
@@ -375,21 +360,22 @@ class SnippetService {
   }
 
   getSnippet(id: string): Snippet | undefined {
-    return this.snippets.get(id) || this.userSnippets.find(s => s.id === id);
+    return this.snippets.get(id) || this.userSnippets.find((s) => s.id === id);
   }
 
   searchSnippets(query: string): Snippet[] {
     const lowerQuery = query.toLowerCase();
-    return this.getSnippets().filter(snippet =>
-      snippet.name.toLowerCase().includes(lowerQuery) ||
-      snippet.description.toLowerCase().includes(lowerQuery) ||
-      snippet.prefix.toLowerCase().includes(lowerQuery) ||
-      snippet.category.toLowerCase().includes(lowerQuery)
+    return this.getSnippets().filter(
+      (snippet) =>
+        snippet.name.toLowerCase().includes(lowerQuery) ||
+        snippet.description.toLowerCase().includes(lowerQuery) ||
+        snippet.prefix.toLowerCase().includes(lowerQuery) ||
+        snippet.category.toLowerCase().includes(lowerQuery)
     );
   }
 
   addUserSnippet(snippet: Snippet): void {
-    const exists = this.userSnippets.find(s => s.id === snippet.id);
+    const exists = this.userSnippets.find((s) => s.id === snippet.id);
     if (exists) {
       const index = this.userSnippets.indexOf(exists);
       this.userSnippets[index] = snippet;
@@ -399,7 +385,7 @@ class SnippetService {
   }
 
   removeUserSnippet(id: string): boolean {
-    const index = this.userSnippets.findIndex(s => s.id === id);
+    const index = this.userSnippets.findIndex((s) => s.id === id);
     if (index !== -1) {
       this.userSnippets.splice(index, 1);
       return true;
@@ -411,49 +397,49 @@ class SnippetService {
     try {
       const body = snippet.body.join('\n');
       const text = this.replaceVariables(body, context);
-      
+
       return {
         success: true,
         snippet,
-        insertedText: text
+        insertedText: text,
       };
     } catch (error) {
       return {
-        success: false
+        success: false,
       };
     }
   }
 
   private replaceVariables(text: string, context: SnippetContext): string {
     let result = text;
-    
+
     result = result.replace(/\${1:([^}]*)}/g, (_, defaultValue) => defaultValue);
     result = result.replace(/\${2:([^}]*)}/g, (_, defaultValue) => defaultValue);
     result = result.replace(/\${3:([^}]*)}/g, (_, defaultValue) => defaultValue);
     result = result.replace(/\${4:([^}]*)}/g, (_, defaultValue) => defaultValue);
     result = result.replace(/\${5:([^}]*)}/g, (_, defaultValue) => defaultValue);
-    
+
     result = result.replace(/\${TM_FILENAME}/g, context.fileName);
     result = result.replace(/\${TM_LINE_NUMBER}/g, String(context.lineNumber));
     result = result.replace(/\${TM_SELECTED_TEXT}/g, context.selectedText);
-    
+
     return result;
   }
 
   getSnippetsByLanguage(language: string): Snippet[] {
-    return this.getSnippets().filter(snippet => {
+    return this.getSnippets().filter((snippet) => {
       if (!snippet.scope) return true;
       const scopes = snippet.scope.split(',');
-      return scopes.some(scope => language.includes(scope.trim()));
+      return scopes.some((scope) => language.includes(scope.trim()));
     });
   }
 
   getSnippetsByCategory(categoryId: string): Snippet[] {
     const category = this.categories.get(categoryId);
     if (category) {
-      return [...category.snippets, ...this.userSnippets.filter(s => s.category === categoryId)];
+      return [...category.snippets, ...this.userSnippets.filter((s) => s.category === categoryId)];
     }
-    return this.userSnippets.filter(s => s.category === categoryId);
+    return this.userSnippets.filter((s) => s.category === categoryId);
   }
 }
 

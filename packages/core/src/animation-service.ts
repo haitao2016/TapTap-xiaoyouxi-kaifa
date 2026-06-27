@@ -23,7 +23,7 @@ export class AnimationService {
 
       const animateFrame = (currentTime: number) => {
         const elapsed = currentTime - start - (config.delay || 0);
-        
+
         if (elapsed < 0) {
           this.animations.set(id, requestAnimationFrame(animateFrame));
           return;
@@ -55,23 +55,35 @@ export class AnimationService {
   fadeIn(element: HTMLElement, duration: number = 300): Promise<void> {
     element.style.opacity = '0';
     element.style.display = 'block';
-    
-    return this.animate(element, {
-      from: { opacity: 0 },
-      to: { opacity: 1 },
-    }, { duration, easing: 'easeOut' });
+
+    return this.animate(
+      element,
+      {
+        from: { opacity: 0 },
+        to: { opacity: 1 },
+      },
+      { duration, easing: 'easeOut' }
+    );
   }
 
   fadeOut(element: HTMLElement, duration: number = 300): Promise<void> {
-    return this.animate(element, {
-      from: { opacity: 1 },
-      to: { opacity: 0 },
-    }, { duration, easing: 'easeIn' }).then(() => {
+    return this.animate(
+      element,
+      {
+        from: { opacity: 1 },
+        to: { opacity: 0 },
+      },
+      { duration, easing: 'easeIn' }
+    ).then(() => {
       element.style.display = 'none';
     });
   }
 
-  slideIn(element: HTMLElement, direction: 'left' | 'right' | 'top' | 'bottom' = 'left', duration: number = 300): Promise<void> {
+  slideIn(
+    element: HTMLElement,
+    direction: 'left' | 'right' | 'top' | 'bottom' = 'left',
+    duration: number = 300
+  ): Promise<void> {
     const translations: Record<string, { from: string; to: string }> = {
       left: { from: '-100%', to: '0' },
       right: { from: '100%', to: '0' },
@@ -86,13 +98,21 @@ export class AnimationService {
     element.style.opacity = '0';
     element.style.display = 'block';
 
-    return this.animate(element, {
-      from: { transform: `translate${axis}(${from})`, opacity: 0 },
-      to: { transform: `translate${axis}(${to})`, opacity: 1 },
-    }, { duration, easing: 'easeOut' });
+    return this.animate(
+      element,
+      {
+        from: { transform: `translate${axis}(${from})`, opacity: 0 },
+        to: { transform: `translate${axis}(${to})`, opacity: 1 },
+      },
+      { duration, easing: 'easeOut' }
+    );
   }
 
-  slideOut(element: HTMLElement, direction: 'left' | 'right' | 'top' | 'bottom' = 'right', duration: number = 300): Promise<void> {
+  slideOut(
+    element: HTMLElement,
+    direction: 'left' | 'right' | 'top' | 'bottom' = 'right',
+    duration: number = 300
+  ): Promise<void> {
     const translations: Record<string, string> = {
       left: '-100%',
       right: '100%',
@@ -103,10 +123,14 @@ export class AnimationService {
     const axis = direction === 'left' || direction === 'right' ? 'X' : 'Y';
     const to = translations[direction];
 
-    return this.animate(element, {
-      from: { transform: `translate${axis}(0)`, opacity: 1 },
-      to: { transform: `translate${axis}(${to})`, opacity: 0 },
-    }, { duration, easing: 'easeIn' }).then(() => {
+    return this.animate(
+      element,
+      {
+        from: { transform: `translate${axis}(0)`, opacity: 1 },
+        to: { transform: `translate${axis}(${to})`, opacity: 0 },
+      },
+      { duration, easing: 'easeIn' }
+    ).then(() => {
       element.style.display = 'none';
     });
   }
@@ -116,26 +140,38 @@ export class AnimationService {
     element.style.opacity = '0';
     element.style.display = 'block';
 
-    return this.animate(element, {
-      from: { transform: 'scale(0.9)', opacity: 0 },
-      to: { transform: 'scale(1)', opacity: 1 },
-    }, { duration, easing: 'easeOut' });
+    return this.animate(
+      element,
+      {
+        from: { transform: 'scale(0.9)', opacity: 0 },
+        to: { transform: 'scale(1)', opacity: 1 },
+      },
+      { duration, easing: 'easeOut' }
+    );
   }
 
   scaleOut(element: HTMLElement, duration: number = 300): Promise<void> {
-    return this.animate(element, {
-      from: { transform: 'scale(1)', opacity: 1 },
-      to: { transform: 'scale(0.9)', opacity: 0 },
-    }, { duration, easing: 'easeIn' }).then(() => {
+    return this.animate(
+      element,
+      {
+        from: { transform: 'scale(1)', opacity: 1 },
+        to: { transform: 'scale(0.9)', opacity: 0 },
+      },
+      { duration, easing: 'easeIn' }
+    ).then(() => {
       element.style.display = 'none';
     });
   }
 
   bounce(element: HTMLElement): Promise<void> {
-    return this.animate(element, {
-      from: { transform: 'scale(0.3)' },
-      to: { transform: 'scale(1)' },
-    }, { duration: 700, easing: 'bounce' });
+    return this.animate(
+      element,
+      {
+        from: { transform: 'scale(0.3)' },
+        to: { transform: 'scale(1)' },
+      },
+      { duration: 700, easing: 'bounce' }
+    );
   }
 
   shake(element: HTMLElement): Promise<void> {
@@ -216,7 +252,9 @@ export class AnimationService {
       case 'easeOut':
         return 1 - Math.pow(1 - progress, 3);
       case 'easeInOut':
-        return progress < 0.5 ? 4 * progress * progress * progress : 1 - Math.pow(-2 * progress + 2, 3) / 2;
+        return progress < 0.5
+          ? 4 * progress * progress * progress
+          : 1 - Math.pow(-2 * progress + 2, 3) / 2;
       case 'bounce':
         const n1 = 7.5625;
         const d1 = 2.75;
@@ -234,7 +272,11 @@ export class AnimationService {
     }
   }
 
-  private interpolate(from: string | number, to: string | number, progress: number): string | number {
+  private interpolate(
+    from: string | number,
+    to: string | number,
+    progress: number
+  ): string | number {
     if (typeof from === 'number' && typeof to === 'number') {
       return from + (to - from) * progress;
     }

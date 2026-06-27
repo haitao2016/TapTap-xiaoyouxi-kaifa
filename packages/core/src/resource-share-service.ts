@@ -1,5 +1,5 @@
 import { globalEventBus } from './event-bus';
-import { randomUUID } from 'node:crypto';
+import { randomUUID } from './utils/crypto-utils';
 
 export type ResourceCategory =
   | 'code'
@@ -15,12 +15,7 @@ export type ResourceStatus = 'pending' | 'approved' | 'rejected';
 
 export type ReportStatus = 'pending' | 'processing' | 'resolved' | 'rejected';
 
-export type ReportType =
-  | 'copyright'
-  | 'inappropriate'
-  | 'spam'
-  | 'malicious'
-  | 'other';
+export type ReportType = 'copyright' | 'inappropriate' | 'spam' | 'malicious' | 'other';
 
 export interface ResourceFile {
   name: string;
@@ -185,42 +180,41 @@ export class ResourceShareService {
   }
 
   getResources(options?: ResourceSearchOptions): ResourceSearchResult {
-    let result = this.resources.filter(r => r.status === 'approved');
+    let result = this.resources.filter((r) => r.status === 'approved');
 
     if (options?.status) {
-      result = this.resources.filter(r => r.status === options.status);
+      result = this.resources.filter((r) => r.status === options.status);
     }
 
     if (options?.query) {
       const query = options.query.toLowerCase();
-      result = result.filter(r =>
-        r.title.toLowerCase().includes(query) ||
-        r.description.toLowerCase().includes(query) ||
-        r.tags.some(t => t.toLowerCase().includes(query)) ||
-        r.authorName.toLowerCase().includes(query)
+      result = result.filter(
+        (r) =>
+          r.title.toLowerCase().includes(query) ||
+          r.description.toLowerCase().includes(query) ||
+          r.tags.some((t) => t.toLowerCase().includes(query)) ||
+          r.authorName.toLowerCase().includes(query)
       );
     }
 
     if (options?.category) {
-      result = result.filter(r => r.category === options.category);
+      result = result.filter((r) => r.category === options.category);
     }
 
     if (options?.tags && options.tags.length > 0) {
-      result = result.filter(r =>
-        options.tags!.some(tag => r.tags.includes(tag))
-      );
+      result = result.filter((r) => options.tags!.some((tag) => r.tags.includes(tag)));
     }
 
     if (options?.authorId) {
-      result = result.filter(r => r.authorId === options.authorId);
+      result = result.filter((r) => r.authorId === options.authorId);
     }
 
     if (options?.isFeatured) {
-      result = result.filter(r => r.isFeatured);
+      result = result.filter((r) => r.isFeatured);
     }
 
     if (options?.maxPoints !== undefined) {
-      result = result.filter(r => r.pointsCost <= options.maxPoints!);
+      result = result.filter((r) => r.pointsCost <= options.maxPoints!);
     }
 
     const sortBy = options?.sortBy || 'created';
@@ -262,7 +256,7 @@ export class ResourceShareService {
     const totalPages = Math.ceil(total / pageSize);
 
     return {
-      resources: result.slice(start, end).map(r => this.enrichResource(r)),
+      resources: result.slice(start, end).map((r) => this.enrichResource(r)),
       total,
       page,
       pageSize,
@@ -271,7 +265,7 @@ export class ResourceShareService {
   }
 
   getResourceById(resourceId: string): Resource | undefined {
-    const resource = this.resources.find(r => r.id === resourceId);
+    const resource = this.resources.find((r) => r.id === resourceId);
     if (resource) {
       resource.views++;
       return this.enrichResource(resource);
@@ -280,34 +274,34 @@ export class ResourceShareService {
   }
 
   getMyResources(status?: ResourceStatus): Resource[] {
-    let result = this.resources.filter(r => r.authorId === this.currentUserId);
+    let result = this.resources.filter((r) => r.authorId === this.currentUserId);
     if (status) {
-      result = result.filter(r => r.status === status);
+      result = result.filter((r) => r.status === status);
     }
-    return result.map(r => this.enrichResource(r));
+    return result.map((r) => this.enrichResource(r));
   }
 
   getFeaturedResources(limit = 10): Resource[] {
     return this.resources
-      .filter(r => r.status === 'approved' && r.isFeatured)
+      .filter((r) => r.status === 'approved' && r.isFeatured)
       .slice(0, limit)
-      .map(r => this.enrichResource(r));
+      .map((r) => this.enrichResource(r));
   }
 
   getNewestResources(limit = 10): Resource[] {
     return this.resources
-      .filter(r => r.status === 'approved')
+      .filter((r) => r.status === 'approved')
       .sort((a, b) => b.createdAt - a.createdAt)
       .slice(0, limit)
-      .map(r => this.enrichResource(r));
+      .map((r) => this.enrichResource(r));
   }
 
   getMostDownloadedResources(limit = 10): Resource[] {
     return this.resources
-      .filter(r => r.status === 'approved')
+      .filter((r) => r.status === 'approved')
       .sort((a, b) => b.downloads - a.downloads)
       .slice(0, limit)
-      .map(r => this.enrichResource(r));
+      .map((r) => this.enrichResource(r));
   }
 
   async uploadResource(data: ResourceUploadData): Promise<Resource> {
@@ -348,7 +342,7 @@ export class ResourceShareService {
   }
 
   async updateResource(resourceId: string, data: Partial<ResourceUploadData>): Promise<Resource> {
-    const resource = this.resources.find(r => r.id === resourceId);
+    const resource = this.resources.find((r) => r.id === resourceId);
     if (!resource) {
       throw new Error(`资源不存在: ${resourceId}`);
     }
@@ -370,7 +364,7 @@ export class ResourceShareService {
   }
 
   async removeResource(resourceId: string): Promise<void> {
-    const resource = this.resources.find(r => r.id === resourceId);
+    const resource = this.resources.find((r) => r.id === resourceId);
     if (!resource) {
       throw new Error(`资源不存在: ${resourceId}`);
     }
@@ -379,7 +373,7 @@ export class ResourceShareService {
       throw new Error('无权删除此资源');
     }
 
-    const index = this.resources.findIndex(r => r.id === resourceId);
+    const index = this.resources.findIndex((r) => r.id === resourceId);
     if (index >= 0) {
       this.resources.splice(index, 1);
     }
@@ -391,7 +385,7 @@ export class ResourceShareService {
   }
 
   async downloadResource(resourceId: string): Promise<boolean> {
-    const resource = this.resources.find(r => r.id === resourceId);
+    const resource = this.resources.find((r) => r.id === resourceId);
     if (!resource || resource.status !== 'approved') {
       throw new Error('资源不存在或未通过审核');
     }
@@ -402,7 +396,7 @@ export class ResourceShareService {
     }
 
     const alreadyDownloaded = this.downloadRecords.some(
-      r => r.resourceId === resourceId && r.userId === this.currentUserId
+      (r) => r.resourceId === resourceId && r.userId === this.currentUserId
     );
 
     if (alreadyDownloaded) {
@@ -426,7 +420,13 @@ export class ResourceShareService {
     resource.downloads++;
 
     if (resource.authorId !== this.currentUserId) {
-      this.addPointsRecordForUser(resource.authorId, 'earn', Math.floor(resource.pointsCost * 0.7), `资源被下载: ${resource.title}`, resourceId);
+      this.addPointsRecordForUser(
+        resource.authorId,
+        'earn',
+        Math.floor(resource.pointsCost * 0.7),
+        `资源被下载: ${resource.title}`,
+        resourceId
+      );
     }
 
     globalEventBus.emit({
@@ -438,7 +438,7 @@ export class ResourceShareService {
   }
 
   toggleFavorite(resourceId: string): boolean {
-    const resource = this.resources.find(r => r.id === resourceId);
+    const resource = this.resources.find((r) => r.id === resourceId);
     if (!resource) {
       throw new Error(`资源不存在: ${resourceId}`);
     }
@@ -459,7 +459,7 @@ export class ResourceShareService {
   }
 
   toggleLike(resourceId: string): boolean {
-    const resource = this.resources.find(r => r.id === resourceId);
+    const resource = this.resources.find((r) => r.id === resourceId);
     if (!resource) {
       throw new Error(`资源不存在: ${resourceId}`);
     }
@@ -497,7 +497,7 @@ export class ResourceShareService {
   }
 
   addToCollection(collectionId: string, resourceId: string): void {
-    const collection = this.favoriteCollections.find(c => c.id === collectionId);
+    const collection = this.favoriteCollections.find((c) => c.id === collectionId);
     if (collection && !collection.resourceIds.includes(resourceId)) {
       collection.resourceIds.push(resourceId);
       collection.updatedAt = Date.now();
@@ -505,22 +505,25 @@ export class ResourceShareService {
   }
 
   removeFromCollection(collectionId: string, resourceId: string): void {
-    const collection = this.favoriteCollections.find(c => c.id === collectionId);
+    const collection = this.favoriteCollections.find((c) => c.id === collectionId);
     if (collection) {
-      collection.resourceIds = collection.resourceIds.filter(id => id !== resourceId);
+      collection.resourceIds = collection.resourceIds.filter((id) => id !== resourceId);
       collection.updatedAt = Date.now();
     }
   }
 
   deleteCollection(collectionId: string): void {
-    const index = this.favoriteCollections.findIndex(c => c.id === collectionId);
+    const index = this.favoriteCollections.findIndex((c) => c.id === collectionId);
     if (index >= 0) {
       this.favoriteCollections.splice(index, 1);
     }
   }
 
-  getDownloadHistory(page = 1, pageSize = 20): { records: DownloadRecord[]; total: number; totalPages: number } {
-    const userRecords = this.downloadRecords.filter(r => r.userId === this.currentUserId);
+  getDownloadHistory(
+    page = 1,
+    pageSize = 20
+  ): { records: DownloadRecord[]; total: number; totalPages: number } {
+    const userRecords = this.downloadRecords.filter((r) => r.userId === this.currentUserId);
     const total = userRecords.length;
     const totalPages = Math.ceil(total / pageSize);
     const start = (page - 1) * pageSize;
@@ -546,8 +549,11 @@ export class ResourceShareService {
     return points;
   }
 
-  getPointsHistory(page = 1, pageSize = 20): { records: PointsRecord[]; total: number; totalPages: number } {
-    const userRecords = this.pointsRecords.filter(r => r.userId === this.currentUserId);
+  getPointsHistory(
+    page = 1,
+    pageSize = 20
+  ): { records: PointsRecord[]; total: number; totalPages: number } {
+    const userRecords = this.pointsRecords.filter((r) => r.userId === this.currentUserId);
     const total = userRecords.length;
     const totalPages = Math.ceil(total / pageSize);
     const start = (page - 1) * pageSize;
@@ -559,7 +565,7 @@ export class ResourceShareService {
   }
 
   async reportResource(resourceId: string, type: ReportType, description: string): Promise<Report> {
-    const resource = this.resources.find(r => r.id === resourceId);
+    const resource = this.resources.find((r) => r.id === resourceId);
     if (!resource) {
       throw new Error(`资源不存在: ${resourceId}`);
     }
@@ -586,10 +592,14 @@ export class ResourceShareService {
   }
 
   getMyReports(): Report[] {
-    return this.reports.filter(r => r.reporterId === this.currentUserId);
+    return this.reports.filter((r) => r.reporterId === this.currentUserId);
   }
 
-  getResourceReviews(resourceId: string, page = 1, pageSize = 10): { reviews: ResourceReview[]; total: number; totalPages: number } {
+  getResourceReviews(
+    resourceId: string,
+    page = 1,
+    pageSize = 10
+  ): { reviews: ResourceReview[]; total: number; totalPages: number } {
     const reviews = this.reviews.get(resourceId) || [];
     const total = reviews.length;
     const totalPages = Math.ceil(total / pageSize);
@@ -602,7 +612,7 @@ export class ResourceShareService {
   }
 
   async addReview(resourceId: string, rating: number, content: string): Promise<ResourceReview> {
-    const resource = this.resources.find(r => r.id === resourceId);
+    const resource = this.resources.find((r) => r.id === resourceId);
     if (!resource) {
       throw new Error(`资源不存在: ${resourceId}`);
     }
@@ -620,7 +630,7 @@ export class ResourceShareService {
     };
 
     const existingReviews = this.reviews.get(resourceId) || [];
-    const existingIndex = existingReviews.findIndex(r => r.userId === this.currentUserId);
+    const existingIndex = existingReviews.findIndex((r) => r.userId === this.currentUserId);
 
     if (existingIndex >= 0) {
       review.id = existingReviews[existingIndex].id;
@@ -654,11 +664,13 @@ export class ResourceShareService {
     };
 
     const categoryMap = new Map<ResourceCategory, number>();
-    this.resources.filter(r => r.status === 'approved').forEach(r => {
-      categoryMap.set(r.category, (categoryMap.get(r.category) || 0) + 1);
-    });
+    this.resources
+      .filter((r) => r.status === 'approved')
+      .forEach((r) => {
+        categoryMap.set(r.category, (categoryMap.get(r.category) || 0) + 1);
+      });
 
-    return (Object.keys(categoryMeta) as ResourceCategory[]).map(id => ({
+    return (Object.keys(categoryMeta) as ResourceCategory[]).map((id) => ({
       id,
       name: categoryMeta[id].name,
       icon: categoryMeta[id].icon,
@@ -668,17 +680,28 @@ export class ResourceShareService {
 
   getAllTags(): string[] {
     const tagSet = new Set<string>();
-    this.resources.filter(r => r.status === 'approved').forEach(r =>
-      r.tags.forEach(t => tagSet.add(t))
-    );
+    this.resources
+      .filter((r) => r.status === 'approved')
+      .forEach((r) => r.tags.forEach((t) => tagSet.add(t)));
     return [...tagSet].sort();
   }
 
-  private addPointsRecord(type: 'earn' | 'spend', amount: number, reason: string, resourceId?: string): void {
+  private addPointsRecord(
+    type: 'earn' | 'spend',
+    amount: number,
+    reason: string,
+    resourceId?: string
+  ): void {
     this.addPointsRecordForUser(this.currentUserId, type, amount, reason, resourceId);
   }
 
-  private addPointsRecordForUser(userId: string, type: 'earn' | 'spend', amount: number, reason: string, resourceId?: string): void {
+  private addPointsRecordForUser(
+    userId: string,
+    type: 'earn' | 'spend',
+    amount: number,
+    reason: string,
+    resourceId?: string
+  ): void {
     const record: PointsRecord = {
       id: randomUUID(),
       userId,
@@ -755,11 +778,10 @@ export class ResourceShareService {
         if (saved) {
           const data: string[] = JSON.parse(saved);
           const favorites = this.getUserFavorites();
-          data.forEach(id => favorites.add(id));
+          data.forEach((id) => favorites.add(id));
         }
       }
-    } catch {
-    }
+    } catch {}
   }
 
   private saveUserFavorites(): void {
@@ -768,8 +790,7 @@ export class ResourceShareService {
         const favorites = this.getUserFavorites();
         localStorage.setItem('tapdev-resource-favorites', JSON.stringify([...favorites]));
       }
-    } catch {
-    }
+    } catch {}
   }
 
   private loadUserLikes(): void {
@@ -779,11 +800,10 @@ export class ResourceShareService {
         if (saved) {
           const data: string[] = JSON.parse(saved);
           const likes = this.getUserLikes();
-          data.forEach(id => likes.add(id));
+          data.forEach((id) => likes.add(id));
         }
       }
-    } catch {
-    }
+    } catch {}
   }
 
   private saveUserLikes(): void {
@@ -792,8 +812,7 @@ export class ResourceShareService {
         const likes = this.getUserLikes();
         localStorage.setItem('tapdev-resource-likes', JSON.stringify([...likes]));
       }
-    } catch {
-    }
+    } catch {}
   }
 
   private loadMockResources(): void {
@@ -804,8 +823,10 @@ export class ResourceShareService {
       {
         id: 'res-001',
         title: '自制关卡编辑器脚本分享',
-        description: '一个简单但实用的关卡编辑器脚本，支持拖拽放置瓦片，导出JSON格式。用了两周时间写的，希望对大家有帮助。',
-        content: '## 功能特点\n- 支持多种瓦片类型\n- 拖拽式编辑\n- 一键导出JSON\n- 支持自定义瓦片大小',
+        description:
+          '一个简单但实用的关卡编辑器脚本，支持拖拽放置瓦片，导出JSON格式。用了两周时间写的，希望对大家有帮助。',
+        content:
+          '## 功能特点\n- 支持多种瓦片类型\n- 拖拽式编辑\n- 一键导出JSON\n- 支持自定义瓦片大小',
         authorId: 'user-101',
         authorName: '游戏达人',
         authorAvatar: 'user-101.png',
@@ -832,7 +853,8 @@ export class ResourceShareService {
       {
         id: 'res-002',
         title: '像素风格怪物素材包',
-        description: '自己画的一组像素风格怪物素材，共8只怪物，每只都有4个方向的行走动画。免费分享给大家！',
+        description:
+          '自己画的一组像素风格怪物素材，共8只怪物，每只都有4个方向的行走动画。免费分享给大家！',
         authorId: 'user-102',
         authorName: '像素画家',
         authorAvatar: 'user-102.png',
@@ -859,8 +881,10 @@ export class ResourceShareService {
       {
         id: 'res-003',
         title: 'Roguelike开发经验分享',
-        description: '开发Roguelike游戏一年多了，总结了一些经验和踩过的坑。包括随机地图生成、物品系统、战斗系统等方面。',
-        content: '## 前言\n\n接触Roguelike游戏开发已经一年多了，从最开始的兴趣使然，到现在完成了自己的第一个独立游戏。一路上踩了很多坑，也积累了一些经验，想在这里和大家分享一下。',
+        description:
+          '开发Roguelike游戏一年多了，总结了一些经验和踩过的坑。包括随机地图生成、物品系统、战斗系统等方面。',
+        content:
+          '## 前言\n\n接触Roguelike游戏开发已经一年多了，从最开始的兴趣使然，到现在完成了自己的第一个独立游戏。一路上踩了很多坑，也积累了一些经验，想在这里和大家分享一下。',
         authorId: 'user-103',
         authorName: '独立游戏开发者',
         authorAvatar: 'user-103.png',
@@ -886,7 +910,8 @@ export class ResourceShareService {
       {
         id: 'res-004',
         title: '自制音效：UI交互音效包',
-        description: '用合成软件做的一组UI交互音效，包括按钮点击、弹窗出现、提示音等共20个音效。MP3和WAV双格式。',
+        description:
+          '用合成软件做的一组UI交互音效，包括按钮点击、弹窗出现、提示音等共20个音效。MP3和WAV双格式。',
         authorId: 'user-104',
         authorName: '音效爱好者',
         authorAvatar: 'user-104.png',
@@ -912,7 +937,8 @@ export class ResourceShareService {
       {
         id: 'res-005',
         title: '战斗伤害数字插件',
-        description: '一个轻量级的伤害数字显示插件，支持暴击、治疗、闪避等多种效果，可自定义动画和样式。',
+        description:
+          '一个轻量级的伤害数字显示插件，支持暴击、治疗、闪避等多种效果，可自定义动画和样式。',
         authorId: 'user-105',
         authorName: '插件达人',
         authorAvatar: 'user-105.png',
@@ -939,7 +965,8 @@ export class ResourceShareService {
       {
         id: 'res-006',
         title: '手游UI界面设计稿',
-        description: '一套手游UI界面设计稿，PSD格式，包含主界面、战斗界面、商城界面、背包界面等。仅供学习参考。',
+        description:
+          '一套手游UI界面设计稿，PSD格式，包含主界面、战斗界面、商城界面、背包界面等。仅供学习参考。',
         authorId: 'user-106',
         authorName: 'UI设计师',
         authorAvatar: 'user-106.png',
@@ -964,8 +991,10 @@ export class ResourceShareService {
       {
         id: 'res-007',
         title: '新手向：用TapDev做第一个游戏',
-        description: '写给完全零基础的新手的教程，从安装到做出第一个简单的小游戏，图文并茂，一步步带你入门。',
-        content: '## 准备工作\n\n在开始之前，我们需要先安装TapDev编辑器。请访问官方网站下载最新版本...',
+        description:
+          '写给完全零基础的新手的教程，从安装到做出第一个简单的小游戏，图文并茂，一步步带你入门。',
+        content:
+          '## 准备工作\n\n在开始之前，我们需要先安装TapDev编辑器。请访问官方网站下载最新版本...',
         authorId: 'user-107',
         authorName: '入门导师',
         authorAvatar: 'user-107.png',
@@ -1027,9 +1056,7 @@ export class ResourceShareService {
         reviewerId: 'admin-001',
         reviewedAt: now - 5 * day,
         version: '1.0.0',
-        files: [
-          { name: 'assets.zip', size: 10485760, type: 'archive' },
-        ],
+        files: [{ name: 'assets.zip', size: 10485760, type: 'archive' }],
         totalSize: 10485760,
         previewImages: [],
         downloads: 0,
@@ -1070,7 +1097,8 @@ export class ResourceShareService {
       {
         id: 'res-011',
         title: '游戏中的数学：从入门到精通',
-        description: '系统整理了游戏开发中常用的数学知识，包括向量、矩阵、插值、碰撞检测等。适合数学基础薄弱的同学。',
+        description:
+          '系统整理了游戏开发中常用的数学知识，包括向量、矩阵、插值、碰撞检测等。适合数学基础薄弱的同学。',
         content: '## 目录\n\n1. 向量运算基础\n2. 矩阵变换\n3. 插值算法\n4. 碰撞检测\n5. 物理模拟',
         authorId: 'user-111',
         authorName: '数学老师',
@@ -1097,7 +1125,8 @@ export class ResourceShareService {
       {
         id: 'res-012',
         title: '背景音乐：轻快游戏BGM',
-        description: '自己作曲的一首轻快风格的游戏背景音乐，循环优化过，可以用于休闲类游戏。免费使用，只需署名即可。',
+        description:
+          '自己作曲的一首轻快风格的游戏背景音乐，循环优化过，可以用于休闲类游戏。免费使用，只需署名即可。',
         authorId: 'user-112',
         authorName: '业余作曲家',
         authorAvatar: 'user-112.png',

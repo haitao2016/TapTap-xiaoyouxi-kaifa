@@ -67,7 +67,7 @@ export async function startUnityBuild(config: BuildConfig): Promise<string> {
         cdnUrl: config.cdnUrl,
         appId: config.appId,
       },
-      (progress) => {
+      (progress: { progress: number; message?: string }) => {
         broadcast('native:build-progress', {
           taskId,
           progress: progress.progress,
@@ -75,7 +75,7 @@ export async function startUnityBuild(config: BuildConfig): Promise<string> {
         });
       }
     )
-    .then((result) => {
+    .then((result: { success: boolean; outputFiles: string[]; errors: string[]; warnings: string[] }) => {
       const task = buildTasks.get(taskId);
       if (task?.cancelled) {
         unityBuildRunner.cancel();
@@ -96,7 +96,7 @@ export async function startUnityBuild(config: BuildConfig): Promise<string> {
       broadcast('native:build-complete', buildResult);
       buildTasks.delete(taskId);
     })
-    .catch((err) => {
+    .catch((err: Error) => {
       const task = buildTasks.get(taskId);
       if (task?.cancelled) {
         unityBuildRunner.cancel();
