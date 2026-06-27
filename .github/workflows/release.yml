@@ -10,6 +10,9 @@ on:
         description: '版本号 (如 v0.2.0)'
         required: false
 
+env:
+  NODE_OPTIONS: '--max-old-space-size=8192'
+
 jobs:
   build-desktop:
     name: Build Desktop App (${{ matrix.os }})
@@ -20,13 +23,10 @@ jobs:
         include:
           - os: windows-latest
             platform: win
-            artifact: TapDev-Studio-*.exe
           - os: macos-latest
             platform: mac
-            artifact: TapDev-Studio-*.dmg
           - os: ubuntu-latest
             platform: linux
-            artifact: TapDev-Studio-*.AppImage
 
     steps:
       - uses: actions/checkout@v4
@@ -37,7 +37,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'pnpm'
 
       - name: Install dependencies
@@ -51,12 +51,40 @@ jobs:
           CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
           WIN_CSC_LINK: ${{ secrets.WIN_CSC_LINK }}
           WIN_CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
+          CSC_IDENTITY_AUTO_DISCOVERY: ${{ matrix.platform == 'mac' && secrets.CSC_LINK != '' || 'false' }}
 
-      - name: Upload artifact
+      - name: List build artifacts
+        shell: bash
+        run: ls -la apps/desktop/release/ || echo "No release directory"
+
+      - name: Upload Windows artifacts
+        if: matrix.platform == 'win'
         uses: actions/upload-artifact@v4
         with:
-          name: tapdev-studio-${{ matrix.platform }}
-          path: apps/desktop/release/${{ matrix.artifact }}
+          name: tapdev-studio-win
+          path: |
+            apps/desktop/release/*.exe
+            apps/desktop/release/*.zip
+          if-no-files-found: error
+
+      - name: Upload macOS artifacts
+        if: matrix.platform == 'mac'
+        uses: actions/upload-artifact@v4
+        with:
+          name: tapdev-studio-mac
+          path: |
+            apps/desktop/release/*.dmg
+            apps/desktop/release/*.zip
+          if-no-files-found: error
+
+      - name: Upload Linux artifacts
+        if: matrix.platform == 'linux'
+        uses: actions/upload-artifact@v4
+        with:
+          name: tapdev-studio-linux
+          path: |
+            apps/desktop/release/*.AppImage
+            apps/desktop/release/*.deb
           if-no-files-found: error
 
   create-release:
@@ -70,13 +98,19 @@ jobs:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
 
+      - name: List downloaded artifacts
+        run: ls -laR tapdev-studio-*/
+
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
             tapdev-studio-win/*.exe
+            tapdev-studio-win/*.zip
             tapdev-studio-mac/*.dmg
+            tapdev-studio-mac/*.zip
             tapdev-studio-linux/*.AppImage
+            tapdev-studio-linux/*.deb
           generate_release_notes: true
           draft: false
           prerelease: false
@@ -95,7 +129,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: '22'
           cache: 'pnpm'
 
       - name: Install dependencies
