@@ -2,8 +2,8 @@
     name: Plan a deploy
     command: |
       circleci run release plan \
-        --environment-name="dwasd" \
-        --component-name="dawdad" \
+        --environment-name="dwasdawa" \
+        --component-name="fadadad" \
         --target-version="<some-version-name>"
 # Your job here doing the actual deployment
 - run:
