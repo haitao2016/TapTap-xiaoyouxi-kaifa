@@ -6,6 +6,7 @@
     "outDir": "dist",
     "noEmit": false,
     "allowImportingTsExtensions": false,
+
     "baseUrl": ".",
     "paths": {
       "@tapdev/server": ["../../packages/server/src"],
