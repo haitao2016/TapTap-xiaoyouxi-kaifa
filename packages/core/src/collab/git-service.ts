@@ -8,6 +8,8 @@
  */
 import { globalEventBus } from '../event-bus';
 import { spawn } from 'child_process';
+import { randomUUID } from 'node:crypto';
+import * as fsPromises from 'fs/promises';
 import fs from 'node:fs';
 import { randomUUID } from '../utils/crypto-utils';
 
@@ -475,6 +477,7 @@ export class GitService {
    */
   async parseConflicts(filePath: string): Promise<MergeConflictRegion[]> {
     try {
+      const content = await fsPromises.readFile(filePath, 'utf-8');
       const content = await (fs as any).promises.readFile(filePath, 'utf-8');
       return this.parseConflictMarkers(content, filePath);
     } catch {
@@ -491,6 +494,7 @@ export class GitService {
     strategy: 'ours' | 'theirs' | 'manual',
     manualContent?: string
   ): Promise<boolean> {
+    let content = await fsPromises.readFile(filePath, 'utf-8');
     let content = await (fs as any).promises.readFile(filePath, 'utf-8');
     for (const region of regions) {
       const blockRegex = new RegExp(
@@ -505,6 +509,7 @@ export class GitService {
             : (manualContent ?? region.ours);
       content = content.replace(blockRegex, replacement);
     }
+    await fsPromises.writeFile(filePath, content, 'utf-8');
     await (fs as any).promises.writeFile(filePath, content, 'utf-8');
     await this.exec(['add', filePath]);
     globalEventBus.emit({ type: 'git:conflict-resolved', payload: { filePath, strategy } });

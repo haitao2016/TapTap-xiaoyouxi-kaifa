@@ -51,6 +51,19 @@ export type {
   AIAssistantConfig,
 } from './ai-assistant-service';
 
+export {
+  getRaindropClient,
+  isRaindropEnabled,
+  trackAIEvent,
+  trackAIStreamStart,
+  trackAIStreamComplete,
+  trackAIReview,
+  trackAIDocGen,
+  trackAITutor,
+  trackAIModelSwitch,
+  flushRaindrop,
+} from './raindrop-integration';
+export type { RaindropConfig, AIInstrumentationOptions } from './raindrop-integration';
 export { codeReviewService } from './code-review-service';
 export type {
   IssueSeverity,

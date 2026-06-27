@@ -49,6 +49,10 @@
     "playwright": "^1.61.1",
     "prettier": "^3.4.0",
     "ts-jest": "^29.4.11",
+    "typescript": "^6.0.3"
+  },
+  "dependencies": {
+    "raindrop-ai": "^0.1.4"
     "typescript": "^5.7.2"
   }
 }

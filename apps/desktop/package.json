@@ -19,6 +19,7 @@
   "dependencies": {
     "@tapdev/server": "workspace:*",
     "@tapdev/types": "workspace:*",
+    "electron-updater": "^6.8.9"
     "node-llama-cpp": "^3.1.0"
   },
   "devDependencies": {
@@ -46,16 +47,23 @@
       {
         "from": "../../templates/unity",
         "to": "templates/unity",
-        "filter": ["**/*"]
+        "filter": [
+          "**/*"
+        ]
       }
     ],
     "asar": false,
     "win": {
       "target": [
-        { "target": "nsis", "arch": ["x64"] },
-        { "target": "zip", "arch": ["x64"] }
+        {
+          "target": "zip",
+          "arch": [
+            "x64"
+          ]
+        }
       ],
-      "artifactName": "${productName}-${version}-win-${arch}.${ext}"
+      "artifactName": "${productName}-${version}-win-${arch}.${ext}",
+      "sign": null
     },
     "nsis": {
       "oneClick": false,
@@ -65,14 +73,20 @@
       "shortcutName": "TapDev Studio"
     },
     "mac": {
-      "target": ["dmg", "zip"],
+      "target": [
+        "dmg",
+        "zip"
+      ],
       "category": "public.app-category.developer-tools",
       "artifactName": "${productName}-${version}-mac.${ext}",
       "hardenedRuntime": true,
       "gatekeeperAssess": false
     },
     "linux": {
-      "target": ["AppImage", "deb"],
+      "target": [
+        "AppImage",
+        "deb"
+      ],
       "category": "Development",
       "artifactName": "${productName}-${version}-linux.${ext}"
     }
