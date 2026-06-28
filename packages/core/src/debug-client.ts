@@ -3,6 +3,7 @@ import type {
   DebugLogEntry,
   Breakpoint,
   WSMessage,
+  WSMessageMap,
   BreakpointSyncPayload,
 } from '@tapdev/types';
 import { randomUUID } from './utils/crypto-utils';
@@ -59,8 +60,8 @@ export class DebugWebSocketClient {
     this.send({ type: 'breakpoint-remove', payload: { id } });
   }
 
-  updateBreakpoint(id: string, updates: Partial<Breakpoint>): void {
-    this.send({ type: 'breakpoint-update', payload: { id, updates } });
+  updateBreakpoint(id: string, updates: { enabled?: boolean; condition?: string }): void {
+    this.send({ type: 'breakpoint-update', payload: { id, ...updates } });
   }
 
   isConnected(): boolean {
@@ -106,34 +107,28 @@ export class DebugWebSocketClient {
   private handleMessage(msg: WSMessage): void {
     switch (msg.type) {
       case 'connected': {
-        const payload = msg.payload as {
-          sessionId?: string;
-          status?: { url: string; wsUrl: string };
-        };
-        this.events.onSessionUpdate?.({
-          id: payload.sessionId,
-          qrCodeUrl: payload.status?.url,
-          wsUrl: payload.status?.wsUrl,
-        });
+        const payload = msg.payload as WSMessageMap['connected'];
+        if (payload) {
+          this.events.onSessionUpdate?.({
+            id: payload.sessionId,
+            qrCodeUrl: payload.status?.url,
+            wsUrl: payload.status?.wsUrl,
+          });
+        }
         break;
       }
       case 'log': {
-        const payload = msg.payload as {
-          id?: string;
-          level: DebugLogEntry['level'];
-          message: string;
-          source?: string;
-          data?: unknown;
-          timestamp?: number;
-        };
-        this.events.onLog?.({
-          id: payload.id ?? randomUUID(),
-          level: payload.level,
-          message: payload.message,
-          source: payload.source,
-          timestamp: payload.timestamp ?? Date.now(),
-          data: payload.data,
-        });
+        const payload = msg.payload as WSMessageMap['log'];
+        if (payload) {
+          this.events.onLog?.({
+            id: randomUUID(),
+            level: payload.level,
+            message: payload.message,
+            source: payload.source,
+            timestamp: Date.now(),
+            data: payload.data,
+          });
+        }
         break;
       }
       case 'game-connected':
@@ -144,26 +139,31 @@ export class DebugWebSocketClient {
         this.events.onGameDisconnected?.();
         this.events.onSessionUpdate?.({ gameConnected: false });
         break;
-      case 'breakpoint-sync':
-        this.events.onBreakpointsSync?.((msg.payload as BreakpointSyncPayload).breakpoints);
+      case 'breakpoint-sync': {
+        const payload = msg.payload as WSMessageMap['breakpoint-sync'];
+        if (payload) {
+          this.events.onBreakpointsSync?.(payload.breakpoints);
+        }
         break;
+      }
       case 'breakpoint-hit': {
-        const payload = msg.payload as { breakpointId?: string; vars?: Record<string, unknown> };
-        const breakpointId = payload.breakpointId ?? '';
-        this.events.onBreakpointHit?.(breakpointId, payload.vars);
-        this.events.onLog?.({
-          id: randomUUID(),
-          level: 'warn',
-          message: `断点命中: ${breakpointId}`,
-          timestamp: Date.now(),
-          source: 'game',
-        });
+        const payload = msg.payload as WSMessageMap['breakpoint-hit'];
+        if (payload) {
+          this.events.onBreakpointHit?.(payload.id, payload.vars);
+          this.events.onLog?.({
+            id: randomUUID(),
+            level: 'warn',
+            message: `断点命中: ${payload.file}:${payload.line}`,
+            timestamp: Date.now(),
+            source: 'game',
+          });
+        }
         break;
       }
     }
   }
 
-  private send(msg: WSMessage): void {
+  private send<T extends keyof WSMessageMap>(msg: { type: T; payload?: WSMessageMap[T] }): void {
     if (this.ws?.readyState === WebSocket.OPEN) {
       this.ws.send(JSON.stringify({ ...msg, timestamp: Date.now() }));
     }
