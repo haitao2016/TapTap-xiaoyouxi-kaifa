@@ -19,6 +19,7 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "types": ["jest", "node"]
+    "types": ["jest", "node"],
+    "typeRoots": ["./node_modules/@types", "./types"]
   }
 }
