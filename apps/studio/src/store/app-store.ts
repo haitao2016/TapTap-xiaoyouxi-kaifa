@@ -74,6 +74,7 @@ interface AppState {
   closeTab: (tabId: string) => void;
   setActiveTab: (tabId: string) => void;
   updateTabContent: (tabId: string, content: string) => void;
+  saveFile: (tabId: string) => void;
   updateSettings: (settings: Partial<AppSettings>) => void;
 
   setPlugins: (plugins: PluginInfo[]) => void;
@@ -261,7 +262,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       id: randomUUID(),
       path,
       name: path.split(/[/\\]/).pop() ?? path,
-      content: content || getDefaultContent(path),
+      content: content ?? (get().currentProject ? projectManager.readFile(path, get().currentProject?.path) : getDefaultContent(path)),
       language: langMap[ext] ?? 'plaintext',
       modified: false,
     };
@@ -285,6 +286,16 @@ export const useAppStore = create<AppState>((set, get) => ({
   updateTabContent: (tabId, content) => {
     set((s) => ({
       editorTabs: s.editorTabs.map((t) => (t.id === tabId ? { ...t, content, modified: true } : t)),
+    }));
+  },
+
+  saveFile: (tabId) => {
+    const tab = get().editorTabs.find((t) => t.id === tabId);
+    if (!tab) return;
+
+    projectManager.writeFile(tab.path, tab.content, get().currentProject?.path);
+    set((s) => ({
+      editorTabs: s.editorTabs.map((t) => (t.id === tabId ? { ...t, modified: false } : t)),
     }));
   },
 
