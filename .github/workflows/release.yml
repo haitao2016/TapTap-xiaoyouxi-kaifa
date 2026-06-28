@@ -47,14 +47,16 @@ jobs:
         run: pnpm --filter @tapdev/desktop dist:${{ matrix.platform }}
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          - name: Build Desktop App
+        run: pnpm --filter @tapdev/desktop dist:${{ matrix.platform }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CSC_LINK: ${{ secrets.CSC_LINK }}
           CSC_KEY_PASSWORD: ${{ secrets.CSC_KEY_PASSWORD }}
           WIN_CSC_LINK: ${{ secrets.WIN_CSC_LINK }}
           WIN_CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
-          CSC_IDENTITY_AUTO_DISCOVERY: ${{ matrix.platform == 'mac' && secrets.CSC_LINK != '' || 'false' }}
-
-      - name: List build artifacts
-        shell: bash
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'          # ← 新增
+          WIN_CSC_IDENTITY_AUTO_DISCOVERY: 'false'      # ← 新增
         run: ls -la apps/desktop/release/ || echo "No release directory"
 
       - name: Upload Windows artifacts
