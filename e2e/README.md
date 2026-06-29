@@ -34,10 +34,10 @@ e2e/
 
 1. 安装依赖：
 ```bash
-npm install
-# 或
 pnpm install
 ```
+
+> Playwright 配置会自动通过 `pnpm dev` 启动开发服务器，请先确保本机可用 `pnpm` 命令。
 
 2. 安装 Playwright 浏览器：
 ```bash
@@ -47,26 +47,26 @@ npx playwright install
 ### 运行所有测试
 
 ```bash
-npm run test:e2e
+pnpm test:e2e
 ```
 
 ### 运行特定浏览器测试
 
 ```bash
 # 仅 Chrome
-npm run test:e2e -- --project=chromium
+pnpm test:e2e -- --project=chromium
 
 # 仅 Firefox
-npm run test:e2e -- --project=firefox
+pnpm test:e2e -- --project=firefox
 
 # 仅移动端
-npm run test:e2e -- --project="Mobile Chrome"
+pnpm test:e2e -- --project="Mobile Chrome"
 ```
 
 ### 以 UI 模式运行
 
 ```bash
-npm run test:e2e:ui
+pnpm test:e2e:ui
 ```
 
 ### 运行特定测试文件
@@ -78,7 +78,7 @@ npx playwright test e2e/home.spec.ts
 ### 生成测试报告
 
 ```bash
-npm run test:e2e:report
+pnpm test:e2e:report
 ```
 
 ## 测试配置

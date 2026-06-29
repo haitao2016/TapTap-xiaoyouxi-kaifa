@@ -34,13 +34,13 @@ tapdev-studio/
 ## 环境要求
 
 - Node.js >= 18
-- pnpm >= 8（推荐）
+- pnpm >= 8
 - Unity 2021.3+ / 2022.3+（真实构建时需要）
 - TapTap 小游戏 Unity SDK
 
 ## 安装说明
 
-### 使用 pnpm（推荐）
+### 使用 pnpm
 
 ```bash
 # 安装 pnpm（如未安装）
@@ -59,28 +59,18 @@ pnpm dev:desktop
 pnpm dev:server
 ```
 
-### 使用 npm（备选）
-
-如果无法使用 pnpm，可以使用 npm 作为备选方案：
-
-```bash
-# 安装依赖
-npm install
-
-# 开发模式
-npm run dev
-
-# 构建（可能需要调整）
-npm run build
-```
+根目录脚本和工作区配置都依赖 `pnpm`，因此请先确保本机可用 `pnpm` 命令。
 
 ### Windows PowerShell 注意事项
 
 如果在 Windows PowerShell 中遇到执行策略问题：
 
 ```powershell
-# 使用 .cmd 后缀运行 npm/pnpm
-npm.cmd install
+# 安装 pnpm（如未安装）
+npm.cmd install -g pnpm
+
+# 使用 .cmd 后缀运行 pnpm
+pnpm.cmd install
 pnpm.cmd dev
 
 # 或临时允许脚本执行
