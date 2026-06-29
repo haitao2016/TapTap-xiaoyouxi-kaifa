@@ -1,5 +1,5 @@
 import { globalEventBus } from './event-bus';
-import { generateId as randomUUID } from './utils/uuid';
+import { randomUUID } from './utils/crypto-utils';
 
 export interface StackFrame {
   id: string;
@@ -31,7 +31,10 @@ export class CallStackService {
   }
 
   getCurrentFrame(): StackFrame | undefined {
-    if (this.stack.currentFrameIndex >= 0 && this.stack.currentFrameIndex < this.stack.frames.length) {
+    if (
+      this.stack.currentFrameIndex >= 0 &&
+      this.stack.currentFrameIndex < this.stack.frames.length
+    ) {
       return this.stack.frames[this.stack.currentFrameIndex];
     }
     return undefined;
@@ -71,9 +74,9 @@ export class CallStackService {
     if (index >= 0 && index < this.stack.frames.length) {
       this.stack.currentFrameIndex = index;
       const frame = this.stack.frames[index];
-      globalEventBus.emit({ 
-        type: 'callstack:select', 
-        payload: { index, frame } 
+      globalEventBus.emit({
+        type: 'callstack:select',
+        payload: { index, frame },
       });
     }
   }
@@ -99,7 +102,7 @@ export class CallStackService {
   }
 
   updateFrameLocals(frameId: string, locals: Record<string, unknown>): void {
-    const frame = this.stack.frames.find(f => f.id === frameId);
+    const frame = this.stack.frames.find((f) => f.id === frameId);
     if (frame) {
       frame.locals = locals;
       globalEventBus.emit({ type: 'callstack:frameUpdate', payload: frame });

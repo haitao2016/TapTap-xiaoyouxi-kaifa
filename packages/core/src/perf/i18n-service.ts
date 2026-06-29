@@ -1,110 +1,90 @@
 /**
  * 国际化 (i18n) 服务
- * - 完整中英双语切换
- * - 时区、日期、数字本地化
- * - 文档多语言
- * - 复数形式处理
+ * - 多语言支持 (zh-CN, en-US, ja-JP)
+ * - 命名空间管理 (common, editor, debug, build, settings, plugins, dashboard, collab, ai, platform)
+ * - 延迟加载翻译资源
+ * - 日期、数字、货币本地化
+ * - 复数形式与性别变体
+ * - 翻译缺失 fallback 与警告
  */
 import { globalEventBus } from '../event-bus';
+import type { Namespace } from './i18n/index';
+import { NAMESPACES, defaultTranslations } from './i18n/index';
 
-export type Locale = 'zh-CN' | 'zh-TW' | 'en-US' | 'ja-JP' | 'ko-KR';
+// 静态加载所有 locales 的所有 namespaces
+import enCommon from './i18n/locales/en-US/common';
+import enEditor from './i18n/locales/en-US/editor';
+import enDebug from './i18n/locales/en-US/debug';
+import enBuild from './i18n/locales/en-US/build';
+import enSettings from './i18n/locales/en-US/settings';
+import enPlugins from './i18n/locales/en-US/plugins';
+import enDashboard from './i18n/locales/en-US/dashboard';
+import enCollab from './i18n/locales/en-US/collab';
+import enAi from './i18n/locales/en-US/ai';
+import enPlatform from './i18n/locales/en-US/platform';
+
+import jaCommon from './i18n/locales/ja-JP/common';
+import jaEditor from './i18n/locales/ja-JP/editor';
+import jaDebug from './i18n/locales/ja-JP/debug';
+import jaBuild from './i18n/locales/ja-JP/build';
+import jaSettings from './i18n/locales/ja-JP/settings';
+import jaPlugins from './i18n/locales/ja-JP/plugins';
+import jaDashboard from './i18n/locales/ja-JP/dashboard';
+import jaCollab from './i18n/locales/ja-JP/collab';
+import jaAi from './i18n/locales/ja-JP/ai';
+import jaPlatform from './i18n/locales/ja-JP/platform';
+
+const STATIC_TRANSLATIONS: Record<Locale, Record<Namespace, TranslationDict>> = {
+  'en-US': {
+    common: enCommon as TranslationDict,
+    editor: enEditor as TranslationDict,
+    debug: enDebug as TranslationDict,
+    build: enBuild as TranslationDict,
+    settings: enSettings as TranslationDict,
+    plugins: enPlugins as TranslationDict,
+    dashboard: enDashboard as TranslationDict,
+    collab: enCollab as TranslationDict,
+    ai: enAi as TranslationDict,
+    platform: enPlatform as TranslationDict,
+  },
+  'ja-JP': {
+    common: jaCommon as TranslationDict,
+    editor: jaEditor as TranslationDict,
+    debug: jaDebug as TranslationDict,
+    build: jaBuild as TranslationDict,
+    settings: jaSettings as TranslationDict,
+    plugins: jaPlugins as TranslationDict,
+    dashboard: jaDashboard as TranslationDict,
+    collab: jaCollab as TranslationDict,
+    ai: jaAi as TranslationDict,
+    platform: jaPlatform as TranslationDict,
+  },
+  'zh-CN': defaultTranslations as unknown as Record<Namespace, TranslationDict>,
+  'zh-TW': {} as Record<Namespace, TranslationDict>,
+  'ko-KR': {} as Record<Namespace, TranslationDict>,
+};
+
+export type Locale = 'zh-CN' | 'en-US' | 'ja-JP' | 'zh-TW' | 'ko-KR';
 
 export type TranslationKey = string;
 
-export type Translations = Record<Locale, Record<TranslationKey, string | string[]>>;
+export type TranslationDict = Record<TranslationKey, string>;
+
+export type NamespaceTranslations = Partial<Record<Namespace, TranslationDict>>;
+
+export type Translations = Record<Locale, NamespaceTranslations>;
 
 export interface I18nConfig {
   defaultLocale: Locale;
   fallbackLocale: Locale;
   available: Locale[];
+  defaultNS: Namespace;
+  fallbackNS: Namespace;
+  warnOnMissingKey: boolean;
+  debug: boolean;
 }
 
-const DEFAULT_TRANSLATIONS: Translations = {
-  'zh-CN': {
-    'app.title': 'TapDev Studio',
-    'app.welcome': '欢迎使用',
-    'menu.file': '文件',
-    'menu.edit': '编辑',
-    'menu.view': '视图',
-    'menu.run': '运行',
-    'menu.terminal': '终端',
-    'menu.help': '帮助',
-    'editor.open': '打开',
-    'editor.save': '保存',
-    'editor.saveAll': '全部保存',
-    'editor.untitled': '未命名',
-    'build.success': '构建成功',
-    'build.failed': '构建失败',
-    'debug.connect': '连接调试',
-    'debug.disconnect': '断开',
-    'plugin.install': '安装插件',
-    'plugin.uninstall': '卸载',
-    'settings.theme': '主题',
-    'settings.language': '语言',
-    'common.confirm': '确认',
-    'common.cancel': '取消',
-    'common.close': '关闭',
-    'common.yes': '是',
-    'common.no': '否',
-  },
-  'en-US': {
-    'app.title': 'TapDev Studio',
-    'app.welcome': 'Welcome',
-    'menu.file': 'File',
-    'menu.edit': 'Edit',
-    'menu.view': 'View',
-    'menu.run': 'Run',
-    'menu.terminal': 'Terminal',
-    'menu.help': 'Help',
-    'editor.open': 'Open',
-    'editor.save': 'Save',
-    'editor.saveAll': 'Save All',
-    'editor.untitled': 'Untitled',
-    'build.success': 'Build succeeded',
-    'build.failed': 'Build failed',
-    'debug.connect': 'Connect Debugger',
-    'debug.disconnect': 'Disconnect',
-    'plugin.install': 'Install Plugin',
-    'plugin.uninstall': 'Uninstall',
-    'settings.theme': 'Theme',
-    'settings.language': 'Language',
-    'common.confirm': 'Confirm',
-    'common.cancel': 'Cancel',
-    'common.close': 'Close',
-    'common.yes': 'Yes',
-    'common.no': 'No',
-  },
-  'zh-TW': {
-    'app.title': 'TapDev Studio',
-    'app.welcome': '歡迎使用',
-    'menu.file': '檔案',
-    'menu.edit': '編輯',
-    'menu.view': '檢視',
-    'menu.run': '執行',
-    'menu.terminal': '終端機',
-    'menu.help': '說明',
-  },
-  'ja-JP': {
-    'app.title': 'TapDev Studio',
-    'app.welcome': 'ようこそ',
-    'menu.file': 'ファイル',
-    'menu.edit': '編集',
-    'menu.view': '表示',
-    'menu.run': '実行',
-    'menu.terminal': 'ターミナル',
-    'menu.help': 'ヘルプ',
-  },
-  'ko-KR': {
-    'app.title': 'TapDev Studio',
-    'app.welcome': '환영합니다',
-    'menu.file': '파일',
-    'menu.edit': '편집',
-    'menu.view': '보기',
-    'menu.run': '실행',
-    'menu.terminal': '터미널',
-    'menu.help': '도움말',
-  },
-};
+export type Gender = 'male' | 'female' | 'other';
 
 const LOCALE_LABELS: Record<Locale, string> = {
   'zh-CN': '简体中文',
@@ -114,15 +94,93 @@ const LOCALE_LABELS: Record<Locale, string> = {
   'ko-KR': '한국어',
 };
 
+const LOCALE_CURRENCY: Record<Locale, string> = {
+  'zh-CN': 'CNY',
+  'zh-TW': 'TWD',
+  'en-US': 'USD',
+  'ja-JP': 'JPY',
+  'ko-KR': 'KRW',
+};
+
+const DEFAULT_CONFIG: I18nConfig = {
+  defaultLocale: 'zh-CN',
+  fallbackLocale: 'en-US',
+  available: ['zh-CN', 'en-US', 'ja-JP', 'zh-TW', 'ko-KR'],
+  defaultNS: 'common',
+  fallbackNS: 'common',
+  warnOnMissingKey: true,
+  debug: false,
+};
+
+const loadedNamespaces = new Set<string>();
+
+const namespaceLoaders: Record<
+  Locale,
+  Partial<Record<Namespace, () => Promise<TranslationDict>>>
+> = {
+  'zh-CN': {
+    common: () => import('./i18n/locales/zh-CN/common').then((m) => m.default as TranslationDict),
+    editor: () => import('./i18n/locales/zh-CN/editor').then((m) => m.default as TranslationDict),
+    debug: () => import('./i18n/locales/zh-CN/debug').then((m) => m.default as TranslationDict),
+    build: () => import('./i18n/locales/zh-CN/build').then((m) => m.default as TranslationDict),
+    settings: () =>
+      import('./i18n/locales/zh-CN/settings').then((m) => m.default as TranslationDict),
+    plugins: () => import('./i18n/locales/zh-CN/plugins').then((m) => m.default as TranslationDict),
+    dashboard: () =>
+      import('./i18n/locales/zh-CN/dashboard').then((m) => m.default as TranslationDict),
+    collab: () => import('./i18n/locales/zh-CN/collab').then((m) => m.default as TranslationDict),
+    ai: () => import('./i18n/locales/zh-CN/ai').then((m) => m.default as TranslationDict),
+    platform: () =>
+      import('./i18n/locales/zh-CN/platform').then((m) => m.default as TranslationDict),
+  },
+  'en-US': {
+    common: () => import('./i18n/locales/en-US/common').then((m) => m.default as TranslationDict),
+    editor: () => import('./i18n/locales/en-US/editor').then((m) => m.default as TranslationDict),
+    debug: () => import('./i18n/locales/en-US/debug').then((m) => m.default as TranslationDict),
+    build: () => import('./i18n/locales/en-US/build').then((m) => m.default as TranslationDict),
+    settings: () =>
+      import('./i18n/locales/en-US/settings').then((m) => m.default as TranslationDict),
+    plugins: () => import('./i18n/locales/en-US/plugins').then((m) => m.default as TranslationDict),
+    dashboard: () =>
+      import('./i18n/locales/en-US/dashboard').then((m) => m.default as TranslationDict),
+    collab: () => import('./i18n/locales/en-US/collab').then((m) => m.default as TranslationDict),
+    ai: () => import('./i18n/locales/en-US/ai').then((m) => m.default as TranslationDict),
+    platform: () =>
+      import('./i18n/locales/en-US/platform').then((m) => m.default as TranslationDict),
+  },
+  'ja-JP': {
+    common: () => import('./i18n/locales/ja-JP/common').then((m) => m.default as TranslationDict),
+    editor: () => import('./i18n/locales/ja-JP/editor').then((m) => m.default as TranslationDict),
+    debug: () => import('./i18n/locales/ja-JP/debug').then((m) => m.default as TranslationDict),
+    build: () => import('./i18n/locales/ja-JP/build').then((m) => m.default as TranslationDict),
+    settings: () =>
+      import('./i18n/locales/ja-JP/settings').then((m) => m.default as TranslationDict),
+    plugins: () => import('./i18n/locales/ja-JP/plugins').then((m) => m.default as TranslationDict),
+    dashboard: () =>
+      import('./i18n/locales/ja-JP/dashboard').then((m) => m.default as TranslationDict),
+    collab: () => import('./i18n/locales/ja-JP/collab').then((m) => m.default as TranslationDict),
+    ai: () => import('./i18n/locales/ja-JP/ai').then((m) => m.default as TranslationDict),
+    platform: () =>
+      import('./i18n/locales/ja-JP/platform').then((m) => m.default as TranslationDict),
+  },
+  'zh-TW': {},
+  'ko-KR': {},
+};
+
+function buildInitialTranslations(): Translations {
+  const translations: Translations = {} as Translations;
+  for (const locale of DEFAULT_CONFIG.available) {
+    translations[locale] = STATIC_TRANSLATIONS[locale] ?? {};
+  }
+  return translations;
+}
+
 export class I18nService {
-  private config: I18nConfig = {
-    defaultLocale: 'zh-CN',
-    fallbackLocale: 'en-US',
-    available: ['zh-CN', 'en-US', 'zh-TW', 'ja-JP', 'ko-KR'],
-  };
-  private currentLocale: Locale = 'zh-CN';
-  private translations: Translations = DEFAULT_TRANSLATIONS;
+  private config: I18nConfig = { ...DEFAULT_CONFIG };
+  private currentLocale: Locale = DEFAULT_CONFIG.defaultLocale;
+  private translations: Translations = buildInitialTranslations();
   private readonly listeners = new Set<(locale: Locale) => void>();
+  private readonly missingKeys = new Set<string>();
 
   getCurrent(): Locale {
     return this.currentLocale;
@@ -136,6 +194,10 @@ export class I18nService {
     return LOCALE_LABELS[locale];
   }
 
+  getNamespaces(): Namespace[] {
+    return [...NAMESPACES];
+  }
+
   configure(config: Partial<I18nConfig>): void {
     this.config = { ...this.config, ...config };
   }
@@ -147,61 +209,210 @@ export class I18nService {
     globalEventBus.emit({ type: 'i18n:change', payload: locale });
   }
 
-  /**
-   * 注册翻译
-   */
-  registerTranslations(translations: Partial<Translations>): void {
-    for (const [locale, dict] of Object.entries(translations)) {
-      this.translations[locale as Locale] = {
-        ...this.translations[locale as Locale],
-        ...dict,
-      };
+  async loadNamespace(namespace: Namespace, locale?: Locale): Promise<void> {
+    const targetLocale = locale ?? this.currentLocale;
+    const key = `${targetLocale}:${namespace}`;
+    if (loadedNamespaces.has(key)) return;
+
+    const loader = namespaceLoaders[targetLocale]?.[namespace];
+    if (!loader) {
+      this.warn(`No loader found for namespace "${namespace}" in locale "${targetLocale}"`);
+      return;
+    }
+
+    try {
+      const dict = await loader();
+      if (!this.translations[targetLocale]) {
+        this.translations[targetLocale] = {};
+      }
+      this.translations[targetLocale][namespace] = dict;
+      loadedNamespaces.add(key);
+      if (this.config.debug) {
+        console.log(`[i18n] Loaded namespace "${namespace}" for locale "${targetLocale}"`);
+      }
+    } catch (err) {
+      this.error(`Failed to load namespace "${namespace}" for locale "${targetLocale}":`, err);
     }
   }
 
-  /**
-   * 翻译键
-   */
-  t(key: TranslationKey, params?: Record<string, string | number>): string {
-    const text = this.lookup(this.currentLocale, key)
-      ?? this.lookup(this.config.fallbackLocale, key)
-      ?? this.lookup(this.config.defaultLocale, key)
-      ?? key;
+  async loadNamespaces(namespaces: Namespace[], locale?: Locale): Promise<void> {
+    await Promise.all(namespaces.map((ns) => this.loadNamespace(ns, locale)));
+  }
+
+  async loadAllNamespaces(locale?: Locale): Promise<void> {
+    await this.loadNamespaces(NAMESPACES, locale);
+  }
+
+  isNamespaceLoaded(namespace: Namespace, locale?: Locale): boolean {
+    const targetLocale = locale ?? this.currentLocale;
+    return loadedNamespaces.has(`${targetLocale}:${namespace}`);
+  }
+
+  registerTranslations(locale: Locale, namespace: Namespace, translations: TranslationDict): void {
+    if (!this.translations[locale]) {
+      this.translations[locale] = {};
+    }
+    this.translations[locale][namespace] = {
+      ...this.translations[locale][namespace],
+      ...translations,
+    };
+    loadedNamespaces.add(`${locale}:${namespace}`);
+  }
+
+  t(
+    key: TranslationKey,
+    params?: Record<string, string | number>,
+    options?: { ns?: Namespace; locale?: Locale }
+  ): string {
+    // 如果 key 已经包含 namespace 前缀（冒号或点），直接使用
+    const hasNamespace = key.includes(':') || this.hasNamespacePrefix(key);
+    const resolvedKey = hasNamespace ? key : `${this.config.defaultNS}:${key}`;
+    const [namespace, actualKey] = this.parseKey(resolvedKey);
+    const locale = options?.locale ?? this.currentLocale;
+
+    const text =
+      this.lookup(locale, namespace, actualKey) ??
+      this.lookup(this.config.fallbackLocale, namespace, actualKey) ??
+      this.lookup(this.config.defaultLocale, namespace, actualKey) ??
+      this.lookup(this.config.defaultLocale, this.config.fallbackNS, actualKey) ??
+      actualKey;
+
+    if (text === actualKey && this.config.warnOnMissingKey) {
+      this.warnMissingKey(resolvedKey, locale);
+    }
+
     if (!params) return text;
+    return this.interpolate(text, params);
+  }
+
+  private hasNamespacePrefix(key: string): boolean {
+    const firstPart = key.split(/[:.]/)[0];
+    return NAMESPACES.includes(firstPart as Namespace);
+  }
+
+  private parseKey(key: string): [Namespace, string] {
+    // 优先尝试冒号分隔: namespace:key
+    const colonParts = key.split(':');
+    if (colonParts.length >= 2 && NAMESPACES.includes(colonParts[0] as Namespace)) {
+      return [colonParts[0] as Namespace, colonParts.slice(1).join(':')];
+    }
+    // 点分隔: namespace.key（namespace 是 NAMESPACES 中的一员）
+    const dotParts = key.split('.');
+    if (dotParts.length >= 2 && NAMESPACES.includes(dotParts[0] as Namespace)) {
+      return [dotParts[0] as Namespace, dotParts.slice(1).join('.')];
+    }
+    return [this.config.defaultNS, key];
+  }
+
+  private lookup(locale: Locale, namespace: Namespace, key: string): string | undefined {
+    const dict = this.translations[locale]?.[namespace];
+    return dict?.[key];
+  }
+
+  private interpolate(text: string, params: Record<string, string | number>): string {
     return Object.entries(params).reduce(
       (acc, [k, v]) => acc.replace(new RegExp(`\\{${k}\\}`, 'g'), String(v)),
-      text,
+      text
     );
   }
 
-  /**
-   * 复数形式（英文等需要）
-   */
-  plural(key: TranslationKey, count: number, params?: Record<string, string | number>): string {
-    const entries = this.translations[this.currentLocale]?.[key];
-    const list = Array.isArray(entries) ? entries : [entries ?? key];
-    const idx = count === 1 ? 0 : 1;
-    const text = list[Math.min(idx, list.length - 1)] ?? key;
-    return this.t(text, { ...params, count });
+  private warnMissingKey(key: string, locale: Locale): void {
+    if (this.missingKeys.has(key)) return;
+    this.missingKeys.add(key);
+    if (this.config.warnOnMissingKey) {
+      console.warn(`[i18n] Missing translation key "${key}" for locale "${locale}"`);
+    }
   }
 
-  /**
-   * 数字本地化
-   */
+  plural(
+    key: TranslationKey,
+    count: number,
+    params?: Record<string, string | number>,
+    options?: { ns?: Namespace; locale?: Locale }
+  ): string {
+    const ns = options?.ns ?? this.config.defaultNS;
+    const locale = options?.locale ?? this.currentLocale;
+    const resolvedKey = key.includes(':') ? key : `${ns}:${key}`;
+    const [namespace, actualKey] = this.parseKey(resolvedKey);
+
+    const baseText =
+      this.lookup(locale, namespace, actualKey) ??
+      this.lookup(this.config.fallbackLocale, namespace, actualKey) ??
+      this.lookup(this.config.defaultLocale, namespace, actualKey) ??
+      actualKey;
+
+    const pluralIndex = this.getPluralIndex(locale, count);
+    const pluralKey = `${actualKey}_${pluralIndex}`;
+    const pluralText =
+      this.lookup(locale, namespace, pluralKey) ??
+      this.lookup(this.config.fallbackLocale, namespace, pluralKey) ??
+      this.lookup(this.config.defaultLocale, namespace, pluralKey);
+
+    const finalText = pluralText ?? baseText;
+    return this.interpolate(finalText, { ...params, count });
+  }
+
+  private getPluralIndex(locale: Locale, count: number): number {
+    switch (locale) {
+      case 'zh-CN':
+      case 'zh-TW':
+      case 'ja-JP':
+      case 'ko-KR':
+        return 0;
+      case 'en-US':
+      default:
+        return count === 1 ? 0 : 1;
+    }
+  }
+
+  gender(
+    key: TranslationKey,
+    gender: Gender,
+    params?: Record<string, string | number>,
+    options?: { ns?: Namespace; locale?: Locale }
+  ): string {
+    const ns = options?.ns ?? this.config.defaultNS;
+    const locale = options?.locale ?? this.currentLocale;
+    const resolvedKey = key.includes(':') ? key : `${ns}:${key}`;
+    const [namespace, actualKey] = this.parseKey(resolvedKey);
+
+    const genderKey = `${actualKey}_${gender}`;
+    const genderText =
+      this.lookup(locale, namespace, genderKey) ??
+      this.lookup(this.config.fallbackLocale, namespace, genderKey) ??
+      this.lookup(this.config.defaultLocale, namespace, genderKey);
+
+    const finalText = genderText ?? this.t(resolvedKey, undefined, { ns, locale });
+    return this.interpolate(finalText, params ?? {});
+  }
+
   formatNumber(value: number, options?: Intl.NumberFormatOptions): string {
     return new Intl.NumberFormat(this.currentLocale, options).format(value);
   }
 
-  /**
-   * 日期本地化
-   */
+  formatCurrency(
+    value: number,
+    options?: {
+      currency?: string;
+      currencyDisplay?: 'symbol' | 'code' | 'name';
+      minimumFractionDigits?: number;
+      maximumFractionDigits?: number;
+    }
+  ): string {
+    const currency = options?.currency ?? LOCALE_CURRENCY[this.currentLocale] ?? 'USD';
+    return new Intl.NumberFormat(this.currentLocale, {
+      style: 'currency',
+      currency,
+      currencyDisplay: options?.currencyDisplay ?? 'symbol',
+      minimumFractionDigits: options?.minimumFractionDigits,
+      maximumFractionDigits: options?.maximumFractionDigits,
+    }).format(value);
+  }
+
   formatDate(date: Date | number, options?: Intl.DateTimeFormatOptions): string {
     return new Intl.DateTimeFormat(this.currentLocale, options).format(date);
   }
 
-  /**
-   * 相对时间（如"3 小时前"）
-   */
   formatRelative(date: Date | number): string {
     const target = typeof date === 'number' ? date : date.getTime();
     const diff = Date.now() - target;
@@ -209,6 +420,7 @@ export class I18nService {
     const units: [Intl.RelativeTimeFormatUnit, number][] = [
       ['year', 365 * 24 * 3600_000],
       ['month', 30 * 24 * 3600_000],
+      ['week', 7 * 24 * 3600_000],
       ['day', 24 * 3600_000],
       ['hour', 3600_000],
       ['minute', 60_000],
@@ -222,18 +434,50 @@ export class I18nService {
     return rtf.format(0, 'second');
   }
 
-  /**
-   * 订阅语言变化
-   */
+  formatList(items: string[], options?: Intl.ListFormatOptions): string {
+    return new Intl.ListFormat(this.currentLocale, options).format(items);
+  }
+
+  formatPlural(value: number, options?: Intl.PluralRulesOptions): Intl.LDMLPluralRule {
+    return new Intl.PluralRules(this.currentLocale, options).select(value);
+  }
+
+  getCollator(options?: Intl.CollatorOptions): Intl.Collator {
+    return new Intl.Collator(this.currentLocale, options);
+  }
+
+  getLocaleInfo(locale?: Locale): { label: string; currency: string; direction: 'ltr' | 'rtl' } {
+    const targetLocale = locale ?? this.currentLocale;
+    return {
+      label: LOCALE_LABELS[targetLocale],
+      currency: LOCALE_CURRENCY[targetLocale] ?? 'USD',
+      direction: 'ltr',
+    };
+  }
+
+  getMissingKeys(): string[] {
+    return [...this.missingKeys];
+  }
+
+  clearMissingKeys(): void {
+    this.missingKeys.clear();
+  }
+
   onChange(listener: (locale: Locale) => void): () => void {
     this.listeners.add(listener);
     return () => this.listeners.delete(listener);
   }
 
-  private lookup(locale: Locale, key: TranslationKey): string | undefined {
-    const text = this.translations[locale]?.[key];
-    return Array.isArray(text) ? text[0] : text;
+  private warn(message: string): void {
+    if (this.config.debug || this.config.warnOnMissingKey) {
+      console.warn(`[i18n] ${message}`);
+    }
+  }
+
+  private error(message: string, err?: unknown): void {
+    console.error(`[i18n] ${message}`, err);
   }
 }
 
-export const i18n = new I18nService();
+export const i18nService = new I18nService();
+export const i18n = i18nService;

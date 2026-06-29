@@ -1,343 +1,571 @@
-import { Button, Badge, Card, CardHeader, CardTitle, CardContent, Tabs, TabsList, TabsTrigger, TabsContent } from '@tapdev/ui';
+import { useEffect, useState, useMemo } from 'react';
+import {
+  Button,
+  Badge,
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  Input,
+  Icon,
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+  Switch,
+} from '@tapdev/ui';
+import { useAppStore } from '../store/app-store';
 import { pluginManager } from '@tapdev/core';
-import { useState } from 'react';
-import type { PluginInfo, CommandPaletteItem } from '@tapdev/types';
+import type { PluginInfo } from '@tapdev/types';
+
+interface MarketPlugin {
+  id: string;
+  name: string;
+  description: string;
+  version: string;
+  author: string;
+  category: string;
+  downloads: number;
+  rating: number;
+  installed: boolean;
+  icon: string;
+  tags: string[];
+}
+
+const CATEGORIES = [
+  { id: 'all', name: '全部', icon: 'grid' },
+  { id: 'devtools', name: '开发工具', icon: 'wrench' },
+  { id: 'themes', name: '主题美化', icon: 'palette' },
+  { id: 'frameworks', name: '框架集成', icon: 'layers' },
+  { id: 'analytics', name: '数据分析', icon: 'bar-chart' },
+  { id: 'other', name: '其他', icon: 'more-horizontal' },
+];
+
+const MARKET_PLUGINS: MarketPlugin[] = [
+  {
+    id: 'unity-integration',
+    name: 'Unity 深度集成',
+    description: '提供 Unity 编辑器深度集成，支持脚本同步、资源预览、场景编辑等功能',
+    version: '2.1.0',
+    author: 'TapDev 官方',
+    category: 'devtools',
+    downloads: 12580,
+    rating: 4.8,
+    installed: true,
+    icon: 'cpu',
+    tags: ['官方', '推荐'],
+  },
+  {
+    id: 'git-integration',
+    name: 'Git 版本控制',
+    description: '集成 Git 版本控制功能，支持提交、拉取、分支管理、冲突解决',
+    version: '1.5.2',
+    author: 'TapDev 官方',
+    category: 'devtools',
+    downloads: 9876,
+    rating: 4.6,
+    installed: true,
+    icon: 'git-branch',
+    tags: ['官方'],
+  },
+  {
+    id: 'dark-theme-pro',
+    name: '深色主题 Pro',
+    description: '精心设计的深色主题，护眼舒适，支持多种配色方案自定义',
+    version: '3.0.0',
+    author: 'ThemeStudio',
+    category: 'themes',
+    downloads: 8543,
+    rating: 4.9,
+    installed: false,
+    icon: 'moon',
+    tags: ['热门'],
+  },
+  {
+    id: 'light-theme',
+    name: '清新浅色主题',
+    description: '简洁明亮的浅色主题，适合日间使用，减少眼部疲劳',
+    version: '1.2.0',
+    author: 'DesignLab',
+    category: 'themes',
+    downloads: 6234,
+    rating: 4.5,
+    installed: false,
+    icon: 'sun',
+    tags: [],
+  },
+  {
+    id: 'addressables',
+    name: 'Addressables 管理',
+    description: 'Unity Addressables 资源管理工具，支持资源打包、分析、优化',
+    version: '1.8.0',
+    author: 'UnityTech',
+    category: 'frameworks',
+    downloads: 5678,
+    rating: 4.4,
+    installed: false,
+    icon: 'package',
+    tags: [],
+  },
+  {
+    id: 'playfab',
+    name: 'PlayFab 集成',
+    description: '微软 PlayFab 后端服务集成，支持玩家数据、排行榜、商店等功能',
+    version: '2.0.1',
+    author: 'Microsoft',
+    category: 'frameworks',
+    downloads: 4321,
+    rating: 4.3,
+    installed: false,
+    icon: 'cloud',
+    tags: [],
+  },
+  {
+    id: 'analytics-dashboard',
+    name: '数据分析面板',
+    description: '强大的游戏数据分析面板，支持自定义指标、漏斗分析、留存分析',
+    version: '1.3.0',
+    author: 'DataPro',
+    category: 'analytics',
+    downloads: 3456,
+    rating: 4.7,
+    installed: false,
+    icon: 'bar-chart-2',
+    tags: ['热门'],
+  },
+  {
+    id: 'crash-report',
+    name: '崩溃报告',
+    description: '自动收集和分析游戏崩溃信息，帮助快速定位和修复问题',
+    version: '1.1.0',
+    author: 'StabilityLab',
+    category: 'analytics',
+    downloads: 2890,
+    rating: 4.6,
+    installed: false,
+    icon: 'alert-triangle',
+    tags: [],
+  },
+  {
+    id: 'code-snippets',
+    name: '代码片段库',
+    description: '丰富的 C# 代码片段库，提高编码效率，支持自定义片段',
+    version: '2.2.0',
+    author: 'CodeMaster',
+    category: 'devtools',
+    downloads: 7654,
+    rating: 4.5,
+    installed: false,
+    icon: 'file-code',
+    tags: ['推荐'],
+  },
+  {
+    id: 'asset-preview',
+    name: '资源预览器',
+    description: '支持多种 Unity 资源格式的预览，包括模型、纹理、动画、音频',
+    version: '1.4.0',
+    author: 'AssetView',
+    category: 'devtools',
+    downloads: 5432,
+    rating: 4.4,
+    installed: false,
+    icon: 'image',
+    tags: [],
+  },
+  {
+    id: 'localization',
+    name: '本地化工具',
+    description: '游戏本地化管理工具，支持多语言翻译、术语库、批量导入导出',
+    version: '1.0.0',
+    author: 'i18nTeam',
+    category: 'other',
+    downloads: 1234,
+    rating: 4.2,
+    installed: false,
+    icon: 'globe',
+    tags: ['新上线'],
+  },
+  {
+    id: 'todo-list',
+    name: '开发待办',
+    description: '内置待办事项管理，支持任务优先级、截止日期、进度跟踪',
+    version: '1.0.1',
+    author: 'Productivity',
+    category: 'other',
+    downloads: 2345,
+    rating: 4.3,
+    installed: false,
+    icon: 'check-square',
+    tags: [],
+  },
+];
 
 export function PluginsPage() {
-  const [activeTab, setActiveTab] = useState('plugins');
+  const { plugins, setPlugins, togglePlugin } = useAppStore();
   const [searchQuery, setSearchQuery] = useState('');
-  const [pluginDetails, setPluginDetails] = useState<PluginInfo | null>(null);
+  const [activeTab, setActiveTab] = useState('market');
+  const [activeCategory, setActiveCategory] = useState('all');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [marketPlugins, setMarketPlugins] = useState<MarketPlugin[]>(MARKET_PLUGINS);
 
-  const plugins = pluginManager.getAllPluginInfo();
-  const commands = pluginManager.getCommandPaletteItems(searchQuery);
+  useEffect(() => {
+    loadPlugins();
+  }, []);
 
-  const togglePlugin = async (pluginId: string, enabled: boolean) => {
-    if (enabled) {
-      await pluginManager.deactivatePlugin(pluginId);
-    } else {
-      await pluginManager.activatePlugin(pluginId);
+  const loadPlugins = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const allPlugins = pluginManager.getAllPluginInfo();
+      setPlugins(allPlugins);
+      setMarketPlugins((prev) =>
+        prev.map((p) => ({
+          ...p,
+          installed: allPlugins.some((ap) => ap.meta.id === p.id),
+        }))
+      );
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '加载插件失败');
+    } finally {
+      setLoading(false);
     }
-    setPluginDetails(null);
   };
 
-  const getCategoryItems = (items: CommandPaletteItem[]) => {
-    const categories: Record<string, CommandPaletteItem[]> = {};
-    items.forEach((item) => {
-      const category = item.category || '其他';
-      if (!categories[category]) {
-        categories[category] = [];
+  const installedPlugins = useMemo(() => {
+    return plugins;
+  }, [plugins]);
+
+  const activePlugins = useMemo(() => {
+    return plugins.filter((p) => p.activated);
+  }, [plugins]);
+
+  const filteredMarketPlugins = useMemo(() => {
+    let result = marketPlugins;
+
+    if (activeCategory !== 'all') {
+      result = result.filter((p) => p.category === activeCategory);
+    }
+
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      result = result.filter(
+        (p) =>
+          p.name.toLowerCase().includes(query) ||
+          p.description.toLowerCase().includes(query) ||
+          p.author.toLowerCase().includes(query) ||
+          p.tags.some((t) => t.toLowerCase().includes(query))
+      );
+    }
+
+    return result;
+  }, [marketPlugins, activeCategory, searchQuery]);
+
+  const handleInstall = async (pluginId: string) => {
+    try {
+      setError(null);
+      setLoading(true);
+      const marketPlugin = marketPlugins.find((p) => p.id === pluginId);
+      if (marketPlugin && !pluginManager.isPluginRegistered(pluginId)) {
+        pluginManager.registerPlugin(
+          {
+            id: marketPlugin.id,
+            name: marketPlugin.name,
+            version: marketPlugin.version,
+            description: marketPlugin.description,
+            author: marketPlugin.author,
+            enabled: true,
+            entry: marketPlugin.id,
+            hooks: [],
+            icon: marketPlugin.icon,
+            category: marketPlugin.category,
+          },
+          undefined,
+          undefined
+        );
+        await pluginManager.activatePlugin(pluginId);
       }
-      categories[category].push(item);
-    });
-    return categories;
+      setMarketPlugins((prev) =>
+        prev.map((p) => (p.id === pluginId ? { ...p, installed: true } : p))
+      );
+      const allPlugins = pluginManager.getAllPluginInfo();
+      setPlugins(allPlugins);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '安装插件失败');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleUninstall = async (pluginId: string) => {
+    try {
+      setError(null);
+      setLoading(true);
+      if (pluginManager.isPluginRegistered(pluginId)) {
+        pluginManager.unregisterPlugin(pluginId);
+      }
+      setMarketPlugins((prev) =>
+        prev.map((p) => (p.id === pluginId ? { ...p, installed: false } : p))
+      );
+      const allPlugins = pluginManager.getAllPluginInfo();
+      setPlugins(allPlugins);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '卸载插件失败');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleToggle = async (pluginId: string) => {
+    try {
+      setError(null);
+      await togglePlugin(pluginId);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '操作失败');
+    }
+  };
+
+  const formatDownloads = (num: number) => {
+    if (num >= 10000) {
+      return `${(num / 10000).toFixed(1)}万`;
+    }
+    if (num >= 1000) {
+      return `${(num / 1000).toFixed(1)}k`;
+    }
+    return num.toString();
   };
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6 p-6">
-      <div>
-        <h2 className="text-lg font-semibold">插件管理</h2>
-        <p className="text-sm text-text-secondary">
-          扩展 TapDev Studio 功能，支持自定义插件开发
-        </p>
-      </div>
-
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="mb-6">
-          <TabsTrigger value="plugins">插件列表</TabsTrigger>
-          <TabsTrigger value="commands">命令面板</TabsTrigger>
-          <TabsTrigger value="develop">开发指南</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="plugins" className="mt-0 space-y-4">
-          {plugins.map((plugin) => (
-            <Card key={plugin.meta.id}>
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-surface-2">
-                      <span className="text-sm">{plugin.meta.icon || '📦'}</span>
-                    </div>
-                    <div>
-                      <CardTitle className="text-base">{plugin.meta.name}</CardTitle>
-                      <div className="flex items-center gap-2 text-xs text-text-muted">
-                        <Badge variant="default">v{plugin.meta.version}</Badge>
-                        {plugin.meta.category && (
-                          <span>{plugin.meta.category}</span>
-                        )}
-                        {plugin.activated && <Badge variant="success">已激活</Badge>}
-                      </div>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setPluginDetails(plugin)}
-                    >
-                      详情
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant={plugin.meta.enabled ? 'secondary' : 'primary'}
-                      onClick={() => togglePlugin(plugin.meta.id, plugin.meta.enabled)}
-                    >
-                      {plugin.meta.enabled ? '禁用' : '启用'}
-                    </Button>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <p className="text-sm">{plugin.meta.description}</p>
-                <div className="mt-3 flex flex-wrap gap-2">
-                  {plugin.meta.hooks.map((hook) => (
-                    <span
-                      key={hook}
-                      className="rounded bg-surface-2 px-2 py-0.5 font-mono text-xs text-text-muted"
-                    >
-                      {hook}
-                    </span>
-                  ))}
-                </div>
-                {plugin.meta.author && (
-                  <p className="mt-2 text-xs text-text-muted">作者: {plugin.meta.author}</p>
-                )}
-              </CardContent>
-            </Card>
-          ))}
-        </TabsContent>
-
-        <TabsContent value="commands" className="mt-0">
-          <div className="mb-4">
-            <input
-              type="text"
-              placeholder="搜索命令..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full rounded-lg border border-border bg-surface-1 px-3 py-2 text-sm"
-            />
+    <div className="h-[calc(100vh-3.5rem)] flex flex-col overflow-hidden">
+      {error && (
+        <div className="flex items-center justify-between border-b border-red-500/50 bg-red-500/10 px-4 py-2">
+          <div className="flex items-center gap-2">
+            <Icon name="alert" size={16} className="text-red-400" />
+            <span className="text-sm text-red-400">{error}</span>
           </div>
-
-          {commands.length === 0 ? (
-            <Card>
-              <CardContent className="text-center text-text-muted">
-                未找到匹配的命令
-              </CardContent>
-            </Card>
-          ) : (
-            <div className="space-y-4">
-              {Object.entries(getCategoryItems(commands)).map(([category, items]) => (
-                <Card key={category}>
-                  <CardHeader>
-                    <CardTitle className="text-sm font-medium">{category}</CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-1">
-                    {items.map((item) => (
-                      <div
-                        key={item.id}
-                        className="flex items-center justify-between rounded-lg bg-surface-2 px-3 py-2"
-                        onClick={() => pluginManager.executeCommandPaletteItem(item.id)}
-                      >
-                        <div className="flex items-center gap-3">
-                          <span className="text-sm">{item.icon || '⚡'}</span>
-                          <div>
-                            <div className="text-sm font-medium">{item.title}</div>
-                            {item.description && (
-                              <div className="text-xs text-text-muted">
-                                {item.description}
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                        {item.shortcut && (
-                          <Badge variant="default" className="font-mono text-xs">
-                            {item.shortcut}
-                          </Badge>
-                        )}
-                      </div>
-                    ))}
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          )}
-        </TabsContent>
-
-        <TabsContent value="develop" className="mt-0">
-          <Card>
-            <CardHeader>
-              <CardTitle>创建自定义插件</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <pre className="overflow-auto rounded-lg bg-surface-2 p-4 font-mono text-xs">
-{`// plugins/my-plugin/index.ts
-import type { PluginContext } from '@tapdev/types';
-
-export function activate(ctx: PluginContext) {
-  // 注册命令
-  ctx.registerCommand('my-command', async () => {
-    ctx.showNotification('Hello from my plugin!', 'success');
-  }, {
-    id: 'my-command',
-    title: '我的命令',
-    description: '执行自定义操作',
-    icon: 'star',
-    shortcut: 'Ctrl+M',
-    category: '自定义',
-  });
-
-  // 注册面板
-  ctx.registerPanel('my-panel', {
-    id: 'my-panel',
-    title: '我的面板',
-    icon: 'panel',
-    component: 'MyPanel',
-    defaultPosition: 'right',
-    defaultSize: 400,
-  });
-
-  // 注册动作
-  ctx.registerAction({
-    id: 'my-action',
-    type: 'command',
-    label: '我的动作',
-    icon: 'zap',
-    handler: () => {
-      console.log('Action triggered!');
-    },
-  });
-}
-
-export function deactivate() {
-  // 清理资源
-}`}
-              </pre>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>可用钩子</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid gap-2 sm:grid-cols-2">
-                {[
-                  { name: 'onProjectOpen', desc: '项目打开时触发' },
-                  { name: 'onProjectClose', desc: '项目关闭时触发' },
-                  { name: 'onBuildStart', desc: '构建开始时触发' },
-                  { name: 'onBuildComplete', desc: '构建完成时触发' },
-                  { name: 'onDebugConnect', desc: '调试连接时触发' },
-                  { name: 'onDebugDisconnect', desc: '调试断开时触发' },
-                  { name: 'onMonitorTick', desc: '监控每帧触发' },
-                  { name: 'onBeforeSave', desc: '保存前触发' },
-                  { name: 'onAfterSave', desc: '保存后触发' },
-                ].map((hook) => (
-                  <div
-                    key={hook.name}
-                    className="flex items-center justify-between rounded-lg bg-surface-2 px-3 py-2"
-                  >
-                    <code className="text-xs font-mono">{hook.name}</code>
-                    <span className="text-xs text-text-muted">{hook.desc}</span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>插件上下文 API</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2 text-sm">
-                <div className="flex items-start gap-3">
-                  <code className="shrink-0 font-mono text-xs">registerCommand</code>
-                  <span className="text-text-muted">注册命令到命令面板</span>
-                </div>
-                <div className="flex items-start gap-3">
-                  <code className="shrink-0 font-mono text-xs">registerPanel</code>
-                  <span className="text-text-muted">注册侧边面板</span>
-                </div>
-                <div className="flex items-start gap-3">
-                  <code className="shrink-0 font-mono text-xs">registerAction</code>
-                  <span className="text-text-muted">注册自定义动作</span>
-                </div>
-                <div className="flex items-start gap-3">
-                  <code className="shrink-0 font-mono text-xs">showNotification</code>
-                  <span className="text-text-muted">显示通知消息</span>
-                </div>
-                <div className="flex items-start gap-3">
-                  <code className="shrink-0 font-mono text-xs">openUrl</code>
-                  <span className="text-text-muted">在浏览器中打开 URL</span>
-                </div>
-                <div className="flex items-start gap-3">
-                  <code className="shrink-0 font-mono text-xs">emit</code>
-                  <span className="text-text-muted">发送自定义事件</span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
-
-      {pluginDetails && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setPluginDetails(null)}>
-          <Card className="max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
-            <CardHeader>
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-surface-2">
-                  <span className="text-lg">{pluginDetails.meta.icon || '📦'}</span>
-                </div>
-                <div>
-                  <CardTitle>{pluginDetails.meta.name}</CardTitle>
-                  <div className="flex items-center gap-2 text-xs text-text-muted">
-                    <Badge variant="default">v{pluginDetails.meta.version}</Badge>
-                    {pluginDetails.meta.category && (
-                      <span>{pluginDetails.meta.category}</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <p>{pluginDetails.meta.description}</p>
-              
-              {pluginDetails.commands.length > 0 && (
-                <div>
-                  <div className="text-sm font-medium mb-2">命令</div>
-                  <ul className="space-y-1">
-                    {pluginDetails.commands.map((cmd) => (
-                      <li key={cmd.id} className="flex items-center justify-between rounded bg-surface-2 px-3 py-2 text-sm">
-                        <span>{cmd.title}</span>
-                        {cmd.shortcut && <Badge variant="default">{cmd.shortcut}</Badge>}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {pluginDetails.panels.length > 0 && (
-                <div>
-                  <div className="text-sm font-medium mb-2">面板</div>
-                  <ul className="space-y-1">
-                    {pluginDetails.panels.map((panel) => (
-                      <li key={panel.id} className="rounded bg-surface-2 px-3 py-2 text-sm">
-                        {panel.title}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-
-              {pluginDetails.meta.author && (
-                <p className="text-xs text-text-muted">作者: {pluginDetails.meta.author}</p>
-              )}
-            </CardContent>
-            <div className="px-4 pb-4">
-              <Button onClick={() => setPluginDetails(null)} className="w-full">关闭</Button>
-            </div>
-          </Card>
+          <Button size="sm" variant="ghost" onClick={() => setError(null)}>
+            关闭
+          </Button>
         </div>
       )}
+
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border bg-surface-1 px-4 py-3">
+        <div>
+          <h2 className="text-lg font-semibold">插件管理</h2>
+          <p className="text-sm text-text-secondary">管理和扩展 TapDev Studio 的功能</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <Badge variant="success" className="hidden sm:inline-flex">
+            已安装 {installedPlugins.length}
+          </Badge>
+          <Badge variant="default" className="hidden sm:inline-flex">
+            已启用 {activePlugins.length}
+          </Badge>
+          <Button onClick={loadPlugins} disabled={loading}>
+            <Icon name="refresh-cw" size={14} className={loading ? 'animate-spin' : ''} />
+            刷新
+          </Button>
+        </div>
+      </div>
+
+      <div className="flex-1 overflow-hidden flex flex-col">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex-1 flex flex-col">
+          <div className="border-b border-border px-4">
+            <TabsList>
+              <TabsTrigger value="market">插件市场</TabsTrigger>
+              <TabsTrigger value="installed">
+                已安装
+                {installedPlugins.length > 0 && (
+                  <Badge variant="default" className="ml-1">
+                    {installedPlugins.length}
+                  </Badge>
+                )}
+              </TabsTrigger>
+            </TabsList>
+          </div>
+
+          <TabsContent value="market" className="mt-0 flex-1 overflow-auto">
+            <div className="p-4 space-y-4">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="relative flex-1 max-w-md">
+                  <Icon
+                    name="search"
+                    size={18}
+                    className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted"
+                  />
+                  <Input
+                    placeholder="搜索插件..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10"
+                  />
+                </div>
+                <div className="flex flex-wrap gap-1">
+                  {CATEGORIES.map((cat) => (
+                    <button
+                      key={cat.id}
+                      onClick={() => setActiveCategory(cat.id)}
+                      className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm transition-all ${
+                        activeCategory === cat.id
+                          ? 'bg-tap-orange text-white'
+                          : 'bg-surface-2 text-text-secondary hover:bg-surface-3'
+                      }`}
+                    >
+                      <Icon name={cat.icon} size={14} />
+                      {cat.name}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {loading && plugins.length === 0 ? (
+                <div className="py-12 text-center">
+                  <Icon
+                    name="loader"
+                    size={32}
+                    className="mx-auto mb-3 animate-spin text-text-muted"
+                  />
+                  <p className="text-text-secondary">加载插件中...</p>
+                </div>
+              ) : filteredMarketPlugins.length === 0 ? (
+                <div className="py-12 text-center">
+                  <Icon name="search" size={40} className="mx-auto mb-3 text-text-muted" />
+                  <p className="text-text-secondary">未找到相关插件</p>
+                  <p className="mt-1 text-xs text-text-muted">尝试使用其他关键词或分类</p>
+                </div>
+              ) : (
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                  {filteredMarketPlugins.map((plugin) => (
+                    <Card key={plugin.id} className="flex flex-col">
+                      <CardContent className="flex-1 flex flex-col p-4">
+                        <div className="flex items-start gap-3 mb-3">
+                          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-tap-orange/10">
+                            <Icon name={plugin.icon} size={24} className="text-tap-orange" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <div className="font-medium leading-tight">{plugin.name}</div>
+                            <div className="mt-0.5 text-xs text-text-muted">
+                              {plugin.author} · v{plugin.version}
+                            </div>
+                          </div>
+                        </div>
+
+                        <p className="text-sm text-text-secondary line-clamp-2 mb-3 flex-1">
+                          {plugin.description}
+                        </p>
+
+                        {plugin.tags.length > 0 && (
+                          <div className="flex flex-wrap gap-1 mb-3">
+                            {plugin.tags.map((tag) => (
+                              <Badge
+                                key={tag}
+                                variant={tag === '官方' || tag === '推荐' ? 'success' : 'default'}
+                                className="text-xs"
+                              >
+                                {tag}
+                              </Badge>
+                            ))}
+                          </div>
+                        )}
+
+                        <div className="flex items-center justify-between text-xs text-text-muted mb-3">
+                          <span className="flex items-center gap-1">
+                            <Icon name="download" size={12} />
+                            {formatDownloads(plugin.downloads)}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Icon name="star" size={12} className="text-yellow-400" />
+                            {plugin.rating}
+                          </span>
+                        </div>
+
+                        <Button
+                          variant={plugin.installed ? 'outline' : 'primary'}
+                          size="sm"
+                          className="w-full"
+                          onClick={() =>
+                            plugin.installed ? handleUninstall(plugin.id) : handleInstall(plugin.id)
+                          }
+                          disabled={loading}
+                        >
+                          <Icon name={plugin.installed ? 'trash-2' : 'plus'} size={14} />
+                          {plugin.installed ? '卸载' : '安装'}
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="installed" className="mt-0 flex-1 overflow-auto">
+            <div className="p-4">
+              {loading && plugins.length === 0 ? (
+                <div className="py-12 text-center">
+                  <Icon
+                    name="loader"
+                    size={32}
+                    className="mx-auto mb-3 animate-spin text-text-muted"
+                  />
+                  <p className="text-text-secondary">加载插件中...</p>
+                </div>
+              ) : installedPlugins.length === 0 ? (
+                <div className="py-12 text-center">
+                  <Icon name="puzzle" size={40} className="mx-auto mb-3 text-text-muted" />
+                  <p className="text-text-secondary">暂无已安装的插件</p>
+                  <p className="mt-1 text-xs text-text-muted">前往插件市场发现更多功能</p>
+                  <Button className="mt-4" onClick={() => setActiveTab('market')}>
+                    浏览插件市场
+                  </Button>
+                </div>
+              ) : (
+                <div className="mx-auto max-w-4xl space-y-2">
+                  {installedPlugins.map((plugin) => (
+                    <div
+                      key={plugin.meta.id}
+                      className="flex items-center justify-between gap-4 rounded-lg border border-border p-4 hover:bg-surface-2 transition-colors"
+                    >
+                      <div className="flex items-center gap-4 min-w-0">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-tap-orange/10">
+                          <Icon name="puzzle" size={20} className="text-tap-orange" />
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium">{plugin.meta.name}</span>
+                            <span className="text-xs text-text-muted">v{plugin.meta.version}</span>
+                          </div>
+                          {plugin.meta.description && (
+                            <p className="mt-1 text-sm text-text-muted line-clamp-1">
+                              {plugin.meta.description}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3 shrink-0">
+                        <Badge variant={plugin.activated ? 'success' : 'default'}>
+                          {plugin.activated ? '已启用' : '已禁用'}
+                        </Badge>
+                        <Switch
+                          checked={plugin.activated}
+                          onCheckedChange={() => handleToggle(plugin.meta.id)}
+                        />
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => handleUninstall(plugin.meta.id)}
+                        >
+                          <Icon name="trash-2" size={14} />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </TabsContent>
+        </Tabs>
+      </div>
     </div>
   );
 }

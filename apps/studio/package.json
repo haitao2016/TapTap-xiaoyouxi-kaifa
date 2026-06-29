@@ -1,15 +1,18 @@
 {
   "name": "@tapdev/studio",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "scripts": {
+    "lint": "eslint src --ext .ts,.tsx",
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "vite build",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@huggingface/transformers": "^3.0.0",
+    "@mlc-ai/web-llm": "^0.2.46",
     "@monaco-editor/react": "^4.6.0",
     "@tapdev/core": "workspace:*",
     "@tapdev/types": "workspace:*",
@@ -28,6 +31,7 @@
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.7.2",
-    "vite": "^6.0.6"
+    "vite": "^6.0.6",
+    "vite-plugin-node-polyfills": "^0.28.0"
   }
 }

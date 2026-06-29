@@ -13,3 +13,6 @@ export { Tabs, TabsList, TabsTrigger, TabsContent } from './tabs';
 export { Progress } from './progress';
 export { Icon } from './icon';
 export { ErrorBoundary, SimpleErrorBoundary } from './components/ErrorBoundary';
+export { Switch } from './switch';
+export { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from './select';
+export { Slider } from './slider';

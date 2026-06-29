@@ -5,8 +5,7 @@
  * It tracks AI model interactions, performance metrics, and user interactions.
  */
 
-const RAINDROP_WRITE_KEY =
-  typeof process !== 'undefined' ? process.env?.RAINDROP_WRITE_KEY : undefined;
+const RAINDROP_WRITE_KEY = process.env.RAINDROP_WRITE_KEY;
 
 type RaindropClient = {
   track: (data: unknown) => Promise<void>;
@@ -35,11 +34,7 @@ async function loadRaindrop(): Promise<RaindropClient | null> {
   }
   try {
     const mod = await import('raindrop-ai');
-    const Raindrop = mod.Raindrop || mod.default || mod;
-    if (typeof Raindrop !== 'function') {
-      console.error('[Raindrop] Invalid Raindrop constructor');
-      return null;
-    }
+    const Raindrop = mod.default || mod;
     return new Raindrop({
       writeKey: RAINDROP_WRITE_KEY,
     }) as RaindropClient;

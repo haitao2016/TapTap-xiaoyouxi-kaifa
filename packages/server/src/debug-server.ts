@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto';
 import type { DebugLogEntry, Breakpoint } from '@tapdev/types';
 import type {
   WSMessage,
+  WSMessageMap,
   WSClientRole,
   DebugServerConfig,
   DebugServerStatus,
@@ -208,53 +209,61 @@ export class DebugServer {
     ws.on('error', () => clients.delete(ws));
   }
 
-  private handleMessage(
-    msg: WSMessage,
-    role: WSClientRole,
-    ws: import('ws').WebSocket
-  ): void {
-    switch (msg.type) {
-      case 'ping':
-        ws.send(JSON.stringify({ type: 'pong', timestamp: Date.now() } satisfies WSMessage));
-        break;
-      case 'log': {
-        const payload = msg.payload as RemoteLogPayload;
-        this.addLog(payload.level, payload.message, payload.source ?? role, payload.data);
-        if (role === 'game') {
-          this.broadcast(this.studioClients, msg);
+  private handleMessage(msg: WSMessage, role: WSClientRole, ws: import('ws').WebSocket): void {
+    try {
+      switch (msg.type) {
+        case 'ping':
+          ws.send(JSON.stringify({ type: 'pong', timestamp: Date.now() } satisfies WSMessage));
+          break;
+        case 'log': {
+          const payload = msg.payload as WSMessageMap['log'];
+          this.addLog(payload.level, payload.message, payload.source ?? role, payload.data);
+          if (role === 'game') {
+            this.broadcast(this.studioClients, msg);
+          }
+          break;
         }
-        break;
+        case 'breakpoint-add': {
+          const { file, line, condition } = msg.payload as WSMessageMap['breakpoint-add'];
+          this.addBreakpoint(file, line, condition);
+          break;
+        }
+        case 'breakpoint-remove': {
+          const { id } = msg.payload as WSMessageMap['breakpoint-remove'];
+          this.removeBreakpoint(id);
+          break;
+        }
+        case 'breakpoint-update': {
+          const { id, enabled, condition } = msg.payload as WSMessageMap['breakpoint-update'];
+          const bp = this.breakpoints.find((b) => b.id === id);
+          if (bp) {
+            if (enabled !== undefined) bp.enabled = enabled;
+            if (condition !== undefined) bp.condition = condition;
+            this.syncBreakpoints();
+          }
+          break;
+        }
+        case 'breakpoint-hit': {
+          this.broadcast(this.studioClients, msg);
+          this.addLog('warn', `断点命中: ${JSON.stringify(msg.payload)}`, 'game');
+          break;
+        }
+        case 'command': {
+          const { action } = msg.payload as WSMessageMap['command'];
+          if (role === 'studio') this.sendCommand(action);
+          break;
+        }
+        case 'metrics': {
+          const metrics = msg.payload as WSMessageMap['metrics'];
+          this.events.onMetrics?.(metrics);
+          this.broadcast(this.studioClients, msg);
+          break;
+        }
+        default:
+          this.addLog('warn', `未知的消息类型: ${(msg as any).type}`, role);
       }
-      case 'breakpoint-add': {
-        const { file, line, condition } = msg.payload as {
-          file: string;
-          line: number;
-          condition?: string;
-        };
-        this.addBreakpoint(file, line, condition);
-        break;
-      }
-      case 'breakpoint-remove': {
-        const { id } = msg.payload as { id: string };
-        this.removeBreakpoint(id);
-        break;
-      }
-      case 'breakpoint-hit': {
-        this.broadcast(this.studioClients, msg);
-        this.addLog('warn', `断点命中: ${JSON.stringify(msg.payload)}`, 'game');
-        break;
-      }
-      case 'command': {
-        const { action } = msg.payload as DebugCommandPayload;
-        if (role === 'studio') this.sendCommand(action);
-        break;
-      }
-      case 'metrics': {
-        const metrics = msg.payload as MetricsPayload;
-        this.events.onMetrics?.(metrics);
-        this.broadcast(this.studioClients, msg);
-        break;
-      }
+    } catch (err) {
+      this.addLog('error', `处理消息时出错: ${err instanceof Error ? err.message : String(err)}`, role);
     }
   }
 
@@ -304,19 +313,30 @@ export class DebugServer {
     const url = new URL(req.url ?? '/', `http://${req.headers.host}`);
 
     if (url.pathname === '/api/status') {
-      res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
-      res.end(JSON.stringify({ ...this.getStatus(), sessionId: this.sessionId, status: this.status }));
+      res.writeHead(200, {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+      });
+      res.end(
+        JSON.stringify({ ...this.getStatus(), sessionId: this.sessionId, status: this.status })
+      );
       return;
     }
 
     if (url.pathname === '/api/qrcode') {
-      res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+      res.writeHead(200, {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+      });
       res.end(JSON.stringify({ dataUrl: this.qrCodeDataUrl, url: this.getStatus().url }));
       return;
     }
 
     if (url.pathname === '/api/logs') {
-      res.writeHead(200, { 'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*' });
+      res.writeHead(200, {
+        'Content-Type': 'application/json',
+        'Access-Control-Allow-Origin': '*',
+      });
       res.end(JSON.stringify(this.logs.slice(-200)));
       return;
     }

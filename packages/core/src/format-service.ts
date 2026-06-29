@@ -42,7 +42,7 @@ export class FormatService {
 
   format(code: string, language: string, config?: FormatterConfig): FormatResult {
     const formatter = this.formatters.get(language) || this.formatters.get('javascript');
-    
+
     if (!formatter) {
       return {
         success: false,
@@ -65,7 +65,7 @@ export class FormatService {
 
   lint(code: string, language: string): LintResult {
     const formatter = this.formatters.get(language) || this.formatters.get('javascript');
-    
+
     if (!formatter) {
       return {
         success: false,
@@ -88,7 +88,7 @@ export class FormatService {
   formatAndLint(code: string, language: string, config?: FormatterConfig): FormatAndLintResult {
     const formatResult = this.format(code, language, config);
     const lintResult = this.lint(formatResult.code, language);
-    
+
     return {
       ...formatResult,
       ...lintResult,
@@ -124,16 +124,16 @@ class JavaScriptFormatter implements Formatter {
   format(code: string, config?: FormatterConfig): FormatResult {
     const tab = config?.useTabs ? '\t' : ' '.repeat(config?.tabWidth || 2);
     const printWidth = config?.printWidth || 80;
-    
+
     try {
       let formatted = code;
-      
+
       formatted = this.normalizeIndentation(formatted, tab);
       formatted = this.addMissingSemicolons(formatted, config?.semi !== false);
       formatted = this.formatQuotes(formatted, config?.singleQuote !== false);
       formatted = this.formatTrailingCommas(formatted, config?.trailingComma || 'es5');
       formatted = this.wrapLines(formatted, printWidth);
-      
+
       return {
         success: true,
         code: formatted,
@@ -151,12 +151,12 @@ class JavaScriptFormatter implements Formatter {
   lint(code: string): LintResult {
     const errors: LintIssue[] = [];
     const warnings: LintIssue[] = [];
-    
+
     const lines = code.split('\n');
-    
+
     lines.forEach((line, index) => {
       const lineNumber = index + 1;
-      
+
       if (/^(var|function)\s+\S+\s*=\s*function/.test(line)) {
         warnings.push({
           line: lineNumber,
@@ -166,7 +166,7 @@ class JavaScriptFormatter implements Formatter {
           severity: 'warning',
         });
       }
-      
+
       if (/console\.(log|warn|error|info)\(/.test(line)) {
         warnings.push({
           line: lineNumber,
@@ -176,7 +176,7 @@ class JavaScriptFormatter implements Formatter {
           severity: 'warning',
         });
       }
-      
+
       if (/debugger\b/.test(line)) {
         errors.push({
           line: lineNumber,
@@ -186,7 +186,7 @@ class JavaScriptFormatter implements Formatter {
           severity: 'error',
         });
       }
-      
+
       if (line.length > 120) {
         warnings.push({
           line: lineNumber,
@@ -197,7 +197,7 @@ class JavaScriptFormatter implements Formatter {
         });
       }
     });
-    
+
     return {
       success: true,
       errors,
@@ -215,8 +215,11 @@ class JavaScriptFormatter implements Formatter {
 
   private addMissingSemicolons(code: string, addSemi: boolean): string {
     if (!addSemi) return code;
-    
-    return code.replace(/(\b(return|throw|break|continue|import|export)\b.*?)(?=\s*[\r\n])/g, '$1;');
+
+    return code.replace(
+      /(\b(return|throw|break|continue|import|export)\b.*?)(?=\s*[\r\n])/g,
+      '$1;'
+    );
   }
 
   private formatQuotes(code: string, singleQuote: boolean): string {
@@ -233,7 +236,7 @@ class JavaScriptFormatter implements Formatter {
 
   private formatTrailingCommas(code: string, style: string): string {
     if (style === 'none') return code;
-    
+
     return code.replace(/(\([^)]+\))/g, (match) => {
       if (match.includes('\n')) {
         return match.replace(/,\s*\)/, ',)');
@@ -243,30 +246,33 @@ class JavaScriptFormatter implements Formatter {
   }
 
   private wrapLines(code: string, printWidth: number): string {
-    return code.split('\n').map(line => {
-      if (line.length <= printWidth) return line;
-      
-      let result = line;
-      const parts = line.split(',');
-      if (parts.length > 1) {
-        result = parts.join(',\n' + ' '.repeat(4));
-      }
-      
-      return result;
-    }).join('\n');
+    return code
+      .split('\n')
+      .map((line) => {
+        if (line.length <= printWidth) return line;
+
+        let result = line;
+        const parts = line.split(',');
+        if (parts.length > 1) {
+          result = parts.join(',\n' + ' '.repeat(4));
+        }
+
+        return result;
+      })
+      .join('\n');
   }
 }
 
 class TypeScriptFormatter extends JavaScriptFormatter {
   format(code: string, config?: FormatterConfig): FormatResult {
     const result = super.format(code, config);
-    
+
     if (!result.success) return result;
-    
+
     let formatted = result.code;
-    
+
     formatted = this.formatTypeAnnotations(formatted);
-    
+
     return {
       ...result,
       code: formatted,
@@ -308,13 +314,15 @@ class JsonFormatter implements Formatter {
     } catch (error) {
       return {
         success: true,
-        errors: [{
-          line: 1,
-          column: 1,
-          message: error instanceof Error ? error.message : 'JSON 格式错误',
-          ruleId: 'json-parse-error',
-          severity: 'error',
-        }],
+        errors: [
+          {
+            line: 1,
+            column: 1,
+            message: error instanceof Error ? error.message : 'JSON 格式错误',
+            ruleId: 'json-parse-error',
+            severity: 'error',
+          },
+        ],
         warnings: [],
       };
     }
@@ -325,11 +333,11 @@ class MarkdownFormatter implements Formatter {
   format(code: string, config?: FormatterConfig): FormatResult {
     try {
       let formatted = code;
-      
+
       formatted = this.normalizeHeadings(formatted);
       formatted = this.formatLists(formatted);
       formatted = this.normalizeSpaces(formatted);
-      
+
       return {
         success: true,
         code: formatted,
@@ -369,9 +377,9 @@ class HtmlFormatter implements Formatter {
   format(code: string, config?: FormatterConfig): FormatResult {
     try {
       let formatted = code;
-      
+
       formatted = this.indentTags(formatted, config?.tabWidth || 2);
-      
+
       return {
         success: true,
         code: formatted,
@@ -389,15 +397,15 @@ class HtmlFormatter implements Formatter {
   lint(code: string): LintResult {
     const errors: LintIssue[] = [];
     const warnings: LintIssue[] = [];
-    
+
     const selfClosingTags = ['br', 'hr', 'img', 'input', 'meta', 'link'];
-    
+
     const lines = code.split('\n');
-    
+
     lines.forEach((line, index) => {
       const lineNumber = index + 1;
-      
-      selfClosingTags.forEach(tag => {
+
+      selfClosingTags.forEach((tag) => {
         if (new RegExp(`<${tag}(\\s[^>]*)?>`, 'gi').test(line) && !line.includes('/>')) {
           warnings.push({
             line: lineNumber,
@@ -409,7 +417,7 @@ class HtmlFormatter implements Formatter {
         }
       });
     });
-    
+
     return {
       success: true,
       errors,
@@ -422,11 +430,11 @@ class HtmlFormatter implements Formatter {
     let depth = 0;
     const lines: string[] = [];
     let currentLine = '';
-    
+
     for (let i = 0; i < code.length; i++) {
       const char = code[i];
       const nextChar = code[i + 1];
-      
+
       if (char === '<') {
         if (nextChar === '/') {
           depth--;
@@ -451,11 +459,11 @@ class HtmlFormatter implements Formatter {
         currentLine += char;
       }
     }
-    
+
     if (currentLine.trim()) {
       lines.push(currentLine.trim());
     }
-    
+
     return lines.join('\n');
   }
 }
@@ -464,10 +472,10 @@ class CssFormatter implements Formatter {
   format(code: string, config?: FormatterConfig): FormatResult {
     try {
       let formatted = code;
-      
+
       formatted = this.normalizeSpacing(formatted);
       formatted = this.formatProperties(formatted, config?.tabWidth || 2);
-      
+
       return {
         success: true,
         code: formatted,

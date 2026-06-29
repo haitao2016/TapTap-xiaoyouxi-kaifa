@@ -1,5 +1,8 @@
-const { cpSync, rmSync, existsSync, mkdirSync } = require('fs');
-const { join } = require('path');
+import { cpSync, rmSync, existsSync, mkdirSync } from 'fs';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const repoRoot = join(__dirname, '../../..');
 const studioDist = join(repoRoot, 'apps/studio/dist');

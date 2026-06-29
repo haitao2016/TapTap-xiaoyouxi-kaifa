@@ -22,8 +22,8 @@ export function Checkbox({
         onChange={(e) => onCheckedChange?.(e.target.checked)}
         disabled={disabled}
         className={cn(
-          "w-4 h-4 rounded border-primary/30 bg-surface-2 text-primary focus:ring-primary/50",
-          disabled && "opacity-50 cursor-not-allowed",
+          'w-4 h-4 rounded border-primary/30 bg-surface-2 text-primary focus:ring-primary/50',
+          disabled && 'opacity-50 cursor-not-allowed',
           className
         )}
         {...props}

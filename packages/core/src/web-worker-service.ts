@@ -17,7 +17,7 @@ export class WebWorkerService {
 
   createWorker(scriptUrl: string, name?: string): string {
     const workerId = name || `worker-${Date.now()}`;
-    
+
     if (this.workers.has(workerId)) {
       throw new Error(`Worker already exists: ${workerId}`);
     }

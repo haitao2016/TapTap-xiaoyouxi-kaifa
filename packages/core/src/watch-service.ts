@@ -1,6 +1,6 @@
 import type { DebugSession } from '@tapdev/types';
 import { globalEventBus } from './event-bus';
-import { generateId as randomUUID } from './utils/uuid';
+import { randomUUID } from './utils/crypto-utils';
 
 export interface WatchVariable {
   id: string;
@@ -42,10 +42,10 @@ export class WatchService {
       value: undefined,
       enabled: true,
     };
-    
+
     this.variables.set(variable.id, variable);
     this.evaluateVariable(variable);
-    
+
     globalEventBus.emit({ type: 'watch:add', payload: variable });
     return variable;
   }
@@ -55,7 +55,10 @@ export class WatchService {
     globalEventBus.emit({ type: 'watch:remove', payload: { id } });
   }
 
-  updateVariable(id: string, updates: Partial<Pick<WatchVariable, 'name' | 'expression' | 'enabled'>>): void {
+  updateVariable(
+    id: string,
+    updates: Partial<Pick<WatchVariable, 'name' | 'expression' | 'enabled'>>
+  ): void {
     const variable = this.variables.get(id);
     if (variable) {
       if (updates.name !== undefined) variable.name = updates.name;
@@ -66,11 +69,11 @@ export class WatchService {
         variable.errorMessage = undefined;
       }
       if (updates.enabled !== undefined) variable.enabled = updates.enabled;
-      
+
       if (variable.enabled && updates.expression !== undefined) {
         this.evaluateVariable(variable);
       }
-      
+
       globalEventBus.emit({ type: 'watch:update', payload: variable });
     }
   }
@@ -98,7 +101,7 @@ export class WatchService {
 
   clearContext(): void {
     this.evaluationContext = {};
-    this.variables.forEach(v => {
+    this.variables.forEach((v) => {
       if (v.enabled) {
         v.value = undefined;
         v.type = undefined;
@@ -125,20 +128,20 @@ export class WatchService {
       variable.errorMessage = error instanceof Error ? error.message : '评估失败';
     }
 
-    globalEventBus.emit({ 
-      type: 'watch:update', 
+    globalEventBus.emit({
+      type: 'watch:update',
       payload: {
         id: variable.id,
         value: variable.value,
         type: variable.type,
         isError: variable.isError,
         errorMessage: variable.errorMessage,
-      } 
+      },
     });
   }
 
   private evaluateAllVariables(): void {
-    this.variables.forEach(variable => {
+    this.variables.forEach((variable) => {
       if (variable.enabled) {
         this.evaluateVariable(variable);
       }
@@ -152,7 +155,7 @@ export class WatchService {
     try {
       const fn = new Function(...keys, `return ${expression}`);
       const result = fn(...values);
-      
+
       return {
         value: result,
         type: typeof result,

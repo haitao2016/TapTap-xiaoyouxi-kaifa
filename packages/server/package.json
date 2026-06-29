@@ -1,8 +1,8 @@
 {
   "name": "@tapdev/server",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
-  "type": "commonjs",
+  "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -21,6 +21,7 @@
     "tapdev-server": "./dist/cli.js"
   },
   "scripts": {
+    "lint": "eslint src --ext .ts,.tsx",
     "build": "tsc",
     "dev": "tsc --watch",
     "start": "node dist/cli.js",

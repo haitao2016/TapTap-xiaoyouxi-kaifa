@@ -1,6 +1,6 @@
 import type { BuildConfig, BuildResult, BuildStep, EngineType } from '@tapdev/types';
 import { globalEventBus } from '../event-bus';
-import { generateId as randomUUID } from '../utils/uuid';
+import { randomUUID } from '../utils/crypto-utils';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -189,7 +189,7 @@ export class Html5Adapter3D {
     template: string,
     name: string,
     libImport: string,
-    libName: string,
+    libName: string
   ): { path: string; content: string }[] {
     const gameJson = {
       deviceOrientation: 'landscape',
@@ -263,8 +263,22 @@ window.addEventListener('resize', () => {
       { path: 'index.html', content: indexHtml },
       { path: 'game.js', content: gameJs },
       { path: 'game.json', content: JSON.stringify(gameJson, null, 2) },
-      { path: 'package.json', content: JSON.stringify({ name, version: '1.0.0', dependencies: { three: '^0.160.0' } }, null, 2) },
-      { path: 'project.tapdev.json', content: JSON.stringify({ name, engine: 'native-js', template, type: '3d', version: '1.0.0' }, null, 2) },
+      {
+        path: 'package.json',
+        content: JSON.stringify(
+          { name, version: '1.0.0', dependencies: { three: '^0.160.0' } },
+          null,
+          2
+        ),
+      },
+      {
+        path: 'project.tapdev.json',
+        content: JSON.stringify(
+          { name, engine: 'native-js', template, type: '3d', version: '1.0.0' },
+          null,
+          2
+        ),
+      },
     ];
   }
 }

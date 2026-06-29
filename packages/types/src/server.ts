@@ -18,13 +18,31 @@ export type WSMessageType =
   | 'pong'
   | 'error';
 
+/** WebSocket 消息 Payload 映射 */
+export interface WSMessageMap {
+  connected: { role: WSClientRole; sessionId: string; status: DebugServerStatus };
+  log: RemoteLogPayload;
+  'breakpoint-add': { file: string; line: number; condition?: string };
+  'breakpoint-remove': { id: string };
+  'breakpoint-update': { id: string; enabled?: boolean; condition?: string };
+  'breakpoint-hit': { id: string; file: string; line: number; stackTrace?: string; vars?: Record<string, unknown> };
+  'breakpoint-sync': BreakpointSyncPayload;
+  command: DebugCommandPayload;
+  metrics: MetricsPayload;
+  'game-connected': Record<string, never>;
+  'game-disconnected': Record<string, never>;
+  ping: { timestamp?: number };
+  pong: { timestamp?: number };
+  error: { message: string; code?: string };
+}
+
 /** WebSocket 客户端角色 */
 export type WSClientRole = 'studio' | 'game' | 'monitor';
 
 /** WebSocket 消息 */
-export interface WSMessage {
-  type: WSMessageType;
-  payload?: unknown;
+export interface WSMessage<T extends WSMessageType = WSMessageType> {
+  type: T;
+  payload?: WSMessageMap[T];
   timestamp?: number;
 }
 

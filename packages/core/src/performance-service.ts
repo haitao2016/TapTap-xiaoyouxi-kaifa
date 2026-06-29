@@ -4,7 +4,6 @@ export interface WebVitals {
   lcp: number;
   fid: number;
   cls: number;
-  fid: number;
   inp: number;
   ttfcp: number;
 }
@@ -39,21 +38,21 @@ export class PerformanceService {
 
   startMonitoring(): void {
     if (this.isMonitoring) return;
-    
+
     this.isMonitoring = true;
     this.startTime = Date.now();
     this.metricsBuffer = [];
-    
+
     this.intervalId = window.setInterval(() => {
       if (!this.isMonitoring) return;
-      
+
       const metrics = this.collectMetrics();
       this.metricsBuffer.push(metrics);
-      
+
       if (this.metricsBuffer.length > this.maxBufferSize) {
         this.metricsBuffer.shift();
       }
-      
+
       globalEventBus.emit({ type: 'performance:update', payload: metrics });
     }, 1000);
 
@@ -62,14 +61,14 @@ export class PerformanceService {
 
   stopMonitoring(): void {
     if (!this.isMonitoring) return;
-    
+
     this.isMonitoring = false;
-    
+
     if (this.intervalId) {
       clearInterval(this.intervalId);
       this.intervalId = null;
     }
-    
+
     globalEventBus.emit({ type: 'performance:stopped', payload: this.generateReport() });
   }
 
@@ -103,9 +102,12 @@ export class PerformanceService {
     }
 
     const duration = Date.now() - this.startTime;
-    const avgFrameRate = this.metricsBuffer.reduce((sum, m) => sum + m.frameRate, 0) / this.metricsBuffer.length;
-    const avgMemoryUsage = this.metricsBuffer.reduce((sum, m) => sum + m.memoryUsage, 0) / this.metricsBuffer.length;
-    const avgCpuUsage = this.metricsBuffer.reduce((sum, m) => sum + m.cpuUsage, 0) / this.metricsBuffer.length;
+    const avgFrameRate =
+      this.metricsBuffer.reduce((sum, m) => sum + m.frameRate, 0) / this.metricsBuffer.length;
+    const avgMemoryUsage =
+      this.metricsBuffer.reduce((sum, m) => sum + m.memoryUsage, 0) / this.metricsBuffer.length;
+    const avgCpuUsage =
+      this.metricsBuffer.reduce((sum, m) => sum + m.cpuUsage, 0) / this.metricsBuffer.length;
 
     const latestMetrics = this.metricsBuffer[this.metricsBuffer.length - 1];
 
@@ -140,7 +142,7 @@ export class PerformanceService {
   private getMemoryUsage(): number {
     if (typeof window !== 'undefined' && (window as any).performance?.memory) {
       const memory = (window as any).performance.memory;
-      return (memory.usedJSHeapSize / 1024 / 1024);
+      return memory.usedJSHeapSize / 1024 / 1024;
     }
     return 0;
   }
@@ -174,17 +176,18 @@ export class PerformanceService {
     if (typeof window !== 'undefined' && 'PerformanceObserver' in window) {
       const observer = new PerformanceObserver((entryList) => {
         for (const entry of entryList.getEntries()) {
+          const entryAny = entry as any;
           switch (entry.entryType) {
             case 'largest-contentful-paint':
               (window as any)._lcpValue = entry.startTime;
               break;
             case 'first-input':
-              (window as any)._fidValue = entry.processingStart - entry.startTime;
+              (window as any)._fidValue = entryAny.processingStart - entry.startTime;
               break;
             case 'layout-shift':
-              if (!entry.hadRecentInput) {
+              if (!entryAny.hadRecentInput) {
                 const currentCls = (window as any)._clsValue || 0;
-                (window as any)._clsValue = currentCls + entry.value;
+                (window as any)._clsValue = currentCls + entryAny.value;
               }
               break;
             case 'interaction':

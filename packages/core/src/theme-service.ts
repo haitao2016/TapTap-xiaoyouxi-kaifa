@@ -170,7 +170,7 @@ export class ThemeService {
 
   setTheme(type: ThemeType): void {
     this.savedThemeType = type;
-    
+
     if (type === 'system') {
       this.currentTheme = this.getSystemTheme();
     } else if (type === 'light') {
@@ -223,8 +223,10 @@ export class ThemeService {
   }
 
   isDarkMode(): boolean {
-    return this.currentTheme.type === 'dark' || 
-           (this.currentTheme.type === 'system' && this.getSystemTheme().type === 'dark');
+    return (
+      this.currentTheme.type === 'dark' ||
+      (this.currentTheme.type === 'system' && this.getSystemTheme().type === 'dark')
+    );
   }
 
   private loadSavedTheme(): void {
@@ -254,16 +256,16 @@ export class ThemeService {
   private applyTheme(): void {
     if (typeof document !== 'undefined') {
       document.documentElement.setAttribute('data-theme', this.currentTheme.id);
-      
+
       const root = document.documentElement;
       const colors = this.currentTheme.colors;
-      
+
       Object.entries(colors).forEach(([key, value]) => {
         root.style.setProperty(`--color-${key}`, value);
       });
 
       root.style.setProperty('--font-family', this.currentTheme.fontFamily);
-      
+
       Object.entries(this.currentTheme.fontSize).forEach(([key, value]) => {
         root.style.setProperty(`--font-size-${key}`, value);
       });
@@ -284,10 +286,10 @@ export class ThemeService {
     const g = parseInt(hex.substring(2, 4), 16);
     const b = parseInt(hex.substring(4, 6), 16);
 
-    const isLight = (r * 0.299 + g * 0.587 + b * 0.114) > 128;
-    
+    const isLight = r * 0.299 + g * 0.587 + b * 0.114 > 128;
+
     const baseTheme = isLight ? LIGHT_THEME : DARK_THEME;
-    
+
     return {
       ...baseTheme,
       id: `custom-${name.toLowerCase().replace(/\s+/g, '-')}`,
@@ -306,8 +308,8 @@ export class ThemeService {
     const hex = color.replace('#', '');
     const num = parseInt(hex, 16);
     const r = Math.min(255, Math.max(0, (num >> 16) + amount));
-    const g = Math.min(255, Math.max(0, ((num >> 8) & 0x00FF) + amount));
-    const b = Math.min(255, Math.max(0, (num & 0x0000FF) + amount));
+    const g = Math.min(255, Math.max(0, ((num >> 8) & 0x00ff) + amount));
+    const b = Math.min(255, Math.max(0, (num & 0x0000ff) + amount));
     return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`;
   }
 }

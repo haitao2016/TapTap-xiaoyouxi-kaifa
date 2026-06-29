@@ -2,7 +2,12 @@ import { execSync, spawn, type ChildProcess } from 'node:child_process';
 import { existsSync, readFileSync, readdirSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join, dirname, basename } from 'node:path';
 import { homedir, platform } from 'node:os';
-import type { UnityInstallation, UnityProjectValidation, UnityBuildOptions, UnityBuildProgress } from '@tapdev/types';
+import type {
+  UnityInstallation,
+  UnityProjectValidation,
+  UnityBuildOptions,
+  UnityBuildProgress,
+} from '@tapdev/types';
 
 const TAPTAP_PACKAGE_NAMES = ['com.taptap.minigame', 'com.taptap.minigame.sdk'];
 const BUILD_SCRIPT_REL = 'Assets/Editor/TapDevBuildRunner.cs';
@@ -39,10 +44,10 @@ export class UnityDetector {
     }
 
     try {
-      const reg = execSync(
-        'reg query "HKLM\\SOFTWARE\\Unity Technologies\\Installer\\Unity" /s',
-        { encoding: 'utf8', stdio: ['pipe', 'pipe', 'ignore'] }
-      );
+      const reg = execSync('reg query "HKLM\\SOFTWARE\\Unity Technologies\\Installer\\Unity" /s', {
+        encoding: 'utf8',
+        stdio: ['pipe', 'pipe', 'ignore'],
+      });
       const matches = reg.matchAll(/Unity\s+\d+\.\d+\.\d+[a-z\d]*\s+REG_SZ\s+(.+)/gi);
       for (const m of matches) {
         const p = m[1]?.trim();
@@ -178,7 +183,13 @@ export class UnityBuildRunner {
   async build(
     options: UnityBuildOptions,
     onProgress?: (p: UnityBuildProgress) => void
-  ): Promise<{ success: boolean; outputFiles: string[]; errors: string[]; warnings: string[]; logFile: string }> {
+  ): Promise<{
+    success: boolean;
+    outputFiles: string[];
+    errors: string[];
+    warnings: string[];
+    logFile: string;
+  }> {
     this.cancelled = false;
     const errors: string[] = [];
     const warnings: string[] = [];
@@ -250,9 +261,19 @@ export class UnityBuildRunner {
       warnings.push('未找到标准输出文件，请确认已在 Unity 中配置 TapTap 构建面板');
     }
 
-    onProgress?.({ phase: 'done', progress: 100, message: outputFiles.length ? '构建完成' : '构建失败' });
+    onProgress?.({
+      phase: 'done',
+      progress: 100,
+      message: outputFiles.length ? '构建完成' : '构建失败',
+    });
 
-    return { success: errors.length === 0 && outputFiles.length > 0, outputFiles, errors, warnings, logFile };
+    return {
+      success: errors.length === 0 && outputFiles.length > 0,
+      outputFiles,
+      errors,
+      warnings,
+      logFile,
+    };
   }
 
   private pickUnityPath(projectVersion?: string): string | undefined {
@@ -289,7 +310,11 @@ export class UnityBuildRunner {
           const tail = this.readLogTail(logFile, 5).join(' ');
           if (/CompileScripts|Building|Compress|Packaging/i.test(tail)) {
             lastProgress = Math.min(lastProgress + 2, 85);
-            onProgress?.({ phase: 'unity-build', progress: lastProgress, message: tail.slice(0, 120) });
+            onProgress?.({
+              phase: 'unity-build',
+              progress: lastProgress,
+              message: tail.slice(0, 120),
+            });
           }
         }
       }, 2000);

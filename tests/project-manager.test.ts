@@ -10,7 +10,7 @@ describe('ProjectManager', () => {
     it('should create a new project', () => {
       const project = projectManager.createProject({
         name: 'Test Project',
-        path: '/path/to/test',
+        path: '/tmp/test-projects/test',
         template: 'default',
       });
       
@@ -23,13 +23,13 @@ describe('ProjectManager', () => {
     it('should generate unique project IDs', () => {
       const project1 = projectManager.createProject({
         name: 'Project 1',
-        path: '/path/1',
+        path: '/tmp/test-projects/1',
         template: 'default',
       });
       
       const project2 = projectManager.createProject({
         name: 'Project 2',
-        path: '/path/2',
+        path: '/tmp/test-projects/2',
         template: 'default',
       });
       
@@ -39,7 +39,7 @@ describe('ProjectManager', () => {
     it('should set default values for optional fields', () => {
       const project = projectManager.createProject({
         name: 'Minimal Project',
-        path: '/path/to/project',
+        path: '/tmp/test-projects/project',
         template: 'default',
       });
       
@@ -58,7 +58,7 @@ describe('ProjectManager', () => {
     it('should return project by ID', () => {
       const created = projectManager.createProject({
         name: 'Get Test',
-        path: '/path/get',
+        path: '/tmp/test-projects/get',
         template: 'default',
       });
       
@@ -75,8 +75,8 @@ describe('ProjectManager', () => {
     });
 
     it('should return all projects', () => {
-      projectManager.createProject({ name: 'P1', path: '/p1', template: 'default' });
-      projectManager.createProject({ name: 'P2', path: '/p2', template: 'default' });
+      projectManager.createProject({ name: 'P1', path: '/tmp/test-projects/p1', template: 'default' });
+      projectManager.createProject({ name: 'P2', path: '/tmp/test-projects/p2', template: 'default' });
       
       const projects = projectManager.getAllProjects();
       expect(projects).toHaveLength(2);
@@ -87,7 +87,7 @@ describe('ProjectManager', () => {
     it('should update project properties', () => {
       const project = projectManager.createProject({
         name: 'Original Name',
-        path: '/path/original',
+        path: '/tmp/test-projects/original',
         template: 'default',
       });
       
@@ -111,7 +111,7 @@ describe('ProjectManager', () => {
     it('should delete a project', () => {
       const project = projectManager.createProject({
         name: 'To Delete',
-        path: '/path/delete',
+        path: '/tmp/test-projects/delete',
         template: 'default',
       });
       
@@ -132,7 +132,7 @@ describe('ProjectManager', () => {
     it('should set current project', () => {
       const project = projectManager.createProject({
         name: 'Current Test',
-        path: '/path/current',
+        path: '/tmp/test-projects/current',
         template: 'default',
       });
       
@@ -144,7 +144,7 @@ describe('ProjectManager', () => {
     it('should clear current project with null', () => {
       const project = projectManager.createProject({
         name: 'Clear Test',
-        path: '/path/clear',
+        path: '/tmp/test-projects/clear',
         template: 'default',
       });
       
@@ -183,7 +183,7 @@ describe('ProjectManager', () => {
     it('should export project as JSON', () => {
       const project = projectManager.createProject({
         name: 'Export Test',
-        path: '/path/export',
+        path: '/tmp/test-projects/export',
         template: 'default',
         description: 'Test description',
       });
@@ -208,8 +208,8 @@ describe('ProjectManager', () => {
     });
 
     it('should return recent projects sorted by last opened', () => {
-      const p1 = projectManager.createProject({ name: 'P1', path: '/p1', template: 'default' });
-      const p2 = projectManager.createProject({ name: 'P2', path: '/p2', template: 'default' });
+      const p1 = projectManager.createProject({ name: 'P1', path: '/tmp/test-projects/p1', template: 'default' });
+      const p2 = projectManager.createProject({ name: 'P2', path: '/tmp/test-projects/p2', template: 'default' });
       
       projectManager.openProject(p2.path);
       projectManager.openProject(p1.path);
@@ -222,8 +222,8 @@ describe('ProjectManager', () => {
 
   describe('clearRecentProjects', () => {
     it('should clear recent projects', () => {
-      projectManager.createProject({ name: 'R1', path: '/r1', template: 'default' });
-      projectManager.createProject({ name: 'R2', path: '/r2', template: 'default' });
+      projectManager.createProject({ name: 'R1', path: '/tmp/test-projects/r1', template: 'default' });
+      projectManager.createProject({ name: 'R2', path: '/tmp/test-projects/r2', template: 'default' });
       
       projectManager.clearRecentProjects();
       
@@ -251,8 +251,8 @@ describe('ProjectManager', () => {
     });
 
     it('should search by project name', () => {
-      projectManager.createProject({ name: 'React Game', path: '/r1', template: 'default' });
-      projectManager.createProject({ name: 'Unity App', path: '/u1', template: 'default' });
+      projectManager.createProject({ name: 'React Game', path: '/tmp/test-projects/r1', template: 'default' });
+      projectManager.createProject({ name: 'Unity App', path: '/tmp/test-projects/u1', template: 'default' });
       
       const results = projectManager.searchProjects('React');
       expect(results).toHaveLength(1);
@@ -262,7 +262,7 @@ describe('ProjectManager', () => {
     it('should search by description', () => {
       projectManager.createProject({ 
         name: 'Test Game', 
-        path: '/t1', 
+        path: '/tmp/test-projects/t1', 
         template: 'default',
         description: 'A multiplayer online game',
       });

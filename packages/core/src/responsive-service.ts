@@ -93,7 +93,8 @@ export class ResponsiveService {
       this.viewportInfo.width = window.innerWidth;
       this.viewportInfo.height = window.innerHeight;
       this.viewportInfo.pixelRatio = window.devicePixelRatio || 1;
-      this.viewportInfo.orientation = this.viewportInfo.width < this.viewportInfo.height ? 'portrait' : 'landscape';
+      this.viewportInfo.orientation =
+        this.viewportInfo.width < this.viewportInfo.height ? 'portrait' : 'landscape';
 
       if (this.viewportInfo.width < this.breakpoints.mobile) {
         this.viewportInfo.deviceType = 'mobile';
@@ -113,17 +114,17 @@ export class ResponsiveService {
         timeout = setTimeout(() => {
           const oldDeviceType = this.viewportInfo.deviceType;
           this.updateViewportInfo();
-          
+
           if (oldDeviceType !== this.viewportInfo.deviceType) {
-            globalEventBus.emit({ 
-              type: 'responsive:deviceChange', 
-              payload: this.viewportInfo 
+            globalEventBus.emit({
+              type: 'responsive:deviceChange',
+              payload: this.viewportInfo,
             });
           }
-          
-          globalEventBus.emit({ 
-            type: 'responsive:resize', 
-            payload: this.viewportInfo 
+
+          globalEventBus.emit({
+            type: 'responsive:resize',
+            payload: this.viewportInfo,
           });
         }, 150);
       });

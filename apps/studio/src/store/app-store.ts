@@ -19,6 +19,7 @@ import type {
   EditorTab,
   AppSettings,
   Platform,
+  PluginInfo,
 } from '@tapdev/types';
 import {
   projectManager,
@@ -27,6 +28,7 @@ import {
   buildService,
   platformService,
   getNativeBridge,
+  pluginManager,
 } from '@tapdev/core';
 
 interface AppState {
@@ -49,6 +51,8 @@ interface AppState {
 
   editorTabs: EditorTab[];
   activeTabId: string | null;
+
+  plugins: PluginInfo[];
 
   setActiveView: (view: string) => void;
   toggleSidebar: () => void;
@@ -78,6 +82,11 @@ interface AppState {
   closeTab: (tabId: string) => void;
   setActiveTab: (tabId: string) => void;
   updateTabContent: (tabId: string, content: string) => void;
+  saveFile: (tabId: string) => void;
+  updateSettings: (settings: Partial<AppSettings>) => void;
+
+  setPlugins: (plugins: PluginInfo[]) => void;
+  togglePlugin: (pluginId: string) => Promise<void>;
 }
 
 export const useAppStore = create<AppState>((set, get) => ({
@@ -100,6 +109,8 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   editorTabs: [],
   activeTabId: null,
+
+  plugins: [],
 
   setActiveView: (view) => set({ activeView: view }),
   toggleSidebar: () => set((s) => ({ sidebarOpen: !s.sidebarOpen })),
@@ -206,7 +217,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       compress: options?.compress ?? true,
       wasmSplit: options?.wasmSplit ?? true,
       development: false,
-      targetPlatform: (options?.platforms?.map((p) => p as any) ?? ['pc', 'mobile', 'tablet']),
+      targetPlatform: options?.platforms?.map((p) => p as any) ?? ['pc', 'mobile', 'tablet'],
       version: options?.version ?? '1.0.0',
       cdnUrl: project.config.cdnUrl,
       appId: project.config.appId,
@@ -259,7 +270,7 @@ export const useAppStore = create<AppState>((set, get) => ({
       id: randomUUID(),
       path,
       name: path.split(/[/\\]/).pop() ?? path,
-      content: content || getDefaultContent(path),
+      content: content ?? (get().currentProject ? projectManager.readFile(path, get().currentProject?.path) : getDefaultContent(path)),
       language: langMap[ext] ?? 'plaintext',
       modified: false,
     };
@@ -273,8 +284,7 @@ export const useAppStore = create<AppState>((set, get) => ({
   closeTab: (tabId) => {
     set((s) => {
       const tabs = s.editorTabs.filter((t) => t.id !== tabId);
-      const activeTabId =
-        s.activeTabId === tabId ? tabs.at(-1)?.id ?? null : s.activeTabId;
+      const activeTabId = s.activeTabId === tabId ? (tabs.at(-1)?.id ?? null) : s.activeTabId;
       return { editorTabs: tabs, activeTabId };
     });
   },
@@ -283,10 +293,39 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   updateTabContent: (tabId, content) => {
     set((s) => ({
-      editorTabs: s.editorTabs.map((t) =>
-        t.id === tabId ? { ...t, content, modified: true } : t
-      ),
+      editorTabs: s.editorTabs.map((t) => (t.id === tabId ? { ...t, content, modified: true } : t)),
     }));
+  },
+
+  saveFile: (tabId) => {
+    const tab = get().editorTabs.find((t) => t.id === tabId);
+    if (!tab) return;
+
+    projectManager.writeFile(tab.path, tab.content, get().currentProject?.path);
+    set((s) => ({
+      editorTabs: s.editorTabs.map((t) => (t.id === tabId ? { ...t, modified: false } : t)),
+    }));
+  },
+
+  updateSettings: (newSettings) => {
+    set((s) => ({
+      settings: { ...s.settings, ...newSettings },
+    }));
+  },
+
+  setPlugins: (plugins) => set({ plugins }),
+
+  togglePlugin: async (pluginId) => {
+    const plugin = get().plugins.find((p) => p.meta.id === pluginId);
+    if (!plugin) return;
+
+    if (plugin.activated) {
+      await pluginManager.deactivatePlugin(pluginId);
+    } else {
+      await pluginManager.activatePlugin(pluginId);
+    }
+
+    set({ plugins: pluginManager.getAllPluginInfo() });
   },
 }));
 

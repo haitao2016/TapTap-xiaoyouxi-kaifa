@@ -8,6 +8,7 @@ import {
   startUnityBuild,
   cancelUnityBuild,
 } from './native-service';
+import { registerLLMIpcHandlers } from './llm-service';
 import type { BuildConfig } from '@tapdev/types';
 
 const isDev = !app.isPackaged;
@@ -168,6 +169,7 @@ function registerIpcHandlers(): void {
 app.whenReady().then(() => {
   createMenu();
   registerIpcHandlers();
+  registerLLMIpcHandlers();
   createWindow();
 
   app.on('activate', () => {

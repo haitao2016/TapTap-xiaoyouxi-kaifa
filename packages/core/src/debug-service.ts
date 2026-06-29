@@ -8,7 +8,7 @@ import type {
 } from '@tapdev/types';
 import { globalEventBus } from './event-bus';
 import { debugWebSocketClient } from './debug-client';
-import { generateId as randomUUID } from './utils/uuid';
+import { randomUUID } from './utils/crypto-utils';
 
 export interface StartDebugOptions {
   projectId: string;
@@ -47,7 +47,9 @@ export class DebugService {
   }
 
   getSession(): DebugSession | null {
-    return this.activeSessionId ? (this.sessions.get(this.activeSessionId) ?? this.session) : this.session;
+    return this.activeSessionId
+      ? (this.sessions.get(this.activeSessionId) ?? this.session)
+      : this.session;
   }
 
   getLogs(level?: LogLevel): DebugLogEntry[] {
@@ -89,7 +91,9 @@ export class DebugService {
   }
 
   /** 浏览器模式：连接已运行的调试服务器 */
-  async connectToServer(serverInfo: StartDebugOptions['serverInfo'] & { projectId: string }): Promise<DebugSession> {
+  async connectToServer(
+    serverInfo: StartDebugOptions['serverInfo'] & { projectId: string }
+  ): Promise<DebugSession> {
     this.serverRunning = true;
     this.session = {
       id: randomUUID(),
@@ -188,12 +192,7 @@ export class DebugService {
 
   log(level: LogLevel, message: string, source?: string, data?: unknown): void;
   log(entry: DebugLogEntry): void;
-  log(
-    arg1: LogLevel | DebugLogEntry,
-    arg2?: string,
-    arg3?: string,
-    arg4?: unknown
-  ): void {
+  log(arg1: LogLevel | DebugLogEntry, arg2?: string, arg3?: string, arg4?: unknown): void {
     const entry: DebugLogEntry =
       typeof arg1 === 'string'
         ? {
@@ -214,9 +213,7 @@ export class DebugService {
 
   addBreakpoint(file: string, line: number, id?: string, condition?: string): Breakpoint {
     // 重复检测：相同 file+line 视为重复
-    const existing = [...this.breakpoints.values()].find(
-      (b) => b.file === file && b.line === line
-    );
+    const existing = [...this.breakpoints.values()].find((b) => b.file === file && b.line === line);
     if (existing) return existing;
 
     const bp: Breakpoint = {
@@ -267,13 +264,14 @@ export class DebugService {
       this.breakpointHitCounts.delete(b.id);
     });
     if (this.session) {
-      this.session.breakpoints = this.session.breakpoints.filter(
-        (b) => b.file !== scriptId
-      );
+      this.session.breakpoints = this.session.breakpoints.filter((b) => b.file !== scriptId);
     }
   }
 
-  updateBreakpoint(breakpointId: string, updates: Partial<Pick<Breakpoint, 'condition' | 'enabled'>>): void {
+  updateBreakpoint(
+    breakpointId: string,
+    updates: Partial<Pick<Breakpoint, 'condition' | 'enabled'>>
+  ): void {
     if (!this.session) return;
     const bp = this.session.breakpoints.find((b) => b.id === breakpointId);
     if (bp) {
@@ -359,7 +357,7 @@ export class DebugService {
 
   evaluateCondition(breakpoint: Breakpoint, context: Record<string, unknown>): boolean {
     if (!breakpoint.condition) return true;
-    
+
     try {
       const fn = new Function(...Object.keys(context), `return ${breakpoint.condition}`);
       const result = fn(...Object.values(context));
@@ -423,7 +421,7 @@ export class DebugService {
       },
       onBreakpointsSync: (breakpoints) => {
         if (this.session) this.session.breakpoints = breakpoints;
-        breakpoints.forEach(bp => {
+        breakpoints.forEach((bp) => {
           if (!this.breakpointHitCounts.has(bp.id)) {
             this.breakpointHitCounts.set(bp.id, 0);
           }
@@ -431,7 +429,10 @@ export class DebugService {
       },
       onBreakpointHit: (breakpointId) => {
         const count = this.incrementBreakpointHitCount(breakpointId);
-        globalEventBus.emit({ type: 'debug:breakpointHit', payload: { breakpointId, hitCount: count } });
+        globalEventBus.emit({
+          type: 'debug:breakpointHit',
+          payload: { breakpointId, hitCount: count },
+        });
       },
       onError: (err) => this.log('error', err, 'ws'),
     });
@@ -461,7 +462,9 @@ export interface NativeBridge {
   validateUnityProject: (path: string) => Promise<UnityProjectValidation>;
   startUnityBuild: (config: import('@tapdev/types').BuildConfig) => Promise<{ taskId: string }>;
   cancelUnityBuild: (taskId: string) => Promise<void>;
-  onBuildProgress: (cb: (data: { taskId: string; progress: number; message: string }) => void) => () => void;
+  onBuildProgress: (
+    cb: (data: { taskId: string; progress: number; message: string }) => void
+  ) => () => void;
   onBuildComplete: (cb: (result: import('@tapdev/types').BuildResult) => void) => () => void;
 }
 

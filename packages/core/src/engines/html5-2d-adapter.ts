@@ -1,6 +1,6 @@
 import type { BuildConfig, BuildResult, BuildStep, EngineType } from '@tapdev/types';
 import { globalEventBus } from '../event-bus';
-import { generateId as randomUUID } from '../utils/uuid';
+import { randomUUID } from '../utils/crypto-utils';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -36,7 +36,9 @@ export class Html5Adapter2D {
     const indexPath = path.join(projectPath, 'index.html');
     if (!fs.existsSync(indexPath)) return false;
     const content = fs.readFileSync(indexPath, 'utf-8');
-    return /canvas|2d|game|mini/i.test(content) && !/unity|three|babylon|webgl|cocos/i.test(content);
+    return (
+      /canvas|2d|game|mini/i.test(content) && !/unity|three|babylon|webgl|cocos/i.test(content)
+    );
   }
 
   /**
@@ -250,7 +252,10 @@ requestAnimationFrame(loop);
       { path: 'index.html', content: indexHtml },
       { path: 'game.js', content: gameJs },
       { path: 'game.json', content: JSON.stringify(gameJson, null, 2) },
-      { path: 'project.tapdev.json', content: JSON.stringify({ name, engine: 'native-js', template, version: '1.0.0' }, null, 2) },
+      {
+        path: 'project.tapdev.json',
+        content: JSON.stringify({ name, engine: 'native-js', template, version: '1.0.0' }, null, 2),
+      },
     ];
   }
 }
