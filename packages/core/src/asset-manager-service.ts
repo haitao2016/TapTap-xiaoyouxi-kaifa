@@ -584,7 +584,12 @@ export class AssetManagerService {
   }
 
   private generateMockThumbnail(name: string): string {
-    return `data:image/svg+xml;base64,${btoa(`<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect width="200" height="200" fill="#f0f0f0"/><text x="100" y="100" text-anchor="middle" dy=".3em" font-size="14" fill="#666">${name}</text></svg>`)}`;
+    const encodedName = encodeURIComponent(name)
+      .replace(/%/g, '_')
+      .replace(/_/g, '__');
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200"><rect width="200" height="200" fill="#f0f0f0"/><text x="100" y="100" text-anchor="middle" dy=".3em" font-size="14" fill="#666">${encodedName}</text></svg>`;
+    const base64 = typeof window !== 'undefined' ? window.btoa(svg) : Buffer.from(svg).toString('base64');
+    return `data:image/svg+xml;base64,${base64}`;
   }
 
   private generateMockSpritesheetData(asset: AssetItem): SpritesheetData {

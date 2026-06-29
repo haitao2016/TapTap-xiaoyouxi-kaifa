@@ -3,10 +3,10 @@
   "version": "1.0.0",
   "private": true,
   "description": "跨平台 TapTap 小游戏开发软件 - 支持 PC、手机，平板",
-  "scripts": {
+"scripts": {
     "dev": "pnpm --filter @tapdev/studio dev",
     "dev:desktop": "pnpm --filter @tapdev/desktop dev",
-    "dev:mobile": "pnpm --filter @tapdev/mobile dev",
+    "dev:mobile": "pnpm --filter @tapdev/mobile sync",
     "dev:server": "pnpm --filter @tapdev/server build && pnpm --filter @tapdev/server start",
     "build": "pnpm -r build",
     "build:studio": "pnpm --filter @tapdev/studio build",
