@@ -27,7 +27,7 @@
     "@capacitor/haptics": "^6.0.2"
   },
   "devDependencies": {
-    "@capacitor/cli": "^6.2.0",
-    "typescript": "^5.7.2"
+    "@capacitor/cli": "^6.2.1",
+    "typescript": "^5.9.3"
   }
 }

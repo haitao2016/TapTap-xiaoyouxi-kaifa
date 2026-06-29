@@ -24,10 +24,10 @@
   },
   "devDependencies": {
     "@tapdev/studio": "workspace:*",
-    "concurrently": "^9.1.0",
-    "electron": "^33.2.1",
+    "concurrently": "^9.2.3",
+    "electron": "^33.4.11",
     "electron-builder": "^25.1.8",
-    "typescript": "^5.7.2",
+    "typescript": "^5.9.3",
     "wait-on": "^8.0.1"
   },
   "build": {
