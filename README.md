@@ -123,11 +123,20 @@ Unity.exe -batchmode -nographics -quit \
 WebSocket 消息：`log`、`breakpoint-sync`、`breakpoint-hit`、`command`、`metrics`
 
 ```bash
-# 独立启动（Web 开发时）
+# Web 开发时：构建并启动独立调试服务器
 pnpm dev:server
 
-# Electron 内自动启动，无需手动
+# 只构建 server 包
+pnpm --filter @tapdev/server build
+
+# 通过 CLI 指定端口与项目 ID
+pnpm --filter @tapdev/server start -- 9090 --project-id demo-project
+
+# 或使用环境变量
+TAPDEV_DEBUG_PORT=9090 TAPDEV_PROJECT_ID=demo-project pnpm --filter @tapdev/server start
 ```
+
+调试服务器 CLI 入口为 `tapdev-server [port]`，支持 `--project-id`、`--help` / `-h`，默认端口为 `8081`，默认项目 ID 为 `standalone`。Electron 桌面端会自动启动这个服务，无需手动执行。
 
 ## 平台支持
 
