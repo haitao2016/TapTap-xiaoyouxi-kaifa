@@ -20,7 +20,7 @@
     "@tapdev/server": "workspace:*",
     "@tapdev/types": "workspace:*",
     "electron-updater": "^6.8.9",
-    "node-llama-cpp": "^3.1.0"
+    "node-llama-cpp": "^3.18.1"
   },
   "devDependencies": {
     "@tapdev/studio": "workspace:*",

@@ -52,7 +52,7 @@
     "typescript": "^6.0.3"
   },
   "dependencies": {
-    "raindrop-ai": "^0.1.4",
-    "typescript": "^5.7.2"
+    "raindrop-ai": "^0.1.6",
+    "typescript": "^5.9.3"
   }
 }

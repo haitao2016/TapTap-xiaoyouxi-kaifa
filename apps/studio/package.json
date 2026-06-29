@@ -11,16 +11,16 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@huggingface/transformers": "^3.0.0",
-    "@mlc-ai/web-llm": "^0.2.46",
-    "@monaco-editor/react": "^4.6.0",
+    "@huggingface/transformers": "^3.8.1",
+    "@mlc-ai/web-llm": "^0.2.84",
+    "@monaco-editor/react": "^4.7.0",
     "@tapdev/core": "workspace:*",
     "@tapdev/types": "workspace:*",
     "@tapdev/ui": "workspace:*",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router-dom": "^7.1.1",
-    "zustand": "^5.0.2"
+    "react-router-dom": "^7.18.0",
+    "zustand": "^5.0.14"
   },
   "devDependencies": {
     "@types/react": "^18.3.18",
