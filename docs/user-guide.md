@@ -126,20 +126,23 @@ TapDev Studio 集成了 Monaco 代码编辑器，支持：
 
 ## 项目配置
 
-项目配置文件位于项目根目录的 `.tapdev/config.json`：
+TapDev Studio 会在项目根目录读取和保存 `tapdev.config.json`。
+
+配置文件至少需要包含以下字段：`id`、`name`、`engine`、`buildPath`、`createdAt`、`updatedAt`。根据项目类型，还可以包含 `description`、`unityVersion`、`appId`、`clientId`、`cdnUrl` 等可选字段。
 
 ```json
 {
-  "projectId": "my-game",
+  "id": "my-game",
   "name": "My Game",
-  "version": "1.0.0",
-  "buildPath": "./Builds",
-  "cdnUrl": "https://cdn.example.com",
-  "unityPath": "auto",
-  "monitor": {
-    "fpsThreshold": 30,
-    "memoryThreshold": 0.85
-  }
+  "engine": "unity",
+  "buildPath": "/path/to/project/build",
+  "createdAt": "2026-01-01T00:00:00.000Z",
+  "updatedAt": "2026-01-01T00:00:00.000Z",
+  "description": "TapTap 小游戏项目",
+  "unityVersion": "2022.3.21f1",
+  "appId": "your-app-id",
+  "clientId": "your-client-id",
+  "cdnUrl": "https://cdn.example.com"
 }
 ```
 
