@@ -18,7 +18,7 @@
 
 ### Linux
 
-下载最新的 `.deb` 或 `.AppImage` 包进行安装。
+下载最新的 `.deb` 包并使用系统包管理器安装。也可以下载 `.AppImage` 文件直接运行；如果文件没有执行权限，请先运行 `chmod +x TapDev-Studio-<version>-linux.AppImage`，然后运行 `./TapDev-Studio-<version>-linux.AppImage`。
 
 ## 从源码构建
 
