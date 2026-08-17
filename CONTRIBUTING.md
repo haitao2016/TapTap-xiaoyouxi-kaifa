@@ -79,11 +79,7 @@ pnpm lint
 
 ### Prettier
 
-项目使用 Prettier 进行代码格式化：
-
-```bash
-pnpm format
-```
+项目通过 ESLint 的 `prettier/prettier` 规则检查 TypeScript 文件格式，请运行上面的 `pnpm lint`。
 
 ## 提交信息规范
 
