@@ -32,6 +32,6 @@ pnpm build
 
 ## 资源
 
-- [GitHub](https://github.com/tapdev/tapdev-studio)
+- [GitHub](https://github.com/haitao2016/TapTap-xiaoyouxi-kaifa)
 - [贡献指南](../CONTRIBUTING.md)
 - [更新日志](../CHANGELOG.md)
