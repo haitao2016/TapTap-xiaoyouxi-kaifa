@@ -42,9 +42,9 @@ const stats = monitorService.getStats();
 // { avgFps: 58, avgMemoryUsage: 50, totalRequests: 100, ... }
 ```
 
-**recordNetworkRequest(request: NetworkRequestInfo)**
+**recordNetworkRequest(request: Omit<NetworkRequestInfo, 'id' | 'timestamp'>)**
 
-记录网络请求。
+记录网络请求。服务会自动生成请求的 `id` 和 `timestamp`。
 
 ```typescript
 monitorService.recordNetworkRequest({
