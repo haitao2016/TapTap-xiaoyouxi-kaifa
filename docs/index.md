@@ -28,7 +28,7 @@ pnpm build
 
 - [安装指南](guide/install)
 - [快速开始](guide/quickstart)
-- [API 文档](api/)
+- [API 文档](api-reference)
 
 ## 资源
 
