@@ -165,8 +165,8 @@
 
 ```bash
 # 克隆项目
-git clone https://github.com/tapdev/studio.git
-cd studio
+git clone https://github.com/haitao2016/TapTap-xiaoyouxi-kaifa.git
+cd TapTap-xiaoyouxi-kaifa
 
 # 安装依赖
 pnpm install
